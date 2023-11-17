@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{78EC1D6D-D57F-4A48-8848-64661F9F03E4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Modeling</RootNamespace>
+    <AssemblyName>Modeling</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Aspose.Cells, Version=22.12.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
+      <HintPath>..\packages\Aspose.Cells.22.12.0\lib\net40\Aspose.Cells.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Aspose.PDF, Version=23.2.0.0, Culture=neutral, PublicKeyToken=716fcc553a201e56, processorArchitecture=MSIL">
+      <HintPath>..\packages\Aspose.PDF.23.2.0\lib\net4.0\Aspose.PDF.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="RevitAPI">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2023\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2023\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="TD_Mgd_3.03_9, Version=3.0.0.8111, Culture=neutral, PublicKeyToken=460a0bef3ba73253, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\引用Dll\TD_Mgd_3.03_9.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Previous Functions\AdjustSlabElevation.cs" />
+    <Compile Include="Algorithm.cs" />
+    <Compile Include="AreaEstimation\AutoCalculateStairsArea.cs" />
+    <Compile Include="AutoCreateBeams\AutoCreateBeams_Test.cs" />
+    <Compile Include="AutoCreateBeams.cs" />
+    <Compile Include="AutoCreateColumns.cs" />
+    <Compile Include="Previous Functions\AutoCreateOpenedWall_new.cs" />
+    <Compile Include="Previous Functions\AutoCreateOpening_A.cs" />
+    <Compile Include="AdjustWallHeight.cs" />
+    <Compile Include="Test Function\AutoCreateModelLine_Test.cs" />
+    <Compile Include="Previous Functions\AdjustWallLength.cs" />
+    <Compile Include="Test Function\AutoCreateSlabs_Test2.cs" />
+    <Compile Include="AutoCreateOpening.cs" />
+    <Compile Include="AutoCreateSlab.cs" />
+    <Compile Include="StairsGeneration\AutoCreateStairs_3Landing.cs" />
+    <Compile Include="StairsGeneration\AutoCreateStairs_ClickCADLayer.cs" />
+    <Compile Include="StairsGeneration\AutoCreateStairs_ClickLine.cs" />
+    <Compile Include="StairsGeneration\AutoCreateStairs_Ex.cs" />
+    <Compile Include="StairsGeneration\AutoCreateStairs_Test1.cs" />
+    <Compile Include="StairsGeneration\AutoCreateStairs_Test2.cs" />
+    <Compile Include="AreaEstimation\BOM.cs" />
+    <Compile Include="Test Function\Class1.cs" />
+    <Compile Include="Previous Functions\AutoSplitSlabs.cs" />
+    <Compile Include="Test Function\AutoCreateSlabs_Test1.cs" />
+    <Compile Include="Previous Functions\ChangeMaterial.cs" />
+    <Compile Include="Test Function\Class2.cs" />
+    <Compile Include="ColumnForm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ColumnForm.Designer.cs">
+      <DependentUpon>ColumnForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Test Function\ConvertToFormworkPlanningWall.cs" />
+    <Compile Include="CreateWallModelline.cs" />
+    <Compile Include="GridlineForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GridlineForm.Designer.cs">
+      <DependentUpon>GridlineForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Test Function\GetPointCoordinate.cs" />
+    <Compile Include="Icon.cs" />
+    <Compile Include="Test Function\IsOverlapped.cs" />
+    <Compile Include="Test Function\IsPointInOutlines.cs" />
+    <Compile Include="Test Function\Join.cs" />
+    <Compile Include="Test Function\PJ_catchspecificlayerandtext.cs" />
+    <Compile Include="Test Function\SampleCode.cs" />
+    <Compile Include="Test Function\TwoLineToRecWall.cs" />
+    <Compile Include="TwoLineToWall_P.cs" />
+    <Compile Include="TwoLineToWall_A.cs" />
+    <Compile Include="Test Function\CountOverlapped.cs" />
+    <Compile Include="levelHeightForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="levelHeightForm.Designer.cs">
+      <DependentUpon>levelHeightForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Test Function\GetCoincidentPoints.cs" />
+    <Compile Include="OpenWallForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OpenWallForm.Designer.cs">
+      <DependentUpon>OpenWallForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AutoCreateBeams\ElemsSelect.cs" />
+    <Compile Include="Test Function\GetWallProfile.cs" />
+    <Compile Include="Previous Functions\AutoJoin.cs" />
+    <Compile Include="Previous Functions\AutoCreateSlabs_split.cs" />
+    <Compile Include="Previous Functions\AutoCreateOpenedWall.cs" />
+    <Compile Include="Previous Functions\AutoCreateWall.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserControl1.xaml.cs">
+      <DependentUpon>UserControl1.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ColumnForm.resx">
+      <DependentUpon>ColumnForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GridlineForm.resx">
+      <DependentUpon>GridlineForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="levelHeightForm.resx">
+      <DependentUpon>levelHeightForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenWallForm.resx">
+      <DependentUpon>OpenWallForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UserControl1.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
