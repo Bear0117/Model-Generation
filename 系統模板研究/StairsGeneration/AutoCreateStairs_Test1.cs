@@ -560,7 +560,7 @@ namespace Modeling
                     stair.LookupParameter("所需梯級數").Set(allrunLines.Count);
                     stair.LookupParameter("實際級深").Set(Math.Abs(finalrun[0][0].GetEndPoint(0).X - finalrun[0][1].GetEndPoint(0).X));
 
-                    var createRuns1 = GetRunsParameter(finalrun[0]);
+                    (IList<Curve>, IList<Curve>, IList<Curve>) createRuns1 = GetRunsParameter(finalrun[0]);
                     IList<Curve> bdryCurves1 = createRuns1.Item1;
                     IList<Curve> riserCurves1 = createRuns1.Item2;
                     IList<Curve> pathCurves1 = createRuns1.Item3;

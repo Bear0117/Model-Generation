@@ -30,6 +30,17 @@ namespace Modeling
             return newPoint;
         }
 
+        public XYZ XYZUnitsToCentimeters(XYZ point, double gridSize)
+        {
+            XYZ newPoint = new XYZ(
+                UnitsToCentimeters(Math.Round(UnitsToCentimeters(point.X) / gridSize) * gridSize),
+                UnitsToCentimeters(Math.Round(UnitsToCentimeters(point.Y) / gridSize) * gridSize),
+                UnitsToCentimeters(Math.Round(UnitsToCentimeters(point.Z) / gridSize) * gridSize)
+                );
+            return newPoint;
+        }
+
+
         public static double UnitsToCentimeters(double value)
         {
             return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Centimeters);
