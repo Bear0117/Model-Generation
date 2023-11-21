@@ -12,7 +12,13 @@ using System.Text;
 using System.Linq;
 using Aspose.Cells.Charts;
 using Aspose.Pdf.Facades;
-//using static Autodesk.Revit.DB.SpecTypeId;
+using System.Windows.Media.Animation;
+using Teigha.DatabaseServices;
+using Solid = Autodesk.Revit.DB.Solid;
+using Line = Autodesk.Revit.DB.Line;
+using Face = Autodesk.Revit.DB.Face;
+using Curve = Autodesk.Revit.DB.Curve;
+
 
 [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
 public class BOM : IExternalCommand
@@ -165,7 +171,7 @@ public class BOM : IExternalCommand
             string stairActualNumRisersst = stair.LookupParameter("實際梯級數").AsValueString();
             stairActualNumRisers = Convert.ToInt32(stairActualNumRisersst);
 
-            //須更新
+            //須更新梯段底部鞋面長度算法
             double stairPathhypotenuseLength = Math.Sqrt(Math.Pow(stairPathLength, 2) + Math.Pow((stairActualRiserHight * stairActualNumRisers) / 2, 2));
 
             ICollection<ElementId> stairLandingsICollectionId = stair.GetStairsLandings();
@@ -219,6 +225,9 @@ public class BOM : IExternalCommand
                 List<Line> yLines = new List<Line>(); // 存 Y 相同的點的，其 X 最大和最小值相連的線
                 List<Line> xLines = new List<Line>(); // 存 X 相同的點的，其 Y 最大和最小值相連的線
 
+                Face topFace = null;
+                Face bottomFace = null;
+
 
                 // 編歷Geometry對象以獲取尺寸信息
                 foreach (GeometryObject geomObj in geometryElement)
@@ -231,53 +240,140 @@ public class BOM : IExternalCommand
                         MessageBox.Show("平台面數量:" + faces.Size.ToString());
                         foreach (Face face in faces)
                         {
-                            // MessageBox.Show("face");
+                            //BoundingBoxUV boxUV = face.GetBoundingBox();
+                            //UV centerPoint = boxUV.Min + 0.5 * (boxUV.Max - boxUV.Min);
+                            //XYZ normal = face.ComputeNormal(centerPoint);
+                            ////normal要等於(0, 0, 1) 或是(0, 0, -1)
 
-                            // 幾何面的邊緣
-                            EdgeArrayArray egdearrayarray = face.EdgeLoops;
-                            foreach (EdgeArray edgearray in egdearrayarray)
+
+                            XYZ targetFaceNormal = face.ComputeNormal(UV.Zero);
+                            XYZ Zdirection = XYZ.BasisZ;
+                            double dotProduct = Zdirection.DotProduct(targetFaceNormal);
+                            //Zdirection.DotProduct(targetFaceNormal))  == 1 或是 == -1
+
+                            if (Math.Abs(dotProduct - 1.0) < 1e-9)
                             {
-                                // 將邊緣線的點存到points裡
-                                foreach (Edge edge in edgearray)
+                                topFace = face;
+                                MessageBox.Show("這是頂面");
+
+
+                                // 幾何面的邊緣
+                                EdgeArrayArray egdearrayarray = topFace.EdgeLoops;
+                                foreach (EdgeArray edgearray in egdearrayarray)
                                 {
-                                    Curve curve = edge.AsCurve();
-                                    points.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(0), 5));
-                                    points.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(1), 5));
+                                    // 將邊緣線的點存到points裡
+                                    foreach (Edge edge in edgearray)
+                                    {
+                                        Curve curve = edge.AsCurve();
+                                        points.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(0), 5));
+                                        points.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(1), 5));
+                                    }
+                                }
+
+                                // 將points裡相同的點移除
+                                points = RemoveDuplicatePoints(points, 0.001);
+                                MessageBox.Show("在頂面平台中不重複的點數量:" + points.Count.ToString());
+                                foreach (XYZ point in points)
+                                {
+                                    MessageBox.Show("頂面點座標:" + XYZUnitsToCentimeters(point, 5).ToString());
                                 }
                             }
+                            else if (Math.Abs(dotProduct + 1.0) < 1e-9)
+                            {
+                                bottomFace = face;
+                                MessageBox.Show("這是底面");
+
+
+                                // 幾何面的邊緣
+                                EdgeArrayArray egdearrayarray = bottomFace.EdgeLoops;
+                                foreach (EdgeArray edgearray in egdearrayarray)
+                                {
+                                    // 將邊緣線的點存到points裡
+                                    foreach (Edge edge in edgearray)
+                                    {
+                                        Curve curve = edge.AsCurve();
+                                        points.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(0), 5));
+                                        points.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(1), 5));
+                                    }
+                                }
+
+                                // 將points裡相同的點移除
+                                points = RemoveDuplicatePoints(points, 0.001);
+                                MessageBox.Show("在底面平台中不重複的點數量:" + points.Count.ToString());
+                                foreach (XYZ point in points)
+                                {
+                                    MessageBox.Show("底面點座標:" + XYZUnitsToCentimeters(point, 5).ToString());
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show("這不是頂面也不是底面");
+                            }
                         }
-                        // 將points裡相同的點移除
-                        points = RemoveDuplicatePoints(points, 0.001);
-                        MessageBox.Show("在平台中不重複的點數量:" + points.Count.ToString());
-                        //foreach (XYZ point in points)
+                        break;
+
+
+                        ////創建一个字典，用於儲存每個 Z 坐座標對應的點列表
+                        //Dictionary<double, List<XYZ>> zCoordinatePointsDict = GroupPointsByZ(points);
+                        //Dictionary<double, List<XYZ>> yCoordinatePointsDict = new Dictionary<double, List<XYZ>>();
+                        //Dictionary<double, List<XYZ>> xCoordinatePointsDict = new Dictionary<double, List<XYZ>>();
+
+
+                        //foreach (KeyValuePair<double, List<XYZ>> z_kvp in zCoordinatePointsDict)
                         //{
-                        //    MessageBox.Show("點座標:" + point.ToString());
+                        //    double zCoordinate = z_kvp.Key; // Z 座標
+                        //    List<XYZ> z_coordinateGroup = z_kvp.Value; // 相同 Z 座標裡的點座標
+
+                        //    // 输出現在所選到的 Z 座標
+                        //    MessageBox.Show("Z 坐标: " + UnitsToCentimeters(zCoordinate));
+
+                        //// 編歷在當前 Z 座標裡的座標點並輸出
+                        //foreach (XYZ point in z_coordinateGroup)
+                        //{
+                        //    MessageBox.Show("坐标点: (" + UnitsToCentimeters(point.X) + ", " + UnitsToCentimeters(point.Y )+ ", " + UnitsToCentimeters(point.Z) + ")");
                         //}
 
-                        // 創建一个字典，用於儲存每個 Z 坐座標對應的點列表
-                        Dictionary<double, List<XYZ>> zCoordinatePointsDict = GroupPointsByZ(points);
+                        //將相同Y、Z座標的點放進List中
+                        //yCoordinatePointsDict = GroupPointsByY(z_coordinateGroup);
+                        //foreach (KeyValuePair<double, List<XYZ>> y_kvp in yCoordinatePointsDict)
+                        //{
+                        //    double yCoordinate = y_kvp.Key; // Y 座標
+                        //    List<XYZ> y_coordinateGroup = y_kvp.Value; // 相同 Y 座標裡的點座標
 
-                        foreach (var kvp in zCoordinatePointsDict)
-                        {
-                            double zCoordinate = kvp.Key; // Z 座標
-                            List<XYZ> coordinateGroup = kvp.Value; // 相同 Z 座標裡的點座標
+                        //    // 输出現在所選到的 Y 座標
+                        //    MessageBox.Show("Y 坐标: " + UnitsToCentimeters(yCoordinate));
 
-                            // 输出現在所選到的 Z 座標
-                            MessageBox.Show("Z 坐标: " + zCoordinate);
+                        // 編歷在當前 Y 座標裡的座標點並輸出
+                        //foreach (XYZ point in y_coordinateGroup)
+                        //{
+                        //    MessageBox.Show("坐标点: (" + UnitsToCentimeters(point.X) + ", " + UnitsToCentimeters(point.Y) + ", " + UnitsToCentimeters(point.Z) + ")");
+                        //}
 
-                            //// 編歷在當前 Z 座標裡的座標點並輸出
-                            //foreach (XYZ point in coordinateGroup)
-                            //{
-                            //    MessageBox.Show("坐标点: (" + point.X + ", " + point.Y + ", " + point.Z + ")");
-                            //}
+                        //yLines = yMaxAndMinPointsInList(y_coordinateGroup); // 在當前 Z 列表中 Y 座標相同的點的 X 最大值和最小值相連成線
+                        //}
 
-                            yLines = yMaxAndMinPointsInList(coordinateGroup); // 在當前 Z 列表中 Y 座標相同的點的 X 最大值和最小值相連成線
-                            xLines = xMaxAndMinPointsInList(coordinateGroup); // 在當前 Z 列表中 X 座標相同的點的 Y 最大值和最小值相連成線
+                        //將相同X、Z座標的點放進List中
+                        //xCoordinatePointsDict = GroupPointsByX(z_coordinateGroup);
+                        //foreach (KeyValuePair<double, List<XYZ>> x_kvp in xCoordinatePointsDict)
+                        //{
+                        //    double xCoordinate = x_kvp.Key; // Y 座標
+                        //    List<XYZ> x_coordinateGroup = x_kvp.Value; // 相同 Y 座標裡的點座標
 
-                        }
+                        //    // 输出現在所選到的 X 座標
+                        //    MessageBox.Show(" X 坐标: " + UnitsToCentimeters(xCoordinate));
+
+                        //// 編歷在當前 X 座標裡的座標點並輸出
+                        //foreach (XYZ point in x_coordinateGroup)
+                        //{
+                        //    MessageBox.Show("坐标点: (" + UnitsToCentimeters(point.X) + ", " + UnitsToCentimeters(point.Y) + ", " + UnitsToCentimeters(point.Z) + ")");
+                        //}
+
+                        //xLines = xMaxAndMinPointsInList(x_coordinateGroup); // 在當前 Z 列表中 X 座標相同的點的 Y 最大值和最小值相連成線
+                        //}
+                        //}
                     }
                 }
-                break;
+                // break;
             }
 
 
@@ -367,6 +463,16 @@ public class BOM : IExternalCommand
         return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Centimeters);
     }
 
+    public XYZ XYZUnitsToCentimeters(XYZ point, double gridSize)
+    {
+        XYZ newPoint = new XYZ(
+            UnitsToCentimeters(Math.Round(UnitsToCentimeters(point.X) / gridSize) * gridSize),
+            UnitsToCentimeters(Math.Round(UnitsToCentimeters(point.Y) / gridSize) * gridSize),
+            UnitsToCentimeters(Math.Round(UnitsToCentimeters(point.Z) / gridSize) * gridSize)
+            );
+        return newPoint;
+    }
+
     public List<XYZ> RemoveDuplicatePoints(List<XYZ> points, double tolerance)
     {
         // 新建一个列表来保存唯一的点
@@ -400,6 +506,7 @@ public class BOM : IExternalCommand
         return uniquePoints;
     }
 
+    //將相同Z座標的點存到同一個List
     public Dictionary<double, List<XYZ>> GroupPointsByZ(List<XYZ> points)
     {
         Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
@@ -417,41 +524,89 @@ public class BOM : IExternalCommand
         }
 
         return groupedPoints;
-
-
-        //Dictionary<double, List<XYZ>> zCoordinatePointsDict = new Dictionary<double, List<XYZ>>();
-
-        //// 編歷 points 列表，根据 Z 座標將點分组儲存到字典中
-        //foreach (XYZ point in points)
-        //{
-        //    double z = point.Z;
-        //    if (!zCoordinatePointsDict.ContainsKey(z))
-        //    {
-        //        zCoordinatePointsDict[z] = new List<XYZ>();
-        //    }
-        //    zCoordinatePointsDict[z].Add(point);
-        //}
     }
+
+    //將相同Y座標的點存到同一個List
+    public Dictionary<double, List<XYZ>> GroupPointsByY(List<XYZ> points)
+    {
+        Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
+
+        foreach (XYZ point in points)
+        {
+            double y = point.Y;
+
+            if (!groupedPoints.ContainsKey(y))
+            {
+                groupedPoints[y] = new List<XYZ>();
+            }
+
+            groupedPoints[y].Add(point);
+        }
+
+        return groupedPoints;
+    }
+
+    //將相同X座標的點存到同一個List
+    public Dictionary<double, List<XYZ>> GroupPointsByX(List<XYZ> points)
+    {
+        Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
+
+        foreach (XYZ point in points)
+        {
+            double x = point.X;
+
+            if (!groupedPoints.ContainsKey(x))
+            {
+                groupedPoints[x] = new List<XYZ>();
+            }
+
+            groupedPoints[x].Add(point);
+        }
+
+        return groupedPoints;
+    }
+
 
     public List<Line> yMaxAndMinPointsInList(List<XYZ> coordinateGroup)
     {
         // 按 Y 坐标值对点进行分组
-        var groupedPoints = coordinateGroup.GroupBy(point => point.Y);
+        IEnumerable<IGrouping<double, XYZ>> groupedPoints = coordinateGroup.GroupBy(point => point.Y);
 
         List<Line> yLines = new List<Line>();
 
-        foreach (var group in groupedPoints)
+        foreach (IGrouping<double, XYZ> group in groupedPoints)
         {
-            List<XYZ> pointsWithSameY = group.ToList();
 
-            // 连接相同 Y 坐标的点成线
-            for (int i = 0; i < pointsWithSameY.Count - 1; i++)
+            List<XYZ> pointsWithSameY = group.ToList();
+            MessageBox.Show("相同Y座標的點數量:" + pointsWithSameY.Count.ToString());
+
+            //// 连接相同 Y 坐标的点成线
+            //for (int i = 0; i < pointsWithSameY.Count - 1; i++)
+            //{
+            //    XYZ startPoint = pointsWithSameY[i];
+            //    XYZ endPoint = pointsWithSameY[i + 1];
+            //    Line yLine = Line.CreateBound(startPoint, endPoint);
+            //    yLines.Add(yLine);
+            //}
+
+            // 獲取 Y 相同的点的 X 最大和最小值
+            if (pointsWithSameY.Count > 1)
             {
-                XYZ startPoint = pointsWithSameY[i];
-                XYZ endPoint = pointsWithSameY[i + 1];
-                Line yLine = Line.CreateBound(startPoint, endPoint);
+                List<XYZ> arrangePoints_X = pointsWithSameY.OrderBy(point => point.X).ToList();
+
+                XYZ minXPoint = arrangePoints_X.First();
+                XYZ maxXPoint = arrangePoints_X.Last();
+
+                // 使用 LINQ 查询来获取 X 坐标最小的点
+                minXPoint = arrangePoints_X.First(point => point.X == arrangePoints_X.Min(p => p.X));
+                // 使用 LINQ 查询来获取 X 坐标最大的点
+                maxXPoint = arrangePoints_X.First(point => point.X == arrangePoints_X.Max(p => p.X));
+
+
+                Line yLine = Line.CreateBound(minXPoint, maxXPoint);
                 yLines.Add(yLine);
             }
+
         }
 
         MessageBox.Show("水平方向的線:" + yLines.Count.ToString());
@@ -463,59 +618,50 @@ public class BOM : IExternalCommand
 
         return yLines;
 
-        //// 將當前分组的座標點，根據 Y 和 X 座標值分別儲存
-        //List<XYZ> ySortedPoints = coordinateGroup.OrderBy(point => point.Y).ToList(); // Y 相同的點
-        //List<Line> yLines = new List<Line>(); // 存 Y 相同的點的，其 X 最大和最小值相連的線
-        //MessageBox.Show("in");
-        //// 獲取 Y 相同的点的 X 最大和最小值
-        //if (ySortedPoints.Count > 1)
-        //{
-        //    XYZ minXPoint = ySortedPoints.First();
-        //    XYZ maxXPoint = ySortedPoints.Last();
-
-        //    // 使用 LINQ 查询来获取 X 坐标最小的点
-        //    minXPoint = ySortedPoints.First(point => point.X == ySortedPoints.Min(p => p.X));
-        //    // 使用 LINQ 查询来获取 X 坐标最大的点
-        //    maxXPoint = ySortedPoints.First(point => point.X == ySortedPoints.Max(p => p.X));
-
-
-        //    Line yLine = Line.CreateBound(minXPoint, maxXPoint);
-        //    yLines.Add(yLine);
-        //}
-        //MessageBox.Show("水平方向的線:" + yLines.Count.ToString());
-
-        //foreach (Line line in yLines)
-        //{
-        //    MessageBox.Show("(" + line.GetEndPoint(0).ToString() + ")" + "(" + line.GetEndPoint(1).ToString() + ")");
-        //}
-
-        //return yLines;
-
     }
 
 
     public List<Line> xMaxAndMinPointsInList(List<XYZ> coordinateGroup)
     {
-        // 按 Y 坐标值对点进行分组
-        var groupedPoints = coordinateGroup.GroupBy(point => point.X);
+        // 按 X 坐标值对点进行分组
+        IEnumerable<IGrouping<double, XYZ>> groupedPoints = coordinateGroup.GroupBy(point => point.X);
 
         List<Line> xLines = new List<Line>();
 
-        foreach (var group in groupedPoints)
+        foreach (IGrouping<double, XYZ> group in groupedPoints)
         {
             List<XYZ> pointsWithSameX = group.ToList();
+            MessageBox.Show("相同Y座標的點數量:" + pointsWithSameX.Count.ToString());
 
-            // 连接相同 Y 坐标的点成线
-            for (int i = 0; i < pointsWithSameX.Count - 1; i++)
+            //// 连接相同 X 坐标的点成线
+            //for (int i = 0; i < pointsWithSameX.Count - 1; i++)
+            //{
+            //    XYZ startPoint = pointsWithSameX[i];
+            //    XYZ endPoint = pointsWithSameX[i + 1];
+            //    Line xLine = Line.CreateBound(startPoint, endPoint);
+            //    xLines.Add(xLine);
+            //}
+
+            // 獲取 X 相同的点的 Y 最大和最小值
+            if (pointsWithSameX.Count > 1)
             {
-                XYZ startPoint = pointsWithSameX[i];
-                XYZ endPoint = pointsWithSameX[i + 1];
-                Line xLine = Line.CreateBound(startPoint, endPoint);
+                List<XYZ> arrangePoints_Y = pointsWithSameX.OrderBy(point => point.Y).ToList();
+
+                XYZ minXPoint = arrangePoints_Y.First();
+                XYZ maxXPoint = arrangePoints_Y.Last();
+
+                // 使用 LINQ 查询来获取 X 坐标最小的点
+                minXPoint = arrangePoints_Y.First(point => point.Y == arrangePoints_Y.Min(p => p.Y));
+                // 使用 LINQ 查询来获取 X 坐标最大的点
+                maxXPoint = arrangePoints_Y.First(point => point.X == arrangePoints_Y.Max(p => p.Y));
+
+
+                Line xLine = Line.CreateBound(minXPoint, maxXPoint);
                 xLines.Add(xLine);
             }
         }
 
-        MessageBox.Show("水平方向的線:" + xLines.Count.ToString());
+        MessageBox.Show("垂直方向的線:" + xLines.Count.ToString());
 
         foreach (Line line in xLines)
         {
@@ -523,44 +669,7 @@ public class BOM : IExternalCommand
         }
 
         return xLines;
-
-
-
-
-        //// 將當前分组的座標點，根據 Y 和 X 座標值分別儲存
-        //List<XYZ> xSortedPoints = coordinateGroup.OrderBy(point => point.X).ToList(); // X 相同的點
-        //List<Line> xLines = new List<Line>(); // 存 X 相同的點的，其 Y 最大和最小值相連的線
-
-        //// 获取 X 相同的点的 Y 最大和最小值
-        //if (xSortedPoints.Count > 1)
-        //{
-        //    XYZ minYPoint = xSortedPoints.First();
-        //    XYZ maxYPoint = xSortedPoints.Last();
-
-        //    // 使用 LINQ 查询来获取 X 坐标最小的点
-        //    minYPoint = xSortedPoints.First(point => point.Y == xSortedPoints.Min(p => p.Y));
-        //    // 使用 LINQ 查询来获取 X 坐标最大的点
-        //    maxYPoint = xSortedPoints.First(point => point.Y == xSortedPoints.Max(p => p.Y));
-
-        //    Line xLine = Line.CreateBound(minYPoint, maxYPoint);
-        //    xLines.Add(xLine);
-        //}
-        //MessageBox.Show("垂直方向的線:" + xLines.Count.ToString());
-
-        //foreach (Line line in xLines)
-        //{
-        //    MessageBox.Show(line.GetEndPoint(0).ToString() + line.GetEndPoint(1).ToString());
-        //}
-
-        //return xLines;
-
     }
-
-
-
-
-
-
 
 
 }
