@@ -305,11 +305,11 @@ public class BOM : IExternalCommand
                         Dictionary<double, List<XYZ>> pointDictionary_Top = GroupPointsByZ(points_Top);
                         Dictionary<double, List<XYZ>> pointDictionary_Bottom = GroupPointsByZ(points_Bottom);
 
-                        List<Line> yLine_Top = LandingBoundaryLines(pointDictionary_Top).Item1;
-                        List<Line> xLine_Top = LandingBoundaryLines(pointDictionary_Top).Item2;
+                        List<Line> yLine_Top = LandingBoundarLines(pointDictionary_Top).Item1;
+                        List<Line> xLine_Top = LandingBoundarLines(pointDictionary_Top).Item2;
 
-                        List<Line> yLine_Bottom = LandingBoundaryLines(pointDictionary_Bottom).Item1;
-                        List<Line> xLine_Bottom = LandingBoundaryLines(pointDictionary_Bottom).Item1;
+                        List<Line> yLine_Bottom = LandingBoundarLines(pointDictionary_Bottom).Item1;
+                        List<Line> xLine_Bottom = LandingBoundarLines(pointDictionary_Bottom).Item1;
                     }
                 }
                 // break;
@@ -630,7 +630,7 @@ public class BOM : IExternalCommand
         return xLines;
     }
 
-    public (List<Line> , List<Line>) LandingBoundaryLines (Dictionary<double, List<XYZ>> pointDictionary)
+    public (List<Line> , List<Line>) LandingBoundarLines (Dictionary<double, List<XYZ>> pointDictionary)
     {
         List<Line> yLines = new List<Line>(); // 存 Y 相同的點的，其 X 最大和最小值相連的線
         List<Line> xLines = new List<Line>(); // 存 X 相同的點的，其 Y 最大和最小值相連的線
