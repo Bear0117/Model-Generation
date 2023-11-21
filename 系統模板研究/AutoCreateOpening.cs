@@ -35,7 +35,7 @@ namespace Modeling
         //執行檔案
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-
+            //123123
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
 
