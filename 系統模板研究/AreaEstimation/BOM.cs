@@ -253,7 +253,7 @@ public class BOM : IExternalCommand
                             if (Math.Abs(dotProduct - 1.0) < 1e-9)
                             {
                                 topFace = face;
-                                MessageBox.Show("這是頂面");
+                                //MessageBox.Show("這是頂面");
 
 
                                 // 幾何面的邊緣
@@ -276,7 +276,7 @@ public class BOM : IExternalCommand
                             else if (Math.Abs(dotProduct + 1.0) < 1e-9)
                             {
                                 bottomFace = face;
-                                MessageBox.Show("這是底面");
+                                //MessageBox.Show("這是底面");
 
 
                                 // 幾何面的邊緣
@@ -305,11 +305,11 @@ public class BOM : IExternalCommand
                         Dictionary<double, List<XYZ>> pointDictionary_Top = GroupPointsByZ(points_Top);
                         Dictionary<double, List<XYZ>> pointDictionary_Bottom = GroupPointsByZ(points_Bottom);
 
-                        List<Line> yLine_Top = LandingBoundarLines(pointDictionary_Top).Item1;
-                        List<Line> xLine_Top = LandingBoundarLines(pointDictionary_Top).Item2;
+                        List<Line> yLine_Top = LandingBoundaryLines(pointDictionary_Top).Item1;
+                        List<Line> xLine_Top = LandingBoundaryLines(pointDictionary_Top).Item2;
 
-                        List<Line> yLine_Bottom = LandingBoundarLines(pointDictionary_Bottom).Item1;
-                        List<Line> xLine_Bottom = LandingBoundarLines(pointDictionary_Bottom).Item1;
+                        List<Line> yLine_Bottom = LandingBoundaryLines(pointDictionary_Bottom).Item1;
+                        List<Line> xLine_Bottom = LandingBoundaryLines(pointDictionary_Bottom).Item1;
                     }
                 }
                 // break;
@@ -408,12 +408,12 @@ public class BOM : IExternalCommand
         return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Centimeters);
     }
 
-    public XYZ XYZUnitsToCentimeters(XYZ point, double gridSize)
+    public XYZ XYZUnitsToCentimeters(XYZ point)
     {
         XYZ newPoint = new XYZ(
-            UnitsToCentimeters(Math.Round(UnitsToCentimeters(point.X) / gridSize) * gridSize),
-            UnitsToCentimeters(Math.Round(UnitsToCentimeters(point.Y) / gridSize) * gridSize),
-            UnitsToCentimeters(Math.Round(UnitsToCentimeters(point.Z) / gridSize) * gridSize)
+            UnitsToCentimeters(point.X),
+            UnitsToCentimeters(point.Y),
+            UnitsToCentimeters(point.Z)
             );
         return newPoint;
     }
@@ -450,7 +450,6 @@ public class BOM : IExternalCommand
         // 返回包含唯一点的列表
         return uniquePoints;
     }
-
     
     public Dictionary<double, List<XYZ>> GroupPointsByZ(List<XYZ> points) //將相同Z座標的點存到同一個List
     {
@@ -474,19 +473,19 @@ public class BOM : IExternalCommand
             double zCoordinate = entry.Key;
             List<XYZ> pointsWithSameZ = entry.Value;
 
-            //// 在這裡對 pointsWithSameZ 做任何你需要的處理
-            //MessageBox.Show($" Z 座標為 {zCoordinate} 的點數量: {pointsWithSameZ.Count}");
-            //foreach (XYZ p in pointsWithSameZ)
-            //{
-            //    MessageBox.Show($"座標: {p}");
-            //}
+            // 在這裡對 pointsWithSameZ 做任何你需要的處理
+            MessageBox.Show($" Z 座標為 {UnitsToCentimeters(zCoordinate)} 的點數量: {pointsWithSameZ.Count}");
+            foreach (XYZ p in pointsWithSameZ)
+            {
+                MessageBox.Show($"座標: {XYZUnitsToCentimeters(p)}");
+            }
         }
 
         return groupedPoints;
     }
 
-    //將相同Y座標的點存到同一個List
-    public Dictionary<double, List<XYZ>> GroupPointsByY(List<XYZ> points)
+    
+    public Dictionary<double, List<XYZ>> GroupPointsByY(List<XYZ> points) //將相同Y座標的點存到同一個List
     {
         Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
 
@@ -505,7 +504,7 @@ public class BOM : IExternalCommand
         return groupedPoints;
     }
 
-    
+
     public Dictionary<double, List<XYZ>> GroupPointsByX(List<XYZ> points) //將相同 X 座標的點存到同一個List
     {
         Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
@@ -526,45 +525,29 @@ public class BOM : IExternalCommand
     }
 
 
-    public List<Line> yMaxAndMinPointsInList(List<XYZ> coordinateGroup) //將相同 Y 座標的點存到同一個List
+    public List<Line> yMaxAndMinPointsInList(List<XYZ> coordinateGroup) 
     {
-        // 按 Y 坐标值对点进行分组
-        IEnumerable<IGrouping<double, XYZ>> groupedPoints = coordinateGroup.GroupBy(point => point.Y);
+        //// 按 Y 坐标值对点进行分组
+        //IEnumerable<IGrouping<double, XYZ>> groupedPoints = coordinateGroup.GroupBy(point => point.Y);
 
         List<Line> yLines = new List<Line>();
 
-        foreach (IGrouping<double, XYZ> group in groupedPoints)
+        // 獲取 Y 相同的点的 X 最大和最小值
+        if (coordinateGroup.Count > 1)
         {
+            List<XYZ> arrangePoints_X = coordinateGroup.OrderBy(point => point.X).ToList();
 
-            List<XYZ> pointsWithSameY = group.ToList();
-            MessageBox.Show("相同Y座標的點數量:" + pointsWithSameY.Count.ToString());
+            XYZ minXPoint = arrangePoints_X.First();
+            XYZ maxXPoint = arrangePoints_X.Last();
 
-            //// 连接相同 Y 坐标的点成线
-            //for (int i = 0; i < pointsWithSameY.Count - 1; i++)
-            //{
-            //    XYZ startPoint = pointsWithSameY[i];
-            //    XYZ endPoint = pointsWithSameY[i + 1];
-            //    Line yLine = Line.CreateBound(startPoint, endPoint);
-            //    yLines.Add(yLine);
-            //}
-
-            // 獲取 Y 相同的点的 X 最大和最小值
-            if (pointsWithSameY.Count > 1)
-            {
-                List<XYZ> arrangePoints_X = pointsWithSameY.OrderBy(point => point.X).ToList();
-
-                XYZ minXPoint = arrangePoints_X.First();
-                XYZ maxXPoint = arrangePoints_X.Last();
-
-                // 使用 LINQ 查询来获取 X 坐标最小的点
-                minXPoint = arrangePoints_X.First(point => point.X == arrangePoints_X.Min(p => p.X));
-                // 使用 LINQ 查询来获取 X 坐标最大的点
-                maxXPoint = arrangePoints_X.First(point => point.X == arrangePoints_X.Max(p => p.X));
+            // 使用 LINQ 查询来获取 X 坐标最小的点
+            minXPoint = arrangePoints_X.First(point => point.X == arrangePoints_X.Min(p => p.X));
+            // 使用 LINQ 查询来获取 X 坐标最大的点
+            maxXPoint = arrangePoints_X.First(point => point.X == arrangePoints_X.Max(p => p.X));
 
 
-                Line yLine = Line.CreateBound(minXPoint, maxXPoint);
-                yLines.Add(yLine);
-            }
+            Line yLine = Line.CreateBound(minXPoint, maxXPoint);
+            yLines.Add(yLine);
 
         }
 
@@ -572,39 +555,25 @@ public class BOM : IExternalCommand
 
         foreach (Line line in yLines)
         {
-            MessageBox.Show("(" + line.GetEndPoint(0).ToString() + ")" + "(" + line.GetEndPoint(1).ToString() + ")");
+            MessageBox.Show(XYZUnitsToCentimeters(line.GetEndPoint(0)).ToString() + XYZUnitsToCentimeters(line.GetEndPoint(1)).ToString());
         }
 
         return yLines;
-
     }
 
 
     public List<Line> xMaxAndMinPointsInList(List<XYZ> coordinateGroup)
     {
-        // 按 X 坐标值对点进行分组
-        IEnumerable<IGrouping<double, XYZ>> groupedPoints = coordinateGroup.GroupBy(point => point.X);
+        //// 按 X 坐标值对点进行分组
+        //IEnumerable<IGrouping<double, XYZ>> groupedPoints = coordinateGroup.GroupBy(point => point.X);
 
         List<Line> xLines = new List<Line>();
 
-        foreach (IGrouping<double, XYZ> group in groupedPoints)
-        {
-            List<XYZ> pointsWithSameX = group.ToList();
-            MessageBox.Show("相同Y座標的點數量:" + pointsWithSameX.Count.ToString());
-
-            //// 连接相同 X 坐标的点成线
-            //for (int i = 0; i < pointsWithSameX.Count - 1; i++)
-            //{
-            //    XYZ startPoint = pointsWithSameX[i];
-            //    XYZ endPoint = pointsWithSameX[i + 1];
-            //    Line xLine = Line.CreateBound(startPoint, endPoint);
-            //    xLines.Add(xLine);
-            //}
 
             // 獲取 X 相同的点的 Y 最大和最小值
-            if (pointsWithSameX.Count > 1)
+            if (coordinateGroup.Count > 1)
             {
-                List<XYZ> arrangePoints_Y = pointsWithSameX.OrderBy(point => point.Y).ToList();
+                List<XYZ> arrangePoints_Y = coordinateGroup.OrderBy(point => point.Y).ToList();
 
                 XYZ minXPoint = arrangePoints_Y.First();
                 XYZ maxXPoint = arrangePoints_Y.Last();
@@ -614,23 +583,22 @@ public class BOM : IExternalCommand
                 // 使用 LINQ 查询来获取 X 坐标最大的点
                 maxXPoint = arrangePoints_Y.First(point => point.X == arrangePoints_Y.Max(p => p.Y));
 
-
                 Line xLine = Line.CreateBound(minXPoint, maxXPoint);
                 xLines.Add(xLine);
             }
-        }
+        
 
         MessageBox.Show("垂直方向的線:" + xLines.Count.ToString());
 
         foreach (Line line in xLines)
         {
-            MessageBox.Show("(" + line.GetEndPoint(0).ToString() + ")" + "(" + line.GetEndPoint(1).ToString() + ")");
+            MessageBox.Show(XYZUnitsToCentimeters(line.GetEndPoint(0)).ToString() + XYZUnitsToCentimeters(line.GetEndPoint(1)).ToString());
         }
 
         return xLines;
     }
 
-    public (List<Line> , List<Line>) LandingBoundarLines (Dictionary<double, List<XYZ>> pointDictionary)
+    public (List<Line> , List<Line>) LandingBoundaryLines (Dictionary<double, List<XYZ>> pointDictionary)
     {
         List<Line> yLines = new List<Line>(); // 存 Y 相同的點的，其 X 最大和最小值相連的線
         List<Line> xLines = new List<Line>(); // 存 X 相同的點的，其 Y 最大和最小值相連的線
@@ -641,7 +609,7 @@ public class BOM : IExternalCommand
             List<XYZ> z_coordinateGroup = z_kvp.Value; // 相同 Z 座標裡的點座標
 
             // 输出現在所選到的 Z 座標
-            MessageBox.Show("Z 坐标: " + zCoordinate);
+            MessageBox.Show("Z 坐标: " + UnitsToCentimeters( zCoordinate));
 
             // 將相同Y、Z座標的點放進List中
             Dictionary<double, List<XYZ>> yCoordinatePointsDict = GroupPointsByY(z_coordinateGroup);
@@ -653,6 +621,7 @@ public class BOM : IExternalCommand
 
                 // 输出現在所選到的 Y 座標
                 MessageBox.Show("Y 坐标: " + UnitsToCentimeters(yCoordinate));
+                MessageBox.Show("相同Y、Z座標的點共有: " + y_coordinateGroup.Count.ToString());
 
                 // 編歷在當前 Y 座標裡的座標點並輸出
                 foreach (XYZ point in y_coordinateGroup)
@@ -672,6 +641,8 @@ public class BOM : IExternalCommand
 
                 // 输出現在所選到的 X 座標
                 MessageBox.Show(" X 坐标: " + UnitsToCentimeters(xCoordinate));
+                MessageBox.Show("相同、Z座標的點共有: " + x_coordinateGroup.Count.ToString());
+
 
                 // 編歷在當前 X 座標裡的座標點並輸出
                 foreach (XYZ point in x_coordinateGroup)
