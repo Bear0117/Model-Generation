@@ -41,7 +41,7 @@ using Transaction = Autodesk.Revit.DB.Transaction;
 namespace Modeling
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    class AutoCreateStairs_3Landing : IExternalCommand
+    class AutoCreateStairs_last : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
