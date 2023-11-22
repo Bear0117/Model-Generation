@@ -40,12 +40,21 @@ public class BOM : IExternalCommand
         public int 實際梯級數 { get; set; }
         public double 梯段路徑長度 { get; set; }
         public double 突沿長度 { get; set; }
-        public double 平台長度 { get; set; }
-        public double 平台寬度 { get; set; }
-        public double 平台面積 { get; set; }
+        public double 中間平台底部高度 { get; set; }
+        public double 結束平台底部高度 { get; set; }
+        public double 第一梯段底部斜長度 { get; set; }
+        public double 第二梯段底部斜長度 { get; set; }
+        public double 中間平台頂面面積 { get; set; }
+        public double 中間平台底面面積 { get; set; }
+        public double 結束平台頂面面積 { get; set; }
+        public double 結束平台底面面積 { get; set; }
+        public double 中間平台總面積 { get; set; }
+        public double 結束平台總面積 { get; set; }
         public double 踏板面積 { get; set; }
         public double 立板面積 { get; set; }
-        public double 路徑斜面積 { get; set; }
+        public double 第一梯段斜面積 { get; set; }
+        public double 第二梯段斜面積 { get; set; }
+
         public double 總面積 { get; set; }
 
         public BOMData()
@@ -58,14 +67,24 @@ public class BOM : IExternalCommand
             梯段路徑長度 = 0;
             突沿長度 = 0;
 
-            平台長度 = 0;
-            平台寬度 = 0;
+            中間平台底部高度 = 0;
+            結束平台底部高度 = 0;
+            中間平台頂面面積 = 0;
+            中間平台底面面積 = 0;
+            結束平台頂面面積 = 0;
+            結束平台底面面積 = 0;
 
-            平台面積 = (平台長度 * 平台寬度) / 10000;
+            第一梯段底部斜長度 = 中間平台底部高度 / 實際級高 * (Math.Sqrt(Math.Pow(實際級高, 2) + Math.Pow(實際級深, 2)));
+            第二梯段底部斜長度 = 結束平台底部高度 / 實際級高 * (Math.Sqrt(Math.Pow(實際級高, 2) + Math.Pow(實際級深, 2)));
+
             踏板面積 = (實際梯段寬度 * 梯段路徑長度 * 2) / 10000;
             立板面積 = (實際梯段寬度 * 實際級高 * 實際梯級數) / 10000;
-            路徑斜面積 = 實際梯段寬度 * (Math.Sqrt(Math.Pow(梯段路徑長度, 2) + Math.Pow(((實際級高 * 實際梯級數) / 2), 2))) / 1000;
-            總面積 = 平台面積 + 踏板面積 + 立板面積 + 路徑斜面積;
+            第一梯段斜面積 = 第一梯段底部斜長度 * 實際梯段寬度;
+            第二梯段斜面積 = 第二梯段底部斜長度 * 實際梯段寬度;
+            中間平台總面積 = 中間平台頂面面積 + 中間平台底面面積;
+            結束平台總面積 = 結束平台頂面面積 + 結束平台底面面積;
+
+            總面積 = 踏板面積 + 立板面積 + 第一梯段斜面積 + 第二梯段斜面積 + 中間平台總面積 + 結束平台總面積;
         }
     }
 
@@ -99,17 +118,27 @@ public class BOM : IExternalCommand
                 file.WriteLine($"{"3. 實際級深"},{item.實際級深}");
                 file.WriteLine($"{"4. 實際梯級數"},{item.實際梯級數}");
                 file.WriteLine($"{"5. 梯段路徑長度"},{item.梯段路徑長度}");
-                file.WriteLine($"{"6. 平台長度"},{item.平台長度}");
-                file.WriteLine($"{"7. 平台寬度"},{item.平台寬度},{"單位:cm"}");
+                file.WriteLine($"{"1. 中間平台底部高度"},{item.中間平台底部高度}");
+                file.WriteLine($"{"2. 結束平台底部高度"},{item.結束平台底部高度}");
+                file.WriteLine($"{"3. 第一梯段底部斜長度"},{item.第一梯段底部斜長度}");
+                file.WriteLine($"{"4. 第二梯段底部斜長度"},{item.第二梯段底部斜長度}");
 
                 file.WriteLine();
 
                 file.WriteLine($"{"面積計算"}");
-                file.WriteLine($"{"1. 平台面積 = LL * LW "},{item.平台面積}");
-                file.WriteLine($"{"2. 踏板面積 = RW * RPL * 2"},{item.踏板面積}");
-                file.WriteLine($"{"3. 立板面積 = RW * RH * RN "},{item.立板面積}");
-                file.WriteLine($"{"4. 路徑斜面積 = RW * Sqrt ((RPL ^ 2 + ((RH * RN) / 2) ^ 2 ) "},{item.路徑斜面積}");
-                file.WriteLine($"{"5. 總面積 = 平台面積 + 踏板面積 + 立板面積 + 路徑斜面積 "},{item.總面積},{"單位:m^2"}");
+                file.WriteLine($"{"中間平台頂面面積"},{item.中間平台頂面面積}");
+                file.WriteLine($"{"中間平台底面面積"},{item.中間平台底面面積}");
+                file.WriteLine($"{"結束平台頂面面積"},{item.結束平台頂面面積}");
+                file.WriteLine($"{"結束平台底面面積"},{item.結束平台底面面積}");
+
+                file.WriteLine($"{"2. 踏板面積 = 實際梯段寬度 * 梯段路徑長度 * 2"},{item.踏板面積}");
+                file.WriteLine($"{"3. 立板面積 = 實際梯段寬度 * 實際級高 * 實際梯級數 "},{item.立板面積}");
+                file.WriteLine($"{"3. 第一梯段斜面積 = 第一梯段底部斜長度 * 實際梯段寬度  "},{item.第一梯段斜面積}");
+                file.WriteLine($"{"3. 第二梯段斜面積 = 第二梯段底部斜長度 * 實際梯段寬度 "},{item.第二梯段斜面積}");
+                file.WriteLine($"{"3. 中間平台總面積 = 中間平台頂面面積 + 中間平台底面面積"},{item.中間平台總面積}");
+                file.WriteLine($"{"3. 結束平台總面積 = 結束平台頂面面積 + 結束平台底面面積"},{item.結束平台總面積}");
+
+                file.WriteLine($"{"5. 總面積 = 踏板面積 + 立板面積 + 第一梯段斜面積 + 第二梯段斜面積 + 中間平台總面積 + 結束平台總面積 "},{item.總面積},{"單位:m^2"}");
                 // 添加空行分隔每个 BOM 条目
             }
 
@@ -130,17 +159,25 @@ public class BOM : IExternalCommand
         int stairActualNumRisers = 0;
         double stairPathLength = 0;
         double stairNosingLength = 0;
+        double first_stairRunBottomLength = 0;
+        double end_stairRunBottomLength = 0;
 
-        double stairLandingLength = 0;
-        double stairLandingWidth = 0;
+        double m_stairLandingBottomLevel = 0;
+        double e_stairLandingBottomLevel = 0;
 
-        double landingArea = 0;
         double threadsArea = 0;
         double risersArea = 0;
-        double pathArea = 0;
+        double first_stairRunBottomArea = 0;
+        double second_stairRunBottomArea = 0;
+        double m_landingArea = 0;
+        double e_landingArea = 0;
         double totalArea = 0;
 
 
+        //中間平台頂面面積 = 0;
+        //中間平台底面面積 = 0;
+        //結束平台頂面面積 = 0;
+        //結束平台底面面積 = 0;
 
         //點選樓梯
         Reference paramerterRef = uidoc.Selection.PickObject(ObjectType.Element);
@@ -226,7 +263,8 @@ public class BOM : IExternalCommand
 
                 Face topFace = null;
                 Face bottomFace = null;
-
+                List<double> allTopFaceArea= new List<double>();
+                List<double> allBottomFaceArea = new List<double>();
 
                 // 編歷Geometry對象以獲取尺寸信息
                 foreach (GeometryObject geomObj in geometryElement)
@@ -239,12 +277,6 @@ public class BOM : IExternalCommand
                         MessageBox.Show("平台面數量:" + faces.Size.ToString());
                         foreach (Face face in faces)
                         {
-                            //BoundingBoxUV boxUV = face.GetBoundingBox();
-                            //UV centerPoint = boxUV.Min + 0.5 * (boxUV.Max - boxUV.Min);
-                            //XYZ normal = face.ComputeNormal(centerPoint);
-                            ////normal要等於(0, 0, 1) 或是(0, 0, -1)
-
-
                             XYZ targetFaceNormal = face.ComputeNormal(UV.Zero);
                             XYZ Zdirection = XYZ.BasisZ;
                             double dotProduct = Zdirection.DotProduct(targetFaceNormal);
@@ -255,45 +287,54 @@ public class BOM : IExternalCommand
                                 topFace = face;
                                 //MessageBox.Show("這是頂面");
 
+                                // 計算頂面的面積
+                                double topFaceArea = topFace.Area;
+                                allTopFaceArea.Add(topFaceArea);
 
-                                // 幾何面的邊緣
-                                EdgeArrayArray egdearrayarray = topFace.EdgeLoops;
-                                foreach (EdgeArray edgearray in egdearrayarray)
-                                {
-                                    // 將邊緣線的點存到points裡
-                                    foreach (Edge edge in edgearray)
-                                    {
-                                        Curve curve = edge.AsCurve();
-                                        points_Top.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(0), 5));
-                                        points_Top.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(1), 5));
-                                    }
-                                }
+                                MessageBox.Show("頂面面積: " + SquareUnitToSquareCentimeter(topFaceArea).ToString());
+                                
+                                //// 幾何面的邊緣
+                                //EdgeArrayArray egdearrayarray = topFace.EdgeLoops;
+                                //foreach (EdgeArray edgearray in egdearrayarray)
+                                //{
+                                //    // 將邊緣線的點存到points裡
+                                //    foreach (Edge edge in edgearray)
+                                //    {
+                                //        Curve curve = edge.AsCurve();
+                                //        points_Top.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(0), 5));
+                                //        points_Top.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(1), 5));
+                                //    }
+                                //}
 
-                                // 將points裡相同的點移除
-                                points_Top = RemoveDuplicatePoints(points_Top, 0.01);
-
+                                //// 將points裡相同的點移除
+                                //points_Top = RemoveDuplicatePoints(points_Top, 0.01);
                             }
                             else if (Math.Abs(dotProduct + 1.0) < 1e-9)
                             {
                                 bottomFace = face;
                                 //MessageBox.Show("這是底面");
 
+                                // 計算底面的面積
+                                double bottomFaceArea = bottomFace.Area;
+                                allBottomFaceArea.Add(-bottomFaceArea);
 
-                                // 幾何面的邊緣
-                                EdgeArrayArray egdearrayarray = bottomFace.EdgeLoops;
-                                foreach (EdgeArray edgearray in egdearrayarray)
-                                {
-                                    // 將邊緣線的點存到points裡
-                                    foreach (Edge edge in edgearray)
-                                    {
-                                        Curve curve = edge.AsCurve();
-                                        points_Bottom.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(0), 5));
-                                        points_Bottom.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(1), 5));
-                                    }
-                                }
+                                MessageBox.Show("底面面積: " + SquareUnitToSquareCentimeter(bottomFaceArea).ToString());
 
-                                // 將points裡相同的點移除
-                                points_Bottom = RemoveDuplicatePoints(points_Bottom, 0.01);
+                                //// 幾何面的邊緣
+                                //EdgeArrayArray egdearrayarray = bottomFace.EdgeLoops;
+                                //foreach (EdgeArray edgearray in egdearrayarray)
+                                //{
+                                //    // 將邊緣線的點存到points裡
+                                //    foreach (Edge edge in edgearray)
+                                //    {
+                                //        Curve curve = edge.AsCurve();
+                                //        points_Bottom.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(0), 5));
+                                //        points_Bottom.Add(Modeling.Algorithm.RoundPoint(curve.GetEndPoint(1), 5));
+                                //    }
+                                //}
+
+                                //// 將points裡相同的點移除
+                                //points_Bottom = RemoveDuplicatePoints(points_Bottom, 0.01);
                             }
                             else
                             {
@@ -301,15 +342,15 @@ public class BOM : IExternalCommand
                             }
                         }
 
-                        // 創建一個字典，用於存儲不同 Z 座標的點列表
-                        Dictionary<double, List<XYZ>> pointDictionary_Top = GroupPointsByZ(points_Top);
-                        Dictionary<double, List<XYZ>> pointDictionary_Bottom = GroupPointsByZ(points_Bottom);
+                        //// 創建一個字典，用於存儲不同 Z 座標的點列表
+                        //Dictionary<double, List<XYZ>> pointDictionary_Top = GroupPointsByZ(points_Top);
+                        //Dictionary<double, List<XYZ>> pointDictionary_Bottom = GroupPointsByZ(points_Bottom);
 
-                        List<Line> yLine_Top = LandingBoundaryLines(pointDictionary_Top).Item1;
-                        List<Line> xLine_Top = LandingBoundaryLines(pointDictionary_Top).Item2;
+                        //List<Line> verticalLine_Top = LandingBoundaryLines(pointDictionary_Top).Item1;
+                        //List<Line> horrizontalLine_Top = LandingBoundaryLines(pointDictionary_Top).Item2;
 
-                        List<Line> yLine_Bottom = LandingBoundaryLines(pointDictionary_Bottom).Item1;
-                        List<Line> xLine_Bottom = LandingBoundaryLines(pointDictionary_Bottom).Item1;
+                        //List<Line> verticalLine_Bottom = LandingBoundaryLines(pointDictionary_Bottom).Item1;
+                        //List<Line> horrizontalLine_Bottom = LandingBoundaryLines(pointDictionary_Bottom).Item2;
                     }
                 }
                 // break;
@@ -416,6 +457,13 @@ public class BOM : IExternalCommand
             UnitsToCentimeters(point.Z)
             );
         return newPoint;
+    }
+
+    // 將平方英吋轉換為平方單位
+    public double SquareUnitToSquareCentimeter(double squareInch)
+    {
+        double conversionFactor = 929.0304;
+        return Math.Round(squareInch * conversionFactor);
     }
 
     public List<XYZ> RemoveDuplicatePoints(List<XYZ> points, double tolerance)
@@ -525,12 +573,9 @@ public class BOM : IExternalCommand
     }
 
 
-    public List<Line> yMaxAndMinPointsInList(List<XYZ> coordinateGroup) 
+    public List<Line> xMaxAndMinPointsInList(List<XYZ> coordinateGroup) // 在相同 Y 座標裡的點找出 X 最大及最小的點連線
     {
-        //// 按 Y 坐标值对点进行分组
-        //IEnumerable<IGrouping<double, XYZ>> groupedPoints = coordinateGroup.GroupBy(point => point.Y);
-
-        List<Line> yLines = new List<Line>();
+        List<Line> horrizontalLines = new List<Line>();
 
         // 獲取 Y 相同的点的 X 最大和最小值
         if (coordinateGroup.Count > 1)
@@ -547,61 +592,56 @@ public class BOM : IExternalCommand
 
 
             Line yLine = Line.CreateBound(minXPoint, maxXPoint);
-            yLines.Add(yLine);
+            horrizontalLines.Add(yLine);
 
         }
 
-        MessageBox.Show("水平方向的線:" + yLines.Count.ToString());
+        MessageBox.Show("水平方向的線:" + horrizontalLines.Count.ToString());
 
-        foreach (Line line in yLines)
+        foreach (Line line in horrizontalLines)
         {
             MessageBox.Show(XYZUnitsToCentimeters(line.GetEndPoint(0)).ToString() + XYZUnitsToCentimeters(line.GetEndPoint(1)).ToString());
         }
 
-        return yLines;
+        return horrizontalLines;
     }
 
 
-    public List<Line> xMaxAndMinPointsInList(List<XYZ> coordinateGroup)
+    public List<Line> yMaxAndMinPointsInList(List<XYZ> coordinateGroup) // 在相同 X 座標裡的點找出 Y 最大及最小的點連線
     {
-        //// 按 X 坐标值对点进行分组
-        //IEnumerable<IGrouping<double, XYZ>> groupedPoints = coordinateGroup.GroupBy(point => point.X);
+        List<Line> verticalLines = new List<Line>();
 
-        List<Line> xLines = new List<Line>();
+        // 獲取 X 相同的点的 Y 最大和最小值
+        if (coordinateGroup.Count > 1)
+        {
+            List<XYZ> arrangePoints_Y = coordinateGroup.OrderBy(point => point.Y).ToList();
 
+            XYZ minXPoint = arrangePoints_Y.First();
+            XYZ maxXPoint = arrangePoints_Y.Last();
 
-            // 獲取 X 相同的点的 Y 最大和最小值
-            if (coordinateGroup.Count > 1)
-            {
-                List<XYZ> arrangePoints_Y = coordinateGroup.OrderBy(point => point.Y).ToList();
+            // 使用 LINQ 查询来获取 X 坐标最小的点
+            minXPoint = arrangePoints_Y.First(point => point.Y == arrangePoints_Y.Min(p => p.Y));
+            // 使用 LINQ 查询来获取 X 坐标最大的点
+            maxXPoint = arrangePoints_Y.First(point => point.Y == arrangePoints_Y.Max(p => p.Y));
 
-                XYZ minXPoint = arrangePoints_Y.First();
-                XYZ maxXPoint = arrangePoints_Y.Last();
+            Line xLine = Line.CreateBound(minXPoint, maxXPoint);
+            verticalLines.Add(xLine);
+        }
 
-                // 使用 LINQ 查询来获取 X 坐标最小的点
-                minXPoint = arrangePoints_Y.First(point => point.Y == arrangePoints_Y.Min(p => p.Y));
-                // 使用 LINQ 查询来获取 X 坐标最大的点
-                maxXPoint = arrangePoints_Y.First(point => point.X == arrangePoints_Y.Max(p => p.Y));
+        MessageBox.Show("垂直方向的線:" + verticalLines.Count.ToString());
 
-                Line xLine = Line.CreateBound(minXPoint, maxXPoint);
-                xLines.Add(xLine);
-            }
-        
-
-        MessageBox.Show("垂直方向的線:" + xLines.Count.ToString());
-
-        foreach (Line line in xLines)
+        foreach (Line line in verticalLines)
         {
             MessageBox.Show(XYZUnitsToCentimeters(line.GetEndPoint(0)).ToString() + XYZUnitsToCentimeters(line.GetEndPoint(1)).ToString());
         }
 
-        return xLines;
+        return verticalLines;
     }
 
     public (List<Line> , List<Line>) LandingBoundaryLines (Dictionary<double, List<XYZ>> pointDictionary)
     {
-        List<Line> yLines = new List<Line>(); // 存 Y 相同的點的，其 X 最大和最小值相連的線
-        List<Line> xLines = new List<Line>(); // 存 X 相同的點的，其 Y 最大和最小值相連的線
+        List<Line> horrizontalLines = new List<Line>(); // 存 Y 相同的點的，其 X 最大和最小值相連的線
+        List<Line> verticalLines = new List<Line>(); // 存 X 相同的點的，其 Y 最大和最小值相連的線
 
         foreach (KeyValuePair<double, List<XYZ>> z_kvp in pointDictionary)
         {
@@ -623,37 +663,36 @@ public class BOM : IExternalCommand
                 MessageBox.Show("Y 坐标: " + UnitsToCentimeters(yCoordinate));
                 MessageBox.Show("相同Y、Z座標的點共有: " + y_coordinateGroup.Count.ToString());
 
-                // 編歷在當前 Y 座標裡的座標點並輸出
-                foreach (XYZ point in y_coordinateGroup)
-                {
-                    MessageBox.Show("坐标点: (" + UnitsToCentimeters(point.X) + ", " + UnitsToCentimeters(point.Y) + ", " + UnitsToCentimeters(point.Z) + ")");
-                }
+                //// 編歷在當前 Y 座標裡的座標點並輸出
+                //foreach (XYZ point in y_coordinateGroup)
+                //{
+                //    MessageBox.Show("坐标点: (" + UnitsToCentimeters(point.X) + ", " + UnitsToCentimeters(point.Y) + ", " + UnitsToCentimeters(point.Z) + ")");
+                //}
 
-                yLines = yMaxAndMinPointsInList(y_coordinateGroup); // 在當前 Z 列表中 Y 座標相同的點的 X 最大值和最小值相連成線
+                horrizontalLines = xMaxAndMinPointsInList(y_coordinateGroup); // 在當前 Z 列表中 Y 座標相同的點的 X 最大值和最小值相連成線
             }
 
             // 將相同X、Z座標的點放進List中
             Dictionary<double, List<XYZ>> xCoordinatePointsDict = GroupPointsByX(z_coordinateGroup);
             foreach (KeyValuePair<double, List<XYZ>> x_kvp in xCoordinatePointsDict)
             {
-                double xCoordinate = x_kvp.Key; // Y 座標
-                List<XYZ> x_coordinateGroup = x_kvp.Value; // 相同 Y 座標裡的點座標
+                double xCoordinate = x_kvp.Key; // X 座標
+                List<XYZ> x_coordinateGroup = x_kvp.Value; // 相同 X 座標裡的點座標
 
                 // 输出現在所選到的 X 座標
                 MessageBox.Show(" X 坐标: " + UnitsToCentimeters(xCoordinate));
                 MessageBox.Show("相同、Z座標的點共有: " + x_coordinateGroup.Count.ToString());
 
+                //// 編歷在當前 X 座標裡的座標點並輸出
+                //foreach (XYZ point in x_coordinateGroup)
+                //{
+                //    MessageBox.Show("坐标点: (" + UnitsToCentimeters(point.X) + ", " + UnitsToCentimeters(point.Y) + ", " + UnitsToCentimeters(point.Z) + ")");
+                //}
 
-                // 編歷在當前 X 座標裡的座標點並輸出
-                foreach (XYZ point in x_coordinateGroup)
-                {
-                    MessageBox.Show("坐标点: (" + UnitsToCentimeters(point.X) + ", " + UnitsToCentimeters(point.Y) + ", " + UnitsToCentimeters(point.Z) + ")");
-                }
-
-                xLines = xMaxAndMinPointsInList(x_coordinateGroup); // 在當前 Z 列表中 X 座標相同的點的 Y 最大值和最小值相連成線
+                verticalLines = yMaxAndMinPointsInList(x_coordinateGroup); // 在當前 Z 列表中 X 座標相同的點的 Y 最大值和最小值相連成線
             }
         }
-        return (yLines, xLines);
+        return (horrizontalLines, verticalLines);
     }
 
 }
