@@ -86,12 +86,12 @@
     <Compile Include="Test Function\AutoCreateSlabs_Test2.cs" />
     <Compile Include="AutoCreateOpening.cs" />
     <Compile Include="AutoCreateSlab.cs" />
-    <Compile Include="StairsGeneration\AutoCreateStairs_3Landing.cs" />
+    <Compile Include="StairsGeneration\AutoCreateStairs_last.cs" />
     <Compile Include="StairsGeneration\AutoCreateStairs_ClickCADLayer.cs" />
     <Compile Include="StairsGeneration\AutoCreateStairs_ClickLine.cs" />
     <Compile Include="StairsGeneration\AutoCreateStairs_Ex.cs" />
     <Compile Include="StairsGeneration\AutoCreateStairs_Test1.cs" />
-    <Compile Include="StairsGeneration\AutoCreateStairs_Test2.cs" />
+    <Compile Include="StairsGeneration\AutoCreateStairs_2Landing.cs" />
     <Compile Include="AreaEstimation\BOM.cs" />
     <Compile Include="Test Function\Class1.cs" />
     <Compile Include="Previous Functions\AutoSplitSlabs.cs" />
