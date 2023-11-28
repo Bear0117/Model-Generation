@@ -40,21 +40,16 @@ public class BOM : IExternalCommand
         public int 實際梯級數 { get; set; }
         public double 梯段路徑長度 { get; set; }
         public double 突沿長度 { get; set; }
-        public double 中間平台底部高度 { get; set; }
-        public double 結束平台底部高度 { get; set; }
-        public double 第一梯段底部斜長度 { get; set; }
-        public double 第二梯段底部斜長度 { get; set; }
-        public double 中間平台頂面面積 { get; set; }
-        public double 中間平台底面面積 { get; set; }
-        public double 結束平台頂面面積 { get; set; }
-        public double 結束平台底面面積 { get; set; }
-        public double 中間平台總面積 { get; set; }
-        public double 結束平台總面積 { get; set; }
+        public double 所有平台底部高度 { get; set; }
+        //public double 中間平台底部高度 { get; set; }
+        //public double 結束平台底部高度 { get; set; }
+        public double 所有梯段底部斜長度 { get; set; }
+        public double 所有平台頂面面積 { get; set; }
+        public double 所有平台底面面積 { get; set; }
+        public double 平台總面積 { get; set; }
         public double 踏板面積 { get; set; }
         public double 立板面積 { get; set; }
-        public double 第一梯段斜面積 { get; set; }
-        public double 第二梯段斜面積 { get; set; }
-
+        public double 所有梯段斜面面積 { get; set; }
         public double 總面積 { get; set; }
 
         public BOMData()
@@ -67,24 +62,22 @@ public class BOM : IExternalCommand
             梯段路徑長度 = 0;
             突沿長度 = 0;
 
-            中間平台底部高度 = 0;
-            結束平台底部高度 = 0;
-            中間平台頂面面積 = 0;
-            中間平台底面面積 = 0;
-            結束平台頂面面積 = 0;
-            結束平台底面面積 = 0;
+            所有平台底部高度 = 0;
+            // 中間平台底部高度 = 0;
+            // 結束平台底部高度 = 0;
 
-            第一梯段底部斜長度 = 中間平台底部高度 / 實際級高 * (Math.Sqrt(Math.Pow(實際級高, 2) + Math.Pow(實際級深, 2)));
-            第二梯段底部斜長度 = 結束平台底部高度 / 實際級高 * (Math.Sqrt(Math.Pow(實際級高, 2) + Math.Pow(實際級深, 2)));
+            所有平台底部高度 = 0;
+            所有平台頂面面積 = 0;
+            所有平台底面面積 = 0;
+            
+            所有梯段底部斜長度 = (所有平台底部高度) / 實際級高 * (Math.Sqrt(Math.Pow(實際級高, 2) + Math.Pow(實際級深, 2)));
 
             踏板面積 = (實際梯段寬度 * 梯段路徑長度 * 2) / 10000;
             立板面積 = (實際梯段寬度 * 實際級高 * 實際梯級數) / 10000;
-            第一梯段斜面積 = 第一梯段底部斜長度 * 實際梯段寬度;
-            第二梯段斜面積 = 第二梯段底部斜長度 * 實際梯段寬度;
-            中間平台總面積 = 中間平台頂面面積 + 中間平台底面面積;
-            結束平台總面積 = 結束平台頂面面積 + 結束平台底面面積;
-
-            總面積 = 踏板面積 + 立板面積 + 第一梯段斜面積 + 第二梯段斜面積 + 中間平台總面積 + 結束平台總面積;
+            所有梯段斜面面積 = 所有梯段底部斜長度 * 實際梯段寬度;
+            平台總面積 = 所有平台頂面面積 + 所有平台底面面積;
+            
+            總面積 = 踏板面積 + 立板面積 + 所有梯段斜面面積 + 平台總面積;
         }
     }
 
@@ -118,27 +111,23 @@ public class BOM : IExternalCommand
                 file.WriteLine($"{"3. 實際級深"},{item.實際級深}");
                 file.WriteLine($"{"4. 實際梯級數"},{item.實際梯級數}");
                 file.WriteLine($"{"5. 梯段路徑長度"},{item.梯段路徑長度}");
-                file.WriteLine($"{"1. 中間平台底部高度"},{item.中間平台底部高度}");
-                file.WriteLine($"{"2. 結束平台底部高度"},{item.結束平台底部高度}");
-                file.WriteLine($"{"3. 第一梯段底部斜長度"},{item.第一梯段底部斜長度}");
-                file.WriteLine($"{"4. 第二梯段底部斜長度"},{item.第二梯段底部斜長度}");
+                file.WriteLine($"{"1. 所有平台底部高度"},{item.所有平台底部高度}");
+                // file.WriteLine($"{"1. 中間平台底部高度"},{item.中間平台底部高度}");
+                // file.WriteLine($"{"2. 結束平台底部高度"},{item.結束平台底部高度}");
+                file.WriteLine($"{"3. 所有梯段底部斜長度"},{item.所有梯段底部斜長度}");
 
                 file.WriteLine();
 
                 file.WriteLine($"{"面積計算"}");
-                file.WriteLine($"{"中間平台頂面面積"},{item.中間平台頂面面積}");
-                file.WriteLine($"{"中間平台底面面積"},{item.中間平台底面面積}");
-                file.WriteLine($"{"結束平台頂面面積"},{item.結束平台頂面面積}");
-                file.WriteLine($"{"結束平台底面面積"},{item.結束平台底面面積}");
+                file.WriteLine($"{"所有平台頂面面積"},{item.所有平台頂面面積}");
+                file.WriteLine($"{"所有平台底面面積"},{item.所有平台底面面積}");
 
                 file.WriteLine($"{"2. 踏板面積 = 實際梯段寬度 * 梯段路徑長度 * 2"},{item.踏板面積}");
                 file.WriteLine($"{"3. 立板面積 = 實際梯段寬度 * 實際級高 * 實際梯級數 "},{item.立板面積}");
-                file.WriteLine($"{"3. 第一梯段斜面積 = 第一梯段底部斜長度 * 實際梯段寬度  "},{item.第一梯段斜面積}");
-                file.WriteLine($"{"3. 第二梯段斜面積 = 第二梯段底部斜長度 * 實際梯段寬度 "},{item.第二梯段斜面積}");
-                file.WriteLine($"{"3. 中間平台總面積 = 中間平台頂面面積 + 中間平台底面面積"},{item.中間平台總面積}");
-                file.WriteLine($"{"3. 結束平台總面積 = 結束平台頂面面積 + 結束平台底面面積"},{item.結束平台總面積}");
+                file.WriteLine($"{"3. 所有梯段斜面面積 = 所有梯段底部斜長度 * 實際梯段寬度  "},{item.所有梯段斜面面積}");
+                file.WriteLine($"{"3. 平台總面積 = 所有平台頂面面積 + 所有平台底面面積"},{item.平台總面積}");
 
-                file.WriteLine($"{"5. 總面積 = 踏板面積 + 立板面積 + 第一梯段斜面積 + 第二梯段斜面積 + 中間平台總面積 + 結束平台總面積 "},{item.總面積},{"單位:m^2"}");
+                file.WriteLine($"{"5. 總面積 = 踏板面積 + 立板面積 + 梯段總斜面積 + 平台總面積 "},{item.總面積},{"單位:m^2"}");
                 // 添加空行分隔每个 BOM 条目
             }
 
@@ -159,18 +148,18 @@ public class BOM : IExternalCommand
         int stairActualNumRisers = 0;
         double stairPathLength = 0;
         double stairNosingLength = 0;
-        double first_stairRunBottomLength = 0;
-        double end_stairRunBottomLength = 0;
+        double stairRunBottomLength = 0;
 
-        double m_stairLandingBottomLevel = 0;
-        double e_stairLandingBottomLevel = 0;
+        double stairLandingBottomLevel = 0;
+        // double m_stairLandingBottomLevel = 0;
+        // double e_stairLandingBottomLevel = 0;
 
         double threadsArea = 0;
         double risersArea = 0;
-        double first_stairRunBottomArea = 0;
-        double second_stairRunBottomArea = 0;
-        double m_landingArea = 0;
-        double e_landingArea = 0;
+        double stairRunBottomArea = 0;
+        double landing_allTopFaceArea = 0;
+        double landing_allBottomFaceArea = 0;
+        double landingArea = 0;
         double totalArea = 0;
 
 
@@ -208,9 +197,7 @@ public class BOM : IExternalCommand
             string stairActualNumRisersst = stair.LookupParameter("實際梯級數").AsValueString();
             stairActualNumRisers = Convert.ToInt32(stairActualNumRisersst);
 
-            //須更新梯段底部鞋面長度算法
-            double stairPathhypotenuseLength = Math.Sqrt(Math.Pow(stairPathLength, 2) + Math.Pow((stairActualRiserHight * stairActualNumRisers) / 2, 2));
-
+            
             ICollection<ElementId> stairLandingsICollectionId = stair.GetStairsLandings();
             MessageBox.Show("平台:" + stairLandingsICollectionId.Count.ToString());
             ICollection<ElementId> stairRunsICollectionId = stair.GetStairsRuns();
@@ -247,9 +234,16 @@ public class BOM : IExternalCommand
                 {
                     stairLandingsList.Add(elem);
                 }
+
             }
 
-            //平台的參數
+            foreach(StairsLanding stairsLanding in stairLandingsList)
+            {
+                stairLandingBottomLevel += stairsLanding.BaseElevation;
+            }
+            
+
+            //平台的參數9
             foreach (Element stairLanding in stairLandingsList)
             {
                 // 獲取樓梯平台的Geometry對象
@@ -316,7 +310,7 @@ public class BOM : IExternalCommand
 
                                 // 計算底面的面積
                                 double bottomFaceArea = bottomFace.Area;
-                                allBottomFaceArea.Add(-bottomFaceArea);
+                                allBottomFaceArea.Add(bottomFaceArea);
 
                                 MessageBox.Show("底面面積: " + SquareUnitToSquareCentimeter(bottomFaceArea).ToString());
 
@@ -354,20 +348,40 @@ public class BOM : IExternalCommand
                     }
                 }
                 // break;
+
+                for (int i = 0; i < allTopFaceArea.Count; i++)
+                {
+
+                    landing_allTopFaceArea += allTopFaceArea[i];
+                }
+
+                for (int i = 0; i < allBottomFaceArea.Count; i++)
+                {
+                    landing_allBottomFaceArea += allBottomFaceArea[i];
+                }
             }
 
 
+            //double m_stairLandingBottomLevel = 0;
+            //double e_stairLandingBottomLevel = 0;
 
 
-            landingArea = (double)(stairLandingWidth * stairLandingLength) / 10000;
+            stairRunBottomLength = stairLandingBottomLevel / stairActualRiserHight * (Math.Sqrt(Math.Pow(stairActualRiserHight, 2) + Math.Pow(stairActualTreadDepth, 2)));
+            
+
+            landingArea = (double)(landing_allTopFaceArea + landing_allBottomFaceArea) / 10000;
             threadsArea = (double)(stairRunsWidth * stairPathLength * 2) / 10000;
             risersArea = (double)(stairRunsWidth * stairActualRiserHight * stairActualNumRisers) / 10000;
-            pathArea = (double)(stairRunsWidth * stairPathhypotenuseLength * 2) / 10000;
-            totalArea = (double)(landingArea + threadsArea + risersArea + pathArea);
+
+            stairRunBottomArea = (double)(stairRunsWidth * stairRunBottomLength) / 10000;
+
+            totalArea = (double)(threadsArea + risersArea + stairRunBottomArea + landingArea);
 
             MessageBox.Show(panelName + "\n" + panelCode + "\n" +
-                stairActualRiserHight.ToString() + "\n" + stairActualTreadDepth.ToString() + "\n" + stairNosingLength.ToString() + "\n" + stairActualNumRisers.ToString() + "\n" + stairPathhypotenuseLength.ToString() + "\n" +
-                landingArea.ToString() + "\n" + threadsArea.ToString() + "\n" + risersArea.ToString() + "\n" + pathArea.ToString() + "\n" + totalArea.ToString());
+                stairActualRiserHight.ToString() + "\n" + stairActualTreadDepth.ToString() + "\n" +
+                stairNosingLength.ToString() + "\n" + stairActualNumRisers.ToString() + "\n" + stairRunBottomLength.ToString() + "\n" +
+                landingArea.ToString() + "\n" + threadsArea.ToString() + "\n" + risersArea.ToString() + "\n" +
+                stairRunBottomArea.ToString() + "\n" + totalArea.ToString());
         }
 
         //BOM表
@@ -410,6 +424,7 @@ public class BOM : IExternalCommand
 
         BOMData bOMData = new BOMData()
         {
+
             名稱 = panelName,
             實際梯段寬度 = stairRunsWidth,
             實際級高 = stairActualRiserHight,
@@ -418,14 +433,15 @@ public class BOM : IExternalCommand
             梯段路徑長度 = stairPathLength,
             突沿長度 = stairNosingLength,
 
-            平台長度 = stairLandingLength,
-            平台寬度 = stairLandingWidth,
+            所有平台底部高度 = stairLandingBottomLevel,
 
-            平台面積 = landingArea,
             踏板面積 = threadsArea,
             立板面積 = risersArea,
-            路徑斜面積 = pathArea,
+            所有梯段斜面面積 = stairRunBottomArea,
+            平台總面積 = landingArea,
             總面積 = totalArea
+
+
         };
         keyValuePairs[panelName] = bOMData;
 
