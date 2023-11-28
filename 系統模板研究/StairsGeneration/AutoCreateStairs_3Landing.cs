@@ -594,7 +594,7 @@ namespace Modeling
                     //newRun2.LookupParameter("從豎板開始").Set(0);
                     //newRun2.LookupParameter("突沿長度").Set(2);
 
-                    StairsLanding newLanding3 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[0], newRun2.TopElevation);
+                    StairsLanding newLanding3 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[2], newRun2.TopElevation);
 
                     //StairsRun newRun3 = StairsRun.CreateSketchedRun(doc, newStairsId, newRun2.TopElevation, bdryCurves3, riserCurves3, pathCurves3);
 
