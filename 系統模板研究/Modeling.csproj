@@ -86,7 +86,7 @@
     <Compile Include="Test Function\AutoCreateSlabs_Test2.cs" />
     <Compile Include="AutoCreateOpening.cs" />
     <Compile Include="AutoCreateSlab.cs" />
-    <Compile Include="StairsGeneration\AutoCreateStairs_last.cs" />
+    <Compile Include="StairsGeneration\AutoCreateStairs_5Landing.cs" />
     <Compile Include="StairsGeneration\AutoCreateStairs_ClickCADLayer.cs" />
     <Compile Include="StairsGeneration\AutoCreateStairs_ClickLine.cs" />
     <Compile Include="StairsGeneration\AutoCreateStairs_Ex.cs" />

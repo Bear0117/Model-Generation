@@ -270,8 +270,8 @@ public class BOM : IExternalCommand
                             if (Math.Abs(dotProduct - 1.0) < 1e-9)
                             {
                                 riserTopFace = face;
-                                //MessageBox.Show("抓到頂面");
-                                
+                                MessageBox.Show("抓到頂面");
+
                                 stairRunsWidth = 0.0;
                                 Edge longestEdge = null;
 
