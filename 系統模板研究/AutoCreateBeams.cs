@@ -747,6 +747,12 @@ namespace Modeling
                                                                     int startIndex1 = text.TextString.IndexOf("H(") + 2;
                                                                     int endIndex1 = text.TextString.IndexOf(")", startIndex1);
                                                                     beamDepth = text.TextString.Substring(startIndex1, endIndex1 - startIndex1);
+                                                                    //MessageBox.Show(beamDepth);
+                                                                    if (beamDepth.Contains("("))
+                                                                    {
+                                                                        continue;
+                                                                        //MessageBox.Show(beamDepth);
+                                                                    }
                                                                     int intBeamDepth = Int32.Parse(beamDepth) / 10;
                                                                     beamDepth = intBeamDepth.ToString();
                                                                     distanceBetweenTB_depth = distance_cad_text;

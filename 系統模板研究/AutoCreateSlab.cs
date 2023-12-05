@@ -130,8 +130,8 @@ namespace Modeling
                     }
                 }
             }
-            MessageBox.Show(slabOutlines.Count.ToString());
-            MessageBox.Show(openOutlines.Count.ToString());
+            //MessageBox.Show(slabOutlines.Count.ToString());
+            //MessageBox.Show(openOutlines.Count.ToString());
 
 
 
