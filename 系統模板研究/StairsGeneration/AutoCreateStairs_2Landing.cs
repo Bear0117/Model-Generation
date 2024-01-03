@@ -942,7 +942,6 @@ namespace Modeling
             lines_2.Reverse();
             return (lines_1, lines_2);
         }
-
         private string GetParameterInformation(Parameter para, Document document)
         {
             string defName = para.Definition.Name;
@@ -1047,7 +1046,6 @@ namespace Modeling
 
             return landingLoop;
         }
-
         public XYZ ConvertFeetToCentimeters(XYZ xyz)
         {
             // 将 XYZ 坐标从英尺转换为公分
@@ -1058,7 +1056,15 @@ namespace Modeling
         {
             return UnitUtils.ConvertToInternalUnits(value, UnitTypeId.Centimeters);
         }
-
+        public XYZ PointMilimeterToUnit(XYZ point)
+        {
+            XYZ newPoint = new XYZ(
+                CentimetersToUnits(point.X),
+                CentimetersToUnits(point.Y),
+                CentimetersToUnits(point.Z)
+                );
+            return newPoint;
+        }
         public XYZ GetNearestLine(List<XYZ> points, String path)
         {
             List<XYZ> ups = new List<XYZ>();
@@ -1156,8 +1162,6 @@ namespace Modeling
                 throw new InvalidOperationException("No closest point found.");
             }
         }
-
-
         public XYZ ConverCADPointToRevitPoint(Point3d point)
         {
             return new XYZ(point.X, point.Y, point.Z);
@@ -1166,15 +1170,6 @@ namespace Modeling
         {
             CADLinkType cadLinkType = revitDoc.GetElement(cadLinkTypeID) as CADLinkType;
             return ModelPathUtils.ConvertModelPathToUserVisiblePath(cadLinkType.GetExternalFileReference().GetAbsolutePath());
-        }
-        public XYZ PointMilimeterToUnit(XYZ point)
-        {
-            XYZ newPoint = new XYZ(
-                CentimetersToUnits(point.X),
-                CentimetersToUnits(point.Y),
-                CentimetersToUnits(point.Z)
-                );
-            return newPoint;
         }
         public List<Autodesk.Revit.DB.Line> CurveLoopToLineList(CurveLoop curveLoop)
         {

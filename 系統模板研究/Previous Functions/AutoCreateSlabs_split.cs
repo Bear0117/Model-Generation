@@ -612,7 +612,7 @@ namespace Modeling
                 yCoorList.Add(Algorithm.RoundPoint(curve.GetEndPoint(1), gridline_size).Y);
                 zCoor = curve.GetEndPoint(0).Z;
             }
-
+            
             // Sort the X and Y coordinate values.
             xCoorList.Sort();
             yCoorList.Sort();
@@ -660,7 +660,7 @@ namespace Modeling
                     profile.Append(line3);
                     profile.Append(line4);
 
-                    // Using midpoint to chech whether the rectangle is in the outline or not.
+                    // Using midpoint to check whether the rectangle is in the outline or not.
                     XYZ midPoint = (point1 + point3) / 2;
                     if (IsInsideOutline(midPoint, curveLoop))
                     {
