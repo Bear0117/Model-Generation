@@ -588,7 +588,7 @@ namespace Modeling
                     //newRun1.LookupParameter("突沿長度").Set(2);
 
                     StairsLanding newLanding2 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[1], newRun1.TopElevation);
-
+                    
                     StairsRun newRun2 = StairsRun.CreateSketchedRun(doc, newStairsId, newRun1.TopElevation, bdryCurves2, riserCurves2, pathCurves2);
                     //newRun2.ActualRunWidth = Math.Abs(runLines_2[0].GetEndPoint(0).Y - runLines_2[0].GetEndPoint(1).Y);
                     //newRun2.LookupParameter("從豎板開始").Set(0);
