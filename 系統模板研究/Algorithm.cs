@@ -30,7 +30,7 @@ namespace Modeling
             return newPoint;
         }
 
-        public XYZ XYZUnitsToCentimeters(XYZ point, double gridSize)
+        public XYZ UnitsToCentimeters_RoundPoint(XYZ point, double gridSize)
         {
             XYZ newPoint = new XYZ(
                 UnitsToCentimeters(Math.Round(UnitsToCentimeters(point.X) / gridSize) * gridSize),
