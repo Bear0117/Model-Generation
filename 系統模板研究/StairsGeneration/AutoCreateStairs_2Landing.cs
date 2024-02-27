@@ -580,9 +580,9 @@ namespace Modeling
                     //IList<Curve> pathCurves3 = createRuns3.Item3;
 
 
-                    StairsLanding newLanding1 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[0], Algorithm.CentimetersToUnits(20));
+                    //StairsLanding newLanding1 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[0], Algorithm.CentimetersToUnits(20));
 
-                    StairsRun newRun1 = StairsRun.CreateSketchedRun(doc, newStairsId, Algorithm.CentimetersToUnits(20), bdryCurves1, riserCurves1, pathCurves1);
+                    StairsRun newRun1 = StairsRun.CreateSketchedRun(doc, newStairsId, Algorithm.CentimetersToUnits(0), bdryCurves1, riserCurves1, pathCurves1);
                     //newRun1.ActualRunWidth = Math.Abs(runLines_1[0].GetEndPoint(0).Y - runLines_1[0].GetEndPoint(1).Y);
                     //newRun1.LookupParameter("以豎板結束").Set(0);
                     //newRun1.LookupParameter("突沿長度").Set(2);
@@ -594,7 +594,7 @@ namespace Modeling
                     //newRun2.LookupParameter("從豎板開始").Set(0);
                     //newRun2.LookupParameter("突沿長度").Set(2);
 
-                    //StairsLanding newLanding3 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[0], newRun2.TopElevation);
+                    StairsLanding newLanding3 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[0], newRun2.TopElevation);
 
                     //StairsRun newRun3 = StairsRun.CreateSketchedRun(doc, newStairsId, newRun2.TopElevation, bdryCurves3, riserCurves3, pathCurves3);
 

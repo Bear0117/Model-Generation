@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Modeling.AreaEstimation
 {
-    internal class _111
+    internal class Test1
     {
         //    // 幾何面的邊緣
         //    EdgeArrayArray egdearrayarray = topFace.EdgeLoops;

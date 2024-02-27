@@ -25,7 +25,7 @@ using Aspose.Pdf;
 
 
 [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-public class BOM : IExternalCommand
+public class BOM_AllLanding : IExternalCommand
 {
     public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
     {
@@ -52,28 +52,11 @@ public class BOM : IExternalCommand
         //public double 第二梯段底部斜長度 { get; set; }
         public double 所有平台頂面面積 { get; set; }
         public double 所有平台底面面積 { get; set; }
-        public double 平台總面積1 { get; set; }
-
-        public double 中間平台頂面長 { get; set; }
-        public double 中間平台頂面寬 { get; set; }
-        public double 中間平台底面長 { get; set; }
-        public double 中間平台底面寬 { get; set; }
-        public double 結束平台頂面長 { get; set; }
-        public double 結束平台頂面寬 { get; set; }
-        public double 結束平台底面長 { get; set; }
-        public double 結束平台底面寬 { get; set; }
-        public double 中間平台頂面面積 { get; set; }
-        public double 中間平台底面面積 { get; set; }
-        public double 結束平台頂面面積 { get; set; }
-        public double 結束平台底面面積 { get; set; }
-
-        public double 平台總面積2 { get; set; }
-
+        public double 平台總面積 { get; set; }
         public double 踏板面積 { get; set; }
         public double 立板面積 { get; set; }
         public double 所有梯段斜面面積 { get; set; }
-        public double 總面積1 { get; set; }
-        public double 總面積2 { get; set; }
+        public double 總面積 { get; set; }
 
 
         public BOMData()
@@ -93,19 +76,6 @@ public class BOM : IExternalCommand
             所有平台頂面面積 = 0;
             所有平台底面面積 = 0;
 
-            中間平台頂面長 = 0;
-            中間平台頂面寬 = 0;
-            中間平台底面長 = 0;
-            中間平台底面寬 = 0;
-            結束平台頂面長 = 0;
-            結束平台頂面寬 = 0;
-            結束平台底面長 = 0;
-            結束平台底面寬 = 0;
-
-            中間平台頂面面積 = 0;
-            中間平台底面面積 = 0;
-            結束平台頂面面積 = 0;
-            結束平台底面面積 = 0;
 
             所有梯段底部斜長度 = (所有平台底部高度) / 實際級高 * (Math.Sqrt(Math.Pow(實際級高, 2) + Math.Pow(實際級深, 2)));
             // 第一梯段底部斜長度
@@ -114,16 +84,9 @@ public class BOM : IExternalCommand
             踏板面積 = (實際梯段寬度 * 所有梯段路徑長度 * 2) / 10000;
             立板面積 = (實際梯段寬度 * 實際級高 * 實際梯級數) / 10000;
             所有梯段斜面面積 = 所有梯段底部斜長度 * 實際梯段寬度;
-            平台總面積1 = 所有平台頂面面積 + 所有平台底面面積;
+            平台總面積 = 所有平台頂面面積 + 所有平台底面面積;
 
-            中間平台頂面面積 = 中間平台頂面長 * 中間平台頂面寬;
-            中間平台底面面積 = 中間平台底面長 * 中間平台底面寬;
-            結束平台頂面面積 = 結束平台頂面長 * 結束平台頂面寬;
-            結束平台底面面積 = 結束平台底面長 * 結束平台底面寬;
-            平台總面積2 = 中間平台頂面面積 + 中間平台底面面積 + 結束平台頂面面積 + 結束平台底面面積;
-
-            總面積1 = 踏板面積 + 立板面積 + 所有梯段斜面面積 + 平台總面積1;
-            總面積2 = 踏板面積 + 立板面積 + 所有梯段斜面面積 + 平台總面積2;
+            總面積 = 踏板面積 + 立板面積 + 所有梯段斜面面積 + 平台總面積;
         }
     }
 
@@ -166,26 +129,12 @@ public class BOM : IExternalCommand
 
                 file.WriteLine($"{"面積計算"}");
                 file.WriteLine($"{"1.所有平台頂面面積"},{item.所有平台頂面面積}");
-                file.WriteLine($"{"2.所有平台底面面積"},{item.所有平台底面面積}");
-                //file.WriteLine($"{"3.中間平台頂面長 "},{item.中間平台頂面長}");
-                //file.WriteLine($"{"3-1.中間平台頂面寬 "},{item.中間平台頂面寬}");
-                //file.WriteLine($"{"4.中間平台底面長 "},{item.中間平台底面長}");
-                //file.WriteLine($"{"4-1.中間平台底面寬 "},{item.中間平台底面寬}");
-                //file.WriteLine($"{"5.結束平台頂面長 "},{item.結束平台頂面長}");
-                //file.WriteLine($"{"5-1.結束平台頂面寬 "},{item.結束平台頂面寬}");
-                //file.WriteLine($"{"6.結束平台底面長 "},{item.結束平台底面長}");
-                //file.WriteLine($"{"6-1.結束平台底面寬 "},{item.結束平台底面寬}");
-                file.WriteLine($"{"3.中間平台頂面面積 = 中間平台頂面長 * 中間平台頂面寬 "},{item.中間平台頂面面積}");
-                file.WriteLine($"{"3-1.中間平台底面面積= 中間平台底面長 * 中間平台底面寬"},{item.中間平台底面面積}");
-                file.WriteLine($"{"4-1.結束平台頂面面積= 結束平台頂面長 * 結束平台頂面寬"},{item.結束平台頂面面積}");
-                file.WriteLine($"{"4-2.結束平台底面面積= 結束平台底面長 * 結束平台底面寬"},{item.結束平台底面面積}");
-                file.WriteLine($"{"5. 踏板面積 = 實際梯段寬度 * 所有梯段路徑長度"},{item.踏板面積}");
-                file.WriteLine($"{"6. 立板面積 = 實際梯段寬度 * 實際級高 * 實際梯級數 "},{item.立板面積}");
-                file.WriteLine($"{"7. 所有梯段斜面面積 = 所有梯段底部斜長度 * 實際梯段寬度  "},{item.所有梯段斜面面積}");
-                file.WriteLine($"{"8. 平台總面積1 = 所有平台頂面面積 + 所有平台底面面積"},{item.平台總面積1}");
-                file.WriteLine($"{"8-1. 平台總面積2 = 中間平台底面面積 + 中間平台底面面積 + 結束平台頂面面積 + 結束平台底面面積"},{item.平台總面積2}");
-                file.WriteLine($"{"9. 總面積1 = 踏板面積 + 立板面積 + 梯段總斜面積 + 平台總面積 "},{item.總面積1}");
-                file.WriteLine($"{"9-1. 總面積2 = 踏板面積 + 立板面積 + 梯段總斜面積 + 平台總面積 "},{item.總面積2},{"單位:m^2"}");
+                file.WriteLine($"{"2.所有平台底面面積"},{item.所有平台底面面積}");               
+                file.WriteLine($"{"3. 踏板面積 = 實際梯段寬度 * 所有梯段路徑長度"},{item.踏板面積}");
+                file.WriteLine($"{"4. 立板面積 = 實際梯段寬度 * 實際級高 * 實際梯級數 "},{item.立板面積}");
+                file.WriteLine($"{"5. 所有梯段斜面面積 = 所有梯段底部斜長度 * 實際梯段寬度  "},{item.所有梯段斜面面積}");
+                file.WriteLine($"{"6. 平台總面積 = 所有平台頂面面積 + 所有平台底面面積"},{item.平台總面積}");
+                file.WriteLine($"{"7. 總面積 = 踏板面積 + 立板面積 + 梯段總斜面積 + 平台總面積 "},{item.總面積},{"單位:m^2"}");
                 // 添加空行分隔每个 BOM 条目
             }
         }
@@ -210,15 +159,6 @@ public class BOM : IExternalCommand
         // double m_stairLandingBottomLevel = 0;
         // double e_stairLandingBottomLevel = 0;
 
-        //double midLanding_TopFaceLength = 0;
-        //double midLanding_TopFaceWidth = 0;
-        //double midLanding_BottomFaceLength = 0;
-        //double midLanding_BottomFaceWidth = 0;
-        //double lastLanding_TopFaceLength = 0;
-        //double lastLanding_TopFaceWidth = 0;
-        //double lastLanding_BottomFaceLength = 0;
-        //double lastLanding_BottomFaceWidth = 0;
-
         //面積
         double threadsArea = 0;
         double risersArea = 0;
@@ -226,16 +166,9 @@ public class BOM : IExternalCommand
 
         double landing_allTopFaceArea = 0;
         double landing_allBottomFaceArea = 0;
-        double allLandingArea1 = 0;
+        double allLandingArea = 0;
 
-        double midLandingTopArea = 0; // 中間平台頂面面積
-        double midLandingBottomArea = 0; // 中間平台底面面積
-        double lastLandingTopArea = 0; // 結束平台頂面面積
-        double lastLandingBottomArea = 0; // 結束平台底面面積
-        double allLandingArea2 = 0;
-
-        double totalArea1 = 0;
-        double totalArea2 = 0;
+        double totalArea = 0;
 
 
         //點選樓梯
@@ -251,6 +184,7 @@ public class BOM : IExternalCommand
         IList<Element> stairList = new List<Element>();
         IList<Element> stairRunsList = new List<Element>();
         IList<Element> stairLandingsList = new List<Element>();
+        List<StairsLanding> stairLandingList1 = new List<StairsLanding>();
 
         List<double> landingTopFaceAreasList = new List<double>();
         List<double> landingBottomFaceAreasList = new List<double>();
@@ -381,23 +315,18 @@ public class BOM : IExternalCommand
 
             }
 
+           
             foreach (StairsLanding stairsLanding in stairLandingsList)
             {
                 // 須減平台厚度
-                stairLandingThick = UnitsToMeters(stairsLanding.Thickness);
-                stairLandingBottomLevel = UnitsToMeters(stairsLanding.BaseElevation) - stairLandingThick;
+                stairLandingList1.Add(stairsLanding);
+                // stairLandingThick = UnitsToMeters(stairsLanding.Thickness);
+                // stairLandingBottomLevel = UnitsToMeters(stairsLanding.BaseElevation) - stairLandingThick;
             }
 
-
-            //foreach (StairsLanding stairLanding in stairLandingsList)
-            //{
-            //    if (stairLanding.BaseElevation == stairElevation)
-            //    {
-            //        stairLandingsList.Remove(stairLanding);
-            //    }
-            //}
-
-
+            stairLandingThick = UnitsToMeters(stairLandingList1[stairLandingList1.Count - 1].Thickness);
+            stairLandingBottomLevel = UnitsToMeters(stairLandingList1[stairLandingList1.Count - 1].BaseElevation - stairLandingList1[0].BaseElevation)- stairLandingThick;
+            
             //平台的參數
             foreach (StairsLanding stairLanding in stairLandingsList)
             {
@@ -414,7 +343,7 @@ public class BOM : IExternalCommand
                 List<CurveLoop> topOutlines = new List<CurveLoop>();
                 List<CurveLoop> bottomOutlines = new List<CurveLoop>();
 
-                if (UnitsToMeters(stairLanding.BaseElevation) != stairActualRiserHight)
+                //if (UnitsToCentimeters(stairLanding.BaseElevation) != stairActualRiserHight)
                 {
                     // 編歷Geometry對象以獲取尺寸信息
                     foreach (GeometryObject geomObj in geometryElement)
@@ -428,7 +357,7 @@ public class BOM : IExternalCommand
                         {
                             // 抓取幾何面
                             FaceArray faces = solid.Faces;
-                            //MessageBox.Show("平台面數量:" + faces.Size.ToString());
+                            MessageBox.Show("平台面數量:" + faces.Size.ToString());
                             foreach (Face face in faces)
                             {
                                 XYZ targetFaceNormal = face.ComputeNormal(UV.Zero);
@@ -445,95 +374,6 @@ public class BOM : IExternalCommand
                                     allTopFaceArea.Add(topFaceArea);
                                     MessageBox.Show("頂面面積: " + topFaceArea.ToString());
 
-                                    // 獲取 topFace 的 CurveLoop
-                                    // CurveLoop curveLoop = GetCurveLoopFromFace(topFace);
-                                    PolyLine polyLine = ConvertFaceEdgesToPolyLine(topFace);
-
-                                    List<XYZ> points_list = new List<XYZ>(polyLine.GetCoordinates());
-                                    //foreach (XYZ point in points_list)
-                                    //{
-                                    //    MessageBox.Show("TopFacePoints:" + point.ToString());
-                                    //}
-
-                                    CurveLoop prof = new CurveLoop() as CurveLoop;
-
-                                    for (int i = 0; i < points_list.Count - 1; i++)
-                                    {
-
-                                        if (points_list[i].DistanceTo(points_list[i + 1]) < CentimetersToUnits(0.1))
-                                        {
-                                            continue;
-                                        }
-                                        XYZ line_direction = (points_list[i] - points_list[i + 1]).Normalize();
-                                        if (line_direction == direction)
-                                        {
-                                            prof = new CurveLoop() as CurveLoop;
-                                            isValid = false;
-                                            break;
-                                        }
-                                        Line line = Line.CreateBound(points_list[i], points_list[i + 1]);
-                                        //line = TransformLine(transform, line);
-                                        prof.Append(line);
-                                    }
-
-                                    if (isValid)
-                                    {
-                                        topOutlines.Add(prof);
-                                    }
-
-                                    List<CurveLoop> landingCurves = new List<CurveLoop>();
-
-                                    foreach (CurveLoop topOutLine in topOutlines)
-                                    {
-                                        //foreach (Curve c in topOutLine)
-                                        //{
-                                        //    MessageBox.Show("StartPoint:" + c.GetEndPoint(0).ToString() + "\n" +
-                                        //                    "EndPoint:" + c.GetEndPoint(1).ToString());
-                                        //}
-                                        landingCurves = GetRecSlabsFromPolySlab(topOutLine);
-                                        MessageBox.Show(landingCurves.Count.ToString());
-                                    }
-
-                                    List<double> allTopFaceLength = new List<double>();
-                                    List<double> allTopFaceWidth = new List<double>();
-
-                                    double topFaceLength = 0;
-                                    double topFaceWidth = 0;
-
-                                    foreach (CurveLoop curveLoop in landingCurves)
-                                    {
-                                        List<double> curveLengths = new List<double>();
-                                        foreach (Curve curve in curveLoop)
-                                        {
-                                            //MessageBox.Show("Startpoint_check:" + curve.GetEndPoint(0) + "\n" +
-                                            //                "Endpoint_check:" + curve.GetEndPoint(1));
-
-                                            double curveLength = UnitsToCentimeters(Math.Abs(Math.Sqrt(Math.Pow(curve.GetEndPoint(0).X - curve.GetEndPoint(1).X, 2) +
-                                                                                             Math.Pow(curve.GetEndPoint(0).Y - curve.GetEndPoint(1).Y, 2))));
-                                            MessageBox.Show("平台頂面邊長:" + curveLength.ToString());
-                                            curveLengths.Add(curveLength);
-                                        }
-                                        topFaceLength = curveLengths[0];
-                                        topFaceWidth = curveLengths[1];
-                                        allTopFaceLength.Add(topFaceLength);
-                                        allTopFaceWidth.Add(topFaceWidth);
-                                    }
-
-                                    List<double> landingTopFaceAreas = new List<double>();
-                                    for (int i = 0; i < landingCurves.Count; i++)
-                                    {
-                                        double landingSplitArea = allTopFaceLength[i] * allTopFaceWidth[i];
-                                        MessageBox.Show("平台頂面切割面積:" + landingSplitArea.ToString());
-                                        landingTopFaceAreas.Add(landingSplitArea);
-                                    }
-
-                                    double landingTopFaceArea = 0;
-                                    foreach (double area in landingTopFaceAreas)
-                                    {
-                                        landingTopFaceArea += area;
-                                    }
-                                    MessageBox.Show("平台頂面面面積:" + landingTopFaceArea);
-                                    landingTopFaceAreasList.Add(landingTopFaceArea);
                                 }
 
                                 else if (Math.Abs(dotProduct + 1.0) < 1e-9)
@@ -545,95 +385,6 @@ public class BOM : IExternalCommand
                                     allBottomFaceArea.Add(bottomFaceArea);
                                     MessageBox.Show("底面面積: " + bottomFaceArea.ToString());
 
-                                    // 獲取 bottomFace 的 CurveLoop
-                                    // CurveLoop curveLoop = GetCurveLoopFromFace(bottomFace);
-                                    PolyLine polyLine = ConvertFaceEdgesToPolyLine(bottomFace);
-
-                                    List<XYZ> points_list = new List<XYZ>(polyLine.GetCoordinates());
-                                    //foreach (XYZ point in points_list)
-                                    //{
-                                    //    MessageBox.Show("BottomFacePoints:" + point.ToString());
-                                    //}
-
-                                    CurveLoop prof = new CurveLoop() as CurveLoop;
-
-                                    for (int i = 0; i < points_list.Count - 1; i++)
-                                    {
-
-                                        if (points_list[i].DistanceTo(points_list[i + 1]) < CentimetersToUnits(0.1))
-                                        {
-                                            continue;
-                                        }
-                                        XYZ line_direction = (points_list[i] - points_list[i + 1]).Normalize();
-                                        if (line_direction == direction)
-                                        {
-                                            prof = new CurveLoop() as CurveLoop;
-                                            isValid = false;
-                                            break;
-                                        }
-                                        Line line = Line.CreateBound(points_list[i], points_list[i + 1]);
-                                        //line = TransformLine(transform, line);
-                                        prof.Append(line);
-                                    }
-
-                                    if (isValid)
-                                    {
-                                        bottomOutlines.Add(prof);
-                                    }
-
-                                    List<CurveLoop> landingCurves = new List<CurveLoop>();
-
-                                    foreach (CurveLoop bottomOutLine in bottomOutlines)
-                                    {
-                                        //foreach (Curve c in bottomOutLine)
-                                        //{
-                                        //    MessageBox.Show("StartPoint:" + c.GetEndPoint(0).ToString() + "\n" +
-                                        //                    "EndPoint:" + c.GetEndPoint(1).ToString());
-                                        //}
-                                        landingCurves = GetRecSlabsFromPolySlab(bottomOutLine);
-                                        MessageBox.Show(landingCurves.Count.ToString());
-                                    }
-
-                                    List<double> allBottomFaceLength = new List<double>();
-                                    List<double> allBottomFaceWidth = new List<double>();
-
-                                    double bottomFaceLength = 0;
-                                    double bottomFaceWidth = 0;
-
-                                    foreach (CurveLoop curveLoop in landingCurves)
-                                    {
-                                        List<double> curveLengths = new List<double>();
-                                        foreach (Curve curve in curveLoop)
-                                        {
-                                            //MessageBox.Show("Startpoint_check:" + curve.GetEndPoint(0) + "\n" +
-                                            //                "Endpoint_check:" + curve.GetEndPoint(1));
-
-                                            double curveLength = UnitsToCentimeters(Math.Abs(Math.Sqrt(Math.Pow(curve.GetEndPoint(0).X - curve.GetEndPoint(1).X, 2) +
-                                                                                             Math.Pow(curve.GetEndPoint(0).Y - curve.GetEndPoint(1).Y, 2))));
-                                            MessageBox.Show("平台頂面邊長:" + curveLength.ToString());
-                                            curveLengths.Add(curveLength);
-                                        }
-                                        bottomFaceLength = curveLengths[0];
-                                        bottomFaceWidth = curveLengths[1];
-                                        allBottomFaceLength.Add(bottomFaceLength);
-                                        allBottomFaceWidth.Add(bottomFaceWidth);
-                                    }
-
-                                    List<double> landingBottomFaceAreas = new List<double>();
-                                    for (int i = 0; i < landingCurves.Count; i++)
-                                    {
-                                        double landingSplitArea = allBottomFaceLength[i] * allBottomFaceWidth[i];
-                                        MessageBox.Show("平台頂面切割面積:" + landingSplitArea.ToString());
-                                        landingBottomFaceAreas.Add(landingSplitArea);
-                                    }
-
-                                    double landingBottomFaceArea = 0;
-                                    foreach (double area in landingBottomFaceAreas)
-                                    {
-                                        landingBottomFaceArea += area;
-                                    }
-                                    MessageBox.Show("平台頂面面面積:" + landingBottomFaceArea);
-                                    landingBottomFaceAreasList.Add(landingBottomFaceArea);
                                 }
 
                             }
@@ -657,29 +408,21 @@ public class BOM : IExternalCommand
 
         stairRunBottomLength = stairLandingBottomLevel / stairActualRiserHight * (Math.Sqrt(Math.Pow(stairActualRiserHight, 2) + Math.Pow(stairActualTreadDepth, 2)));
 
-        
-        allLandingArea1 = (double)(landing_allTopFaceArea + landing_allBottomFaceArea); // 確定的平台面積
-
-        midLandingTopArea = landingTopFaceAreasList[0];
-        midLandingBottomArea = landingBottomFaceAreasList[0];
-        lastLandingTopArea = landingTopFaceAreasList[1];
-        lastLandingBottomArea = landingBottomFaceAreasList[1];
-        allLandingArea2 = midLandingTopArea + midLandingBottomArea + lastLandingTopArea + lastLandingBottomArea;
+        allLandingArea = (double)(landing_allTopFaceArea + landing_allBottomFaceArea); // 確定的平台面積
 
         threadsArea = (double)(stairRunsWidth * stairPathLength);
-        risersArea = (double)(stairRunsWidth * stairActualRiserHight * stairActualNumRisers) ;
+        risersArea = (double)(stairRunsWidth * stairActualRiserHight * (stairActualNumRisers)) ;
 
         stairRunBottomArea = (double)(stairRunsWidth * stairRunBottomLength);
 
-        totalArea1 = (double)(threadsArea + risersArea + stairRunBottomArea + allLandingArea1);
-        totalArea2 = (double)(threadsArea + risersArea + stairRunBottomArea + allLandingArea2);
+        totalArea = (double)(threadsArea + risersArea + stairRunBottomArea + allLandingArea);
 
 
         MessageBox.Show(panelName + "\n" + panelCode + "\n" +
             stairActualRiserHight.ToString() + "\n" + stairActualTreadDepth.ToString() + "\n" +
             stairActualNumRisers.ToString() + "\n" + stairRunBottomLength.ToString() + "\n" +
-            allLandingArea1.ToString() + "\n" + allLandingArea2.ToString() + "\n" + threadsArea.ToString() + "\n" + risersArea.ToString() + "\n" +
-            stairRunBottomArea.ToString() + "\n" + totalArea1.ToString() + "\n" + totalArea2.ToString());
+            allLandingArea.ToString()  + "\n" + threadsArea.ToString() + "\n" + risersArea.ToString() + "\n" +
+            stairRunBottomArea.ToString() + "\n" + totalArea.ToString() );
 
 
         //BOM表
@@ -701,27 +444,12 @@ public class BOM : IExternalCommand
             所有平台頂面面積 = landing_allTopFaceArea,
             所有平台底面面積 = landing_allBottomFaceArea,
 
-            //中間平台頂面長 = midLanding_TopFaceLength,
-            //中間平台頂面寬 = midLanding_TopFaceWidth,
-            //中間平台底面長 = midLanding_BottomFaceLength,
-            //中間平台底面寬 = midLanding_BottomFaceWidth,
-            //結束平台頂面長 = lastLanding_TopFaceLength,
-            //結束平台頂面寬 = lastLanding_TopFaceWidth,
-            //結束平台底面長 = lastLanding_BottomFaceLength,
-            //結束平台底面寬 = lastLanding_BottomFaceWidth,
-
-            中間平台頂面面積 = midLandingTopArea,
-            中間平台底面面積 = midLandingBottomArea,
-            結束平台頂面面積 = lastLandingTopArea,
-            結束平台底面面積 = lastLandingBottomArea,
-
             踏板面積 = threadsArea,
             立板面積 = risersArea,
             所有梯段斜面面積 = stairRunBottomArea,
-            平台總面積1 = allLandingArea1,
-            平台總面積2 = allLandingArea2,
-            總面積1 = totalArea1,
-            總面積2 = totalArea2,
+            平台總面積 = allLandingArea,
+            
+            總面積 = totalArea,
 
         };
         keyValuePairs[panelName] = bOMData;
@@ -1270,12 +998,12 @@ public class BOM : IExternalCommand
     public double SquareUnitToSquareCentimeter(double squareInch)
     {
         double conversionFactor = 929.0304;
-        return Math.Round(squareInch * conversionFactor);
+        return squareInch * conversionFactor;
     }
     public double SquareUnitToSquareMeter(double squareInch)
     {
-        double conversionFactor = 9.290304;
-        return Math.Round(squareInch * conversionFactor);
+        double conversionFactor = 0.09290304;
+        return squareInch * conversionFactor;
     }
     public static XYZ RoundPoint(XYZ point, double gridSize)
     {
@@ -1352,8 +1080,6 @@ public class BOM : IExternalCommand
 
         return groupedPoints;
     }
-
-
     public Dictionary<double, List<XYZ>> GroupPointsByY(List<XYZ> points) //將相同Y座標的點存到同一個List
     {
         Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
@@ -1372,8 +1098,6 @@ public class BOM : IExternalCommand
 
         return groupedPoints;
     }
-
-
     public Dictionary<double, List<XYZ>> GroupPointsByX(List<XYZ> points) //將相同 X 座標的點存到同一個List
     {
         Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
@@ -1392,8 +1116,6 @@ public class BOM : IExternalCommand
 
         return groupedPoints;
     }
-
-
     public List<Line> xMaxAndMinPointsInList(List<XYZ> coordinateGroup) // 在相同 Y 座標裡的點找出 X 最大及最小的點連線
     {
         List<Line> horrizontalLines = new List<Line>();
@@ -1426,8 +1148,6 @@ public class BOM : IExternalCommand
 
         return horrizontalLines;
     }
-
-
     public List<Line> yMaxAndMinPointsInList(List<XYZ> coordinateGroup) // 在相同 X 座標裡的點找出 Y 最大及最小的點連線
     {
         List<Line> verticalLines = new List<Line>();
@@ -1458,7 +1178,6 @@ public class BOM : IExternalCommand
 
         return verticalLines;
     }
-
     public (List<Line>, List<Line>) LandingBoundaryLines(Dictionary<double, List<XYZ>> pointDictionary)
     {
         List<Line> horrizontalLines = new List<Line>(); // 存 Y 相同的點的，其 X 最大和最小值相連的線
