@@ -50,19 +50,20 @@ namespace Modeling
                 //建立標駐所需要的參考
                 foreach (StairsLanding stairLanding in stairLandingsList)
                 {
-                    List<Face> stairLandingTopFace = GetFace(stairLanding).Item1;
-                    List<Face> stairLandingBottomFace = GetFace(stairLanding).Item2;
+                    ViewSection sectionView = uidoc.ActiveView as ViewSection;
 
-                    List<Line> stairLandingTopLine = GetLine(stairLandingTopFace);
-                    stairLandingTopLine = MergeLines(stairLandingTopLine, 0.00001);
+                    List<Face> stairLandingFace = GetFace(stairLanding, sectionView.ViewDirection);
 
-                    List<Line> stairLandingBottomLine = GetLine(stairLandingBottomFace);
-                    stairLandingBottomLine = MergeLines(stairLandingBottomLine, 0.00001);
+                    List<Line> stairLandingLine = GetLine(stairLandingFace);
+                    stairLandingLine = MergeLines(stairLandingLine, 0.00001);
 
                     Transaction tran = new Transaction(doc, "Create Dimension");
                     tran.Start();
+                    
+                    //Plane plane = Plane.CreateByNormalAndOrigin(viewDirection, uidoc.ActiveView.Origin);
+                    //MessageBox.Show(uidoc.ActiveView.ViewDirection.ToString() + uidoc.ActiveView.Origin.ToString());
 
-                    foreach (Line line in stairLandingTopLine)
+                    foreach (Line line in stairLandingLine)
                     {
                         if (line.GetEndPoint(0).Y == line.GetEndPoint(1).Y)
                         {
@@ -72,6 +73,14 @@ namespace Modeling
                             Plane sketchPlanePlane = sketchPlane.GetPlane();
                             double parameter1 = sketchPlanePlane.Normal.DotProduct(line.GetEndPoint(0) - sketchPlanePlane.Origin);
                             double parameter2 = sketchPlanePlane.Normal.DotProduct(line.GetEndPoint(1) - sketchPlanePlane.Origin);
+                            Curve curve = line as Curve;
+
+                            if (curve.GetEndPointReference(0) != null)
+                            {
+                                MessageBox.Show("It is not empty!");
+                            }
+
+
                             if (Math.Abs(parameter1) < 0.0001 && Math.Abs(parameter2) < 0.0001)
                             {
                                 // 在 Family Editor 中創建一個 ModelCurve
@@ -92,35 +101,6 @@ namespace Modeling
                         }
                     }
 
-                    foreach (Line line in stairLandingBottomLine)
-                    {
-                        if (line.GetEndPoint(0).Y == line.GetEndPoint(1).Y)
-                        {
-                            // 創建一個平面
-                            Plane plane = Plane.CreateByNormalAndOrigin(uidoc.ActiveView.ViewDirection, new XYZ(0, line.GetEndPoint(0).Y, 0));
-                            SketchPlane sketchPlane = SketchPlane.Create(doc, plane);
-                            Plane sketchPlanePlane = sketchPlane.GetPlane();
-                            double parameter1 = sketchPlanePlane.Normal.DotProduct(line.GetEndPoint(0) - sketchPlanePlane.Origin);
-                            double parameter2 = sketchPlanePlane.Normal.DotProduct(line.GetEndPoint(1) - sketchPlanePlane.Origin);
-                            if (Math.Abs(parameter1) < 0.0001 && Math.Abs(parameter2) < 0.0001)
-                            {
-                                // 在 Family Editor 中創建一個 ModelCurve
-                                ModelCurve modelCurve = doc.Create.NewModelCurve(line, sketchPlane);
-
-                                XYZ offsetStartPoint = GetOffsetByStairLandingOrientation(modelCurve.GeometryCurve.GetEndPoint(0), -0.05);
-                                XYZ offsetEndPoint = GetOffsetByStairLandingOrientation(modelCurve.GeometryCurve.GetEndPoint(1), -0.05);
-                                Line offsetLine = Line.CreateBound(offsetStartPoint, offsetEndPoint);
-
-                                ReferenceArray referenceArray = new ReferenceArray();
-                                // MessageBox.Show(modelCurve.GeometryCurve.GetEndPointReference(0) + "\n" + modelCurve.GeometryCurve.GetEndPointReference(1));
-
-                                referenceArray.Append(modelCurve.GeometryCurve.GetEndPointReference(0));
-                                referenceArray.Append(modelCurve.GeometryCurve.GetEndPointReference(1));
-                                // MessageBox.Show("參考數量:"+referenceArray.Size.ToString());
-                                doc.Create.NewDimension(uidoc.ActiveView, offsetLine, referenceArray);
-                            }
-                        }
-                    }
                     tran.Commit();
                 }
 
@@ -154,11 +134,10 @@ namespace Modeling
         //    return dimensionLine;
         //}
 
-        private (List<Face>,List<Face>) GetFace(Element element)
+        private List<Face>  GetFace(Element element, XYZ viewDirection)
         {
             GeometryElement geometryElement = element.get_Geometry(new Options());
-            List<Face> topFace = new List<Face>();
-            List<Face> bottomFace = new List<Face>();
+            List<Face> newFace = new List<Face>();
 
             // 編歷Geometry對象以獲取尺寸信息
             foreach (GeometryObject geomObj in geometryElement)
@@ -173,23 +152,14 @@ namespace Modeling
                     foreach (Face face in faces)
                     {
                         XYZ targetFaceNormal = face.ComputeNormal(UV.Zero);
-                        XYZ zDirection = XYZ.BasisZ;
-                        double dotProduct = zDirection.DotProduct(targetFaceNormal);
-                        //Zdirection.DotProduct(targetFaceNormal))  == 1 或是 == -1
-
-                        if (Math.Abs(dotProduct - 1.0) < 1e-9 )
+                        if (targetFaceNormal.DotProduct(viewDirection) > 0)
                         {
-                            topFace.Add(face);
-                        }
-
-                        if (Math.Abs(dotProduct + 1.0) < 1e-9)
-                        {
-                            bottomFace.Add(face);
+                            newFace.Add(face);
                         }
                     }
                 }
             }
-            return (topFace, bottomFace);
+            return newFace;
         }
 
         private List<Line> GetLine(List<Face> faces)
@@ -203,12 +173,31 @@ namespace Modeling
                 foreach (Edge edge in edges)
                 {
                     Line line = edge.AsCurve() as Line;
-                    lineList.Add(line);
+                    if (IsVectorHorizontal(line.Direction, XYZ.BasisX))
+                    {
+                        lineList.Add(line);
+                    }
+                    if (IsVectorHorizontal(line.Direction, XYZ.BasisY))
+                    {
+                        lineList.Add(line);
+                    }
+
                 }
             }
             // MessageBox.Show("線數量:"+lineList.Count.ToString());
             return lineList;
         }
+
+        bool IsVectorHorizontal(XYZ vector, XYZ referenceDirection)
+        {
+            double dotProduct = vector.DotProduct(referenceDirection);
+
+            // 如果兩個向量的點積為1（或者-1），表示它們平行
+            // 這裡可以考慮一個小的閾值，因為在實際應用中可能不會精確為1（或者-1）
+            double tolerance = 1e-9;
+            return Math.Abs(Math.Abs(dotProduct) - 1) < tolerance;
+        }
+
         public List<Line> MergeLines(List<Line> lines, double tolerance)
         {
             List<Line> mergedLines = new List<Line>();
@@ -287,5 +276,7 @@ namespace Modeling
 
             return returnPoint;
         }
+
+
     }
 }

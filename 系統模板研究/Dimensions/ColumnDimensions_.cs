@@ -32,6 +32,7 @@ namespace Modeling
 
             ids = ids.OrderByDescending(e => doc.GetElement(e).get_BoundingBox(null).Max.Y).ToList();
             double height = uidoc.ActiveGraphicalView.GenLevel.Elevation;
+
             foreach (ElementId elemId in ids)
             {
 
