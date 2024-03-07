@@ -76,7 +76,9 @@
     <Compile Include="AreaEstimation\BOM_Test1.cs" />
     <Compile Include="AreaEstimation\Test1.cs" />
     <Compile Include="AreaEstimation\Test2_wei1.cs" />
+    <Compile Include="Dimensions\StairDimensions_Elevation .cs" />
     <Compile Include="Dimensions\StairLandindDimensions_FloorPlane.cs" />
+    <Compile Include="Dimensions\StairRunDimensions_Elevation .cs" />
     <Compile Include="Dimensions\WallDimensionsl.cs" />
     <Compile Include="Dimensions\StairLandingDimensions.cs" />
     <Compile Include="Dimensions\StairLandingDimensions_Elevation.cs" />

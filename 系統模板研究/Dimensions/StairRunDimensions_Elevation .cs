@@ -17,7 +17,7 @@ using System.Net;
 namespace Modeling
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    class StairLandingDimensions_Elevation : IExternalCommand
+    class StairRunDimensions_Elevation : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -33,37 +33,62 @@ namespace Modeling
             {
                 Stairs selectedStair = selectedElem as Stairs;
 
-                ICollection<ElementId> stairLandingsICollectionId = selectedStair.GetStairsLandings();
-                // MessageBox.Show("平台:" + stairLandingsICollectionId.Count.ToString());
+                ICollection<ElementId> stairRunsICollectionId = selectedStair.GetStairsRuns();
+                // MessageBox.Show("梯段:" + stairRunsICollectionId.Count.ToString());
 
-                //選到的樓梯裡的平台
-                IList<Element> stairLandingsList = new List<Element>();
-                foreach (ElementId stairLandingsId in stairLandingsICollectionId)
+                //選到的樓梯裡的梯段
+                IList<Element> stairRunsList = new List<Element>();
+                foreach (ElementId stairRunsId in stairRunsICollectionId)
                 {
-                    Element elem = doc.GetElement(stairLandingsId);
+                    Element elem = doc.GetElement(stairRunsId);
                     if (elem != null)
                     {
-                        stairLandingsList.Add(elem);
+                        stairRunsList.Add(elem);
                     }
                 }
 
                 //建立標駐所需要的參考
-                foreach (StairsLanding stairLanding in stairLandingsList)
+                foreach (StairsRun stairRun in stairRunsList)
                 {
                     ViewSection sectionView = uidoc.ActiveView as ViewSection;
 
-                    List<Face> stairLandingFace = GetLandingFace(stairLanding, sectionView.ViewDirection);
+                    List<Face> stairRunFace = GetRunFace(stairRun, sectionView.ViewDirection);
 
-                    List<Line> stairLandingLine = GetLandingLine(stairLandingFace);
-                    stairLandingLine = MergeLines(stairLandingLine, 0.00001);
+                    List<Line> stairRunHorrizontalLine = GetRunLine(stairRunFace).Item1;
+                    List<Line> stairRunVerticalLine = GetRunLine(stairRunFace).Item2;
+                    List<Line> stairRunSlopeLine = GetRunLine(stairRunFace).Item3;
+
+                    stairRunHorrizontalLine = AlignAndSortLines(stairRunHorrizontalLine, XYZ.BasisX);
+                    stairRunVerticalLine = AlignAndSortLines(stairRunVerticalLine, XYZ.BasisX);
+                    stairRunSlopeLine = AlignAndSortLines(stairRunSlopeLine, XYZ.BasisX);
+
+                    stairRunHorrizontalLine = RemoveSameLines(stairRunHorrizontalLine);
+                    stairRunVerticalLine = RemoveSameLines(stairRunVerticalLine);
+                    stairRunSlopeLine = RemoveSameLines(stairRunSlopeLine);
+
+                    stairRunHorrizontalLine = MergeLines(stairRunHorrizontalLine, 0.00001);
+                    stairRunVerticalLine = MergeLines(stairRunVerticalLine, 0.00001);
+                    stairRunSlopeLine = MergeLines(stairRunSlopeLine, 0.00001);
+
+                    List<Line> stairRunLine = new List<Line>();
+                    foreach (Line line in stairRunHorrizontalLine)
+                    {
+                        stairRunLine.Add(line);
+                    }
+                    //foreach (Line line in stairRunVerticalLine)
+                    //{
+                    //    stairRunLine.Add(line);
+                    //}
+                    foreach (Line line in stairRunSlopeLine)
+                    {
+                        stairRunLine.Add(line);
+                    }
+
 
                     Transaction tran = new Transaction(doc, "Create Dimension");
                     tran.Start();
                     
-                    //Plane plane = Plane.CreateByNormalAndOrigin(viewDirection, uidoc.ActiveView.Origin);
-                    //MessageBox.Show(uidoc.ActiveView.ViewDirection.ToString() + uidoc.ActiveView.Origin.ToString());
-
-                    foreach (Line line in stairLandingLine)
+                    foreach (Line line in stairRunLine)
                     {
                         if (line.GetEndPoint(0).Y == line.GetEndPoint(1).Y)
                         {
@@ -73,7 +98,7 @@ namespace Modeling
                             Plane sketchPlanePlane = sketchPlane.GetPlane();
                             double parameter1 = sketchPlanePlane.Normal.DotProduct(line.GetEndPoint(0) - sketchPlanePlane.Origin);
                             double parameter2 = sketchPlanePlane.Normal.DotProduct(line.GetEndPoint(1) - sketchPlanePlane.Origin);
-                            
+                         
                             if (Math.Abs(parameter1) < 0.0001 && Math.Abs(parameter2) < 0.0001)
                             {
                                 // 在 Family Editor 中創建一個 ModelCurve
@@ -112,22 +137,9 @@ namespace Modeling
         {
             return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Centimeters);
         }
-        //public Line GreateDimensionLine(List<Edge> sortedEdges, double value)
-        //{
-        //    Edge edge = sortedEdges[0];
-        //    Line line = edge.AsCurve() as Line;
-        //    XYZ lineDirection = (line.GetEndPoint(1) - line.GetEndPoint(0)).Normalize();
-        //    XYZ offsetVector = lineDirection * value;
+        
 
-        //    // 偏移线的起点和终点
-        //    XYZ offsetStartPoint = line.GetEndPoint(0) + offsetVector;
-        //    XYZ offsetEndPoint = line.GetEndPoint(1) + offsetVector;
-
-        //    Line dimensionLine = Line.CreateBound(offsetStartPoint, offsetEndPoint);
-        //    return dimensionLine;
-        //}
-
-        private List<Face>  GetLandingFace(Element element, XYZ viewDirection)
+        private List<Face>  GetRunFace(Element element, XYZ viewDirection)
         {
             GeometryElement geometryElement = element.get_Geometry(new Options());
             List<Face> newFace = new List<Face>();
@@ -154,10 +166,12 @@ namespace Modeling
             }
             return newFace;
         }
-
-        private List<Line> GetLandingLine(List<Face> faces)
+        private (List<Line>, List<Line>, List<Line>) GetRunLine(List<Face> faces)
         {
-            List<Line> lineList = new List<Line>();
+            List<Line> verticalLineList = new List<Line>();
+            List<Line> horrizontalLineList = new List<Line>();
+            List<Line> slopeLineList = new List<Line>();
+
             foreach (Face face in faces)
             {
                 EdgeArrayArray edgeArrays = face.EdgeLoops;
@@ -166,22 +180,23 @@ namespace Modeling
                 foreach (Edge edge in edges)
                 {
                     Line line = edge.AsCurve() as Line;
-                    if (IsVectorHorizontal(line.Direction, XYZ.BasisX))
+                    if (LineDirection(line.Direction, XYZ.BasisY) || LineDirection(line.Direction, XYZ.BasisX))
                     {
-                        lineList.Add(line);
+                        horrizontalLineList.Add(line);
                     }
-                    if (IsVectorHorizontal(line.Direction, XYZ.BasisY))
+                    else if (LineDirection(line.Direction, XYZ.BasisZ))
                     {
-                        lineList.Add(line);
+                        verticalLineList.Add(line);
                     }
-
+                    else
+                    {
+                        slopeLineList.Add(line);
+                    }
                 }
             }
-            // MessageBox.Show("線數量:"+lineList.Count.ToString());
-            return lineList;
+            return (horrizontalLineList, verticalLineList, slopeLineList);
         }
-
-        bool IsVectorHorizontal(XYZ vector, XYZ referenceDirection)
+        bool LineDirection(XYZ vector, XYZ referenceDirection)
         {
             double dotProduct = vector.DotProduct(referenceDirection);
 
@@ -190,7 +205,41 @@ namespace Modeling
             double tolerance = 1e-9;
             return Math.Abs(Math.Abs(dotProduct) - 1) < tolerance;
         }
+        private List<Line> AlignAndSortLines(List<Line> lines, XYZ targetDirection)
+        { 
+            List<Line> newLine = new List<Line>();
 
+            // 1. 修改斜線方向
+            foreach (Line line in lines)
+            {
+                XYZ currentDirection = line.Direction;
+
+                // 檢查方向是否與目標方向相反
+                if (currentDirection.DotProduct(targetDirection) < 0)
+                {
+                    // 反轉方向
+                    Line flippedLine = Line.CreateBound(line.GetEndPoint(1), line.GetEndPoint(0));
+                    newLine.Add(flippedLine);
+                }
+            }
+
+            // 2. 排序
+            newLine = newLine.OrderBy(line => line.GetEndPoint(0).X).ToList();
+
+            return newLine;
+        }
+        private List<Line> RemoveSameLines(List<Line> lines)
+        {
+            for(int i = 0; i < lines.Count - 1; i++)
+            {
+                if(lines[i].GetEndPoint(0).IsAlmostEqualTo(lines[i+1].GetEndPoint(0)) &&
+                   lines[i].GetEndPoint(1).IsAlmostEqualTo(lines[i + 1].GetEndPoint(1)))
+                {
+                    lines.Remove(lines[i]);
+                }
+            }
+            return lines;
+        }
         public List<Line> MergeLines(List<Line> lines, double tolerance)
         {
             List<Line> mergedLines = new List<Line>();
@@ -222,8 +271,8 @@ namespace Modeling
                     }
                 }
 
-                //// 將最後一條線段添加到結果列表中
-                //mergedLines.Add(currentLine);
+                // 將最後一條線段添加到結果列表中
+                mergedLines.Add(currentLine);
 
                 // 再次比較最後一條線段與第一條線段
                 if (AreLinesOnSameLine(currentLine, lines[0], tolerance))
@@ -233,19 +282,6 @@ namespace Modeling
                     mergedLines.Remove(currentLine);
                 }
             }
-
-            StringBuilder coordinatesStringBuilder = new StringBuilder();
-            foreach (Line line in mergedLines)
-            {
-                XYZ startPoint = line.GetEndPoint(0);
-                XYZ endPoint = line.GetEndPoint(1);
-
-                // 將座標添加到 StringBuilder
-                coordinatesStringBuilder.AppendLine($"SP: {startPoint}, \n EP: {endPoint}");
-            }
-            // 顯示所有座標在 TaskDialog 中
-            TaskDialog.Show("Line Coordinates", coordinatesStringBuilder.ToString());
-
             return mergedLines;
         }
 
