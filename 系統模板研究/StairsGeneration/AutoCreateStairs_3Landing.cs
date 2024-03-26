@@ -1,40 +1,18 @@
-﻿using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.DB.ExternalService;
-using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.Common;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Security.Policy;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
-using System.Windows.Media;
-using System.Windows.Documents;
-using System.Windows.Automation.Peers;
-using System.Xml.Linq;
-using Aspose.Cells;
-using Aspose.Cells.Charts;
-using Aspose.Pdf.Operators;
-using Aspose.Pdf;
 using Teigha.DatabaseServices;
 using Teigha.Runtime;
 using Teigha.Geometry;
 using Line = Autodesk.Revit.DB.Line;
 using Curve = Autodesk.Revit.DB.Curve;
-using Transform = Autodesk.Revit.DB.Transform;
 using Document = Autodesk.Revit.DB.Document;
-using static System.Net.Mime.MediaTypeNames;
-using System.Collections;
-using System.Drawing;
 using Transaction = Autodesk.Revit.DB.Transaction;
 
 
@@ -48,11 +26,6 @@ namespace Modeling
             UIApplication uiapp = commandData.Application;
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
-
-            // Default "1F"
-            //Level levelBottom = new FilteredElementCollector(doc).OfClass(typeof(Level)).First<Element>(e => e.Name.Equals("4F")) as Level;
-            //Level levelTop = new FilteredElementCollector(doc).OfClass(typeof(Level)).First<Element>(e => e.Name.Equals("5F")) as Level;
-            //FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(Level));
 
             StairPlacement stairPlacement = new StairPlacement(uidoc);
             Level levelBottom = stairPlacement.GetBottomFloor();
@@ -79,14 +52,6 @@ namespace Modeling
                     }
                 }
 
-                //if (doc.GetElement(graphicsStyleId_run) is GraphicsStyle gs)
-                //{
-                //    targetCategory_run = gs.GraphicsStyleCategory;
-
-                //    // Get the name of the CAD layer which is selected (Stair).
-                //    String name = gs.GraphicsStyleCategory.Name;
-                //    //MessageBox.Show(name.ToString());
-                //}
             }
             if (geoElem_run == null || graphicsStyleId_run == null)
             {
@@ -154,60 +119,19 @@ namespace Modeling
             }
 
             //將垂直梯段調整方線並依序排列
-            List<Line> newverticalrunLines = new List<Line>();
-            newverticalrunLines = ArrangeVerticalLines(verticalLines, newverticalrunLines);
+            List<Line> newverticalrunLines = ArrangeVerticalLines(verticalLines);
 
             // 將垂直梯段分為兩邊
-            List<Line> verticalrunLines_1 = new List<Line>();
-            List<Line> verticalrunLines_2 = new List<Line>();
-            (List<Line>, List<Line>) verticalrunLines_classify = ClassifyVerticalLine(verticalrunLines_1, verticalrunLines_2, newverticalrunLines);
-            verticalrunLines_1 = verticalrunLines_classify.Item1;
-            verticalrunLines_2 = verticalrunLines_classify.Item2;
+            List<Line> verticalrunLines_1 = ClassifyVerticalLine(newverticalrunLines).Item1;
+            List<Line> verticalrunLines_2 = ClassifyVerticalLine(newverticalrunLines).Item2;
 
 
             //將水平梯段調整方線並依序排列
-            List<Line> newhorizontalrunLines = new List<Line>();
-            newhorizontalrunLines = ArrangeHorizontalLines(horizontalLines, newhorizontalrunLines);
+            List<Line> newhorizontalrunLines = ArrangeHorizontalLines(horizontalLines);
 
             // 將水平梯段分為兩邊
-            List<Line> horizontalrunLines_1 = new List<Line>();
-            List<Line> horizontalrunLines_2 = new List<Line>();
-            (List<Line>, List<Line>) horizontalrunLines_classify = ClassifyHorizontalLine(horizontalrunLines_1, horizontalrunLines_2, newhorizontalrunLines);
-            horizontalrunLines_1 = horizontalrunLines_classify.Item1;
-            horizontalrunLines_2 = horizontalrunLines_classify.Item2;
-
-            //StringBuilder stv_1 = new StringBuilder();
-            //StringBuilder stv_2 = new StringBuilder();
-            //StringBuilder sth_1 = new StringBuilder();
-            //StringBuilder sth_2 = new StringBuilder();
-
-            //MessageBox.Show(verticalrunLines_1.Count.ToString());
-            //foreach (Line line in verticalrunLines_1)
-            //{
-            //    stv_1.Append(ConvertFeetToCentimeters(line.GetEndPoint(0)).ToString() + "\n");
-            //}
-            //TaskDialog.Show("XYZ", stv_1.ToString());
-
-            //MessageBox.Show(verticalrunLines_2.Count.ToString());
-            //foreach (Line line in verticalrunLines_2)
-            //{
-            //    stv_2.Append(ConvertFeetToCentimeters(line.GetEndPoint(0)).ToString() + "\n");
-            //}
-            //TaskDialog.Show("XYZ", stv_2.ToString());
-
-            //MessageBox.Show(horizontalrunLines_1.Count.ToString());
-            //foreach (Line line in horizontalrunLines_1)
-            //{
-            //    sth_1.Append(ConvertFeetToCentimeters(line.GetEndPoint(0)).ToString() + "\n");
-            //}
-            //TaskDialog.Show("XYZ", sth_1.ToString());
-
-            //MessageBox.Show(horizontalrunLines_2.Count.ToString());
-            //foreach (Line line in horizontalrunLines_2)
-            //{
-            //    sth_2.Append(ConvertFeetToCentimeters(line.GetEndPoint(0)).ToString() + "\n");
-            //}
-            //TaskDialog.Show("XYZ", sth_2.ToString());
+            List<Line> horizontalrunLines_1 = ClassifyHorizontalLine(newhorizontalrunLines).Item1;
+            List<Line> horizontalrunLines_2 = ClassifyHorizontalLine(newhorizontalrunLines).Item2;
 
             //抓取路徑圖層
             Reference refer_path = uidoc.Selection.PickObject(ObjectType.PointOnElement, "Select a CAD Layer");
@@ -282,15 +206,6 @@ namespace Modeling
                 }
             }
 
-            //StringBuilder st_pathpoints = new StringBuilder();
-            //foreach (Line line in allpathLines)
-            //{
-            //    //pathPoints.Add(line.GetEndPoint(0));
-            //    //pathPoints.Add(line.GetEndPoint(1));
-            //    st_pathpoints.Append(ConvertFeetToCentimeters(line.GetEndPoint(0)).ToString() + "\n");
-            //    st_pathpoints.Append(ConvertFeetToCentimeters(line.GetEndPoint(1)).ToString() + "\n");
-            //}
-            //MessageBox.Show(st_pathpoints.ToString());
 
             // 判斷線的方向
             List<Line> vhpathLines = new List<Line>();
@@ -313,12 +228,9 @@ namespace Modeling
                 st_vhpathpoints.Append(ConvertFeetToCentimeters(line.GetEndPoint(0)).ToString() + "\n");
                 st_vhpathpoints.Append(ConvertFeetToCentimeters(line.GetEndPoint(1)).ToString() + "\n");
             }
-            //MessageBox.Show(vhpathpoints.Count.ToString());
-            //MessageBox.Show(st_vhpathpoints.ToString());
 
             //判斷線離UP的距離
             XYZ up = GetNearestLine(vhpathpoints, path);
-            //MessageBox.Show(up.ToString());
 
             List<List<Line>> finalrun = new List<List<Line>>();
             List<List<Line>> runlines_list = new List<List<Line>>
@@ -368,7 +280,6 @@ namespace Modeling
                 if (closestList_run != null && up != null)
                 {
                     closestList_run = SortLines(closestList_run, up);
-                    //MessageBox.Show(ConvertFeetToCentimeters(closestList_run[0].GetEndPoint(0)).ToString());
                     finalrun.Add(closestList_run);
                     up = closestList_run[closestList_run.Count - 1].GetEndPoint(1);
                     runlines_list.Remove(closestList_run);
@@ -385,11 +296,8 @@ namespace Modeling
             Reference refer_land = uidoc.Selection.PickObject(ObjectType.PointOnElement, "Select a CAD Layer");
             Element elem_land = doc.GetElement(refer_land);
             GeometryObject geoObj_land = elem_land.GetGeometryObjectFromReference(refer_land);
-            Category targetCategory_land = null;
-            ElementId graphicsStyleId_land = null;
-            var selectCADLayer_land = SelectCADLayer(doc, geoObj_land, targetCategory_land, graphicsStyleId_land);
-            targetCategory_land = selectCADLayer_land.Item1;
-            graphicsStyleId_land = selectCADLayer_land.Item2;
+            Category targetCategory_land = SelectCADLayer(doc, geoObj_land).Item1;
+            ElementId graphicsStyleId_land = SelectCADLayer(doc, geoObj_land).Item2;
 
             // 抓平台裡的所有線
             List<Line> alllandLines = new List<Line>();
@@ -440,22 +348,11 @@ namespace Modeling
                                 landingLoopPoly.Append(line);
                             }
 
-                            //StringBuilder sb = new StringBuilder();
-                            //foreach (Line line in landingLoopPoly)
-                            //{
-                            //    sb.Append(line.GetEndPoint(0).ToString() + ", " + line.GetEndPoint(0).ToString() + "\n");
-                            //}
-                            //MessageBox.Show(sb.ToString());
-
-
                             curvelooplist_Landing.Add(landingLoopPoly);
                         }
                     }
-                    //MessageBox.Show("所有選到的線總共有:" + allriserCurves.Count.ToString());
                 }
             }
-
-            //MessageBox.Show(curvelooplist_Landing.Count.ToString());
 
             //平台排列
             List<CurveLoop> finallanding = new List<CurveLoop>();
@@ -475,7 +372,6 @@ namespace Modeling
 
             for (int i = 0; i < curvelooplist_Landing_copy.Count; i++)
             {
-                //MessageBox.Show(finalrun_copy.Count.ToString());
                 Line line1 = finalrun_copy[i][0];
                 Line line2 = finalrun_copy[i][finalrun_copy[i].Count - 1];
                 CurveLoop closestCurveLoop = null;
@@ -505,7 +401,6 @@ namespace Modeling
                 finallanding.Add(closestCurveLoop);
                 curvelooplist_Landing.Remove(closestCurveLoop);
 
-                //MessageBox.Show(curvelooplist_Landing_copy.Count.ToString());
                 if (curvelooplist_Landing.Count <= 0)
                 {
                     break;
@@ -534,16 +429,12 @@ namespace Modeling
                 finallanding.Add(closestCurveLoop);
                 curvelooplist_Landing.Remove(closestCurveLoop);
 
-                //MessageBox.Show(curvelooplist_Landing_copy.Count.ToString());
                 if (curvelooplist_Landing.Count <= 0)
                 {
                     break;
                 }
 
             }
-            //MessageBox.Show(finallanding.Count.ToString());
-
-
 
             //建置樓梯
             ElementId newStairsId = null;
@@ -588,7 +479,7 @@ namespace Modeling
                     //newRun1.LookupParameter("突沿長度").Set(2);
 
                     StairsLanding newLanding2 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[1], newRun1.TopElevation);
-                    
+
                     StairsRun newRun2 = StairsRun.CreateSketchedRun(doc, newStairsId, newRun1.TopElevation, bdryCurves2, riserCurves2, pathCurves2);
                     //newRun2.ActualRunWidth = Math.Abs(runLines_2[0].GetEndPoint(0).Y - runLines_2[0].GetEndPoint(1).Y);
                     //newRun2.LookupParameter("從豎板開始").Set(0);
@@ -651,56 +542,19 @@ namespace Modeling
             XYZ firstLineMidPoint = (riserLine.GetEndPoint(0) + riserLine.GetEndPoint(1)) / 2;
             return firstLineMidPoint.DistanceTo(curveMidPoint);
         }
-
-        public List<Line> FindClosestListAndLineToXYZ(List<List<Line>> line_list_list, XYZ point)
-        {
-            // 初始化最近的線段和清單
-            Line closestLine = null;
-            List<Line> closestList = null;
-            double minDistance = double.MaxValue;
-
-            // 定義一個幫助函數，用於計算線段的中點距離 point 的距離
-            double CalculateDistanceToXYZ(Line line)
-            {
-                XYZ midPoint = (line.GetEndPoint(0) + line.GetEndPoint(1)) / 2;
-                return point.DistanceTo(midPoint);
-            }
-
-            // 遍歷每個清單，找到最近的線段和清單
-            foreach (List<Line> line_list in line_list_list)
-            {
-                if (line_list != null)
-                {
-                    foreach (Line line in line_list)
-                    {
-                        double distance = CalculateDistanceToXYZ(line);
-                        if (distance < minDistance)
-                        {
-                            minDistance = distance;
-                            closestList = line_list;
-                            closestLine = line;
-                        }
-                    }
-                }
-            }
-            //MessageBox.Show(closestLine.GetEndPoint(0).ToString());
-            return closestList;
-        }
-
         public List<Line> SortLines(List<Line> lines, XYZ point)
         {
-            List<Line> lines_dup = lines;
             // 複製原始的線段清單，以確保不影響原始資料
             List<Line> newLines = new List<Line>();
 
             // 建立 KD-Tree 或 Quadtree 以加速查找最近線段的過程
             int count = 0;
-            while (lines_dup.Count > 0)
+            while (lines.Count > 0)
             {
                 double minDistance = double.MaxValue;
                 Line closestLine = null;
 
-                foreach (Line line in lines_dup)
+                foreach (Line line in lines)
                 {
                     XYZ midPoint = (line.GetEndPoint(0) + line.GetEndPoint(1)) / 2;
                     double distance = point.DistanceTo(midPoint);
@@ -715,7 +569,7 @@ namespace Modeling
                 if (closestLine != null)
                 {
                     newLines.Add(closestLine);
-                    lines_dup.Remove(closestLine);
+                    lines.Remove(closestLine);
                 }
                 count++;
                 if (count > 100)
@@ -726,9 +580,6 @@ namespace Modeling
 
             return newLines;
         }
-
-
-
         private void DeleteElement(Autodesk.Revit.DB.Document document, ElementId elemId)
         {
             // 將指定元件以及所有與該元件相關聯的元件刪除，並將刪除後所有的元件存到到容器中
@@ -740,7 +591,6 @@ namespace Modeling
                 throw new System.Exception("選取的元件刪除失敗");
             }
         }
-
         class StairsFailurePreprocessor : IFailuresPreprocessor
         {
             public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
@@ -773,9 +623,11 @@ namespace Modeling
                 return floors;
             }
         }
-
-        public (Category, ElementId) SelectCADLayer(Document doc, GeometryObject geoObj, Category targetCategory, ElementId graphicsStyleId)
+        public (Category, ElementId) SelectCADLayer(Document doc, GeometryObject geoObj)
         {
+            Category targetCategory = null;
+            ElementId graphicsStyleId = null;
+
             //選取CAD圖
             if (geoObj.GraphicsStyleId != ElementId.InvalidElementId)
             {
@@ -791,7 +643,6 @@ namespace Modeling
             }
             return (targetCategory, graphicsStyleId);
         }
-
         private bool IsVertical(Line line)
         {
             double angle = line.Direction.AngleTo(XYZ.BasisY);
@@ -807,10 +658,9 @@ namespace Modeling
             // 如果线的方向与X轴方向的夹角接近0度，则认为是水平线
             return Math.Abs(angle) < 0.01 || Math.Abs(angle - Math.PI) < 0.01;
         }
-
-
-        public List<Line> ArrangeVerticalLines(List<Line> allLines, List<Line> newLines)
+        public List<Line> ArrangeVerticalLines(List<Line> allLines)
         {
+            List<Line> newLines = new List<Line>();
             // 將線的起點方向改為同一邊
             // Define the target direction as Y axis positive direction
             XYZ targetDirection = XYZ.BasisY;
@@ -859,8 +709,9 @@ namespace Modeling
             );
             return newLines;
         }
-        public List<Line> ArrangeHorizontalLines(List<Line> allLines, List<Line> newLines)
+        public List<Line> ArrangeHorizontalLines(List<Line> allLines)
         {
+            List<Line> newLines = new List<Line>();
             // 將線的起點方向改為同一邊
             // Define the target direction as Y axis positive direction
             XYZ targetDirection = XYZ.BasisX;
@@ -909,9 +760,10 @@ namespace Modeling
             );
             return newLines;
         }
-
-        public (List<Line>, List<Line>) ClassifyVerticalLine(List<Line> lines_1, List<Line> lines_2, List<Line> newLines)
+        public (List<Line>, List<Line>) ClassifyVerticalLine(List<Line> newLines)
         {
+            List<Line> lines_1 = new List<Line>();
+            List<Line> lines_2 = new List<Line>();
             for (int i = 0; i < newLines.Count(); i++)
             {
                 if (Math.Abs(newLines[0].GetEndPoint(0).Y - newLines[i].GetEndPoint(0).Y) < 0.001)
@@ -926,8 +778,10 @@ namespace Modeling
             lines_2.Reverse();
             return (lines_1, lines_2);
         }
-        public (List<Line>, List<Line>) ClassifyHorizontalLine(List<Line> lines_1, List<Line> lines_2, List<Line> newLines)
+        public (List<Line>, List<Line>) ClassifyHorizontalLine(List<Line> newLines)
         {
+            List<Line> lines_1 = new List<Line>();
+            List<Line> lines_2 = new List<Line>();
             for (int i = 0; i < newLines.Count(); i++)
             {
                 if (Math.Abs(newLines[0].GetEndPoint(0).X - newLines[i].GetEndPoint(0).X) < 0.001)
@@ -941,44 +795,6 @@ namespace Modeling
             }
             lines_2.Reverse();
             return (lines_1, lines_2);
-        }
-
-        private string GetParameterInformation(Parameter para, Document document)
-        {
-            string defName = para.Definition.Name;
-            switch (para.StorageType)
-            {
-                case StorageType.Double:
-                    return defName + ":" + para.AsValueString();
-
-                case StorageType.ElementId:
-                    ElementId id = para.AsElementId();
-                    if (id.IntegerValue >= 0)
-                        return defName + ":" + document.GetElement(id).Name;
-                    //在2014以前取得元件的方法為get_Element()，而在2014方法更新為GetElement()
-                    else
-                        return defName + ":" + id.IntegerValue.ToString();
-
-                case StorageType.Integer:
-                    // if (ParameterType.YesNo == para.Definition.ParameterType) //在2022以前的做法
-                    if (SpecTypeId.Boolean.YesNo == para.Definition.GetDataType()) //在2023以後的做法
-                    {
-                        if (para.AsInteger() == 0)
-                            return defName + ":" + "False";
-                        else
-                            return defName + ":" + "True";
-                    }
-                    else
-                    {
-                        return defName + ":" + para.AsInteger().ToString();
-                    }
-
-                case StorageType.String:
-                    return defName + ":" + para.AsString();
-
-                default:
-                    return "未公開的參數";
-            }
         }
         public (IList<Curve>, IList<Curve>, IList<Curve>) GetRunsParameter(List<Line> runLines)
         {
@@ -1018,36 +834,6 @@ namespace Modeling
 
             return (bdryCurves, riserCurves, pathCurves);
         }
-        public CurveLoop GetLandingsParameter(List<Line> landLines)
-        {
-            // 平台邊界線的點
-            XYZ landingfirstLineStartPoint;
-            XYZ landingfirstLineEndPoint;
-            XYZ landinglastLineStartPoint;
-            XYZ landinglastLineEndPoint;
-
-            // 樓梯平台閉合曲線
-            CurveLoop landingLoop = new CurveLoop();
-
-            //第一個平台
-            landingfirstLineStartPoint = landLines[0].GetEndPoint(0);
-            landingfirstLineEndPoint = landLines[0].GetEndPoint(1);
-            landinglastLineStartPoint = landLines[1].GetEndPoint(0);
-            landinglastLineEndPoint = landLines[1].GetEndPoint(1);
-
-            Line curve1 = Line.CreateBound(landingfirstLineStartPoint, landingfirstLineEndPoint);
-            Line curve2 = Line.CreateBound(landingfirstLineEndPoint, landinglastLineEndPoint);
-            Line curve3 = Line.CreateBound(landinglastLineEndPoint, landinglastLineStartPoint);
-            Line curve4 = Line.CreateBound(landinglastLineStartPoint, landingfirstLineStartPoint);
-
-            landingLoop.Append(curve1);
-            landingLoop.Append(curve2);
-            landingLoop.Append(curve3);
-            landingLoop.Append(curve4);
-
-            return landingLoop;
-        }
-
         public XYZ ConvertFeetToCentimeters(XYZ xyz)
         {
             // 将 XYZ 坐标从英尺转换为公分
@@ -1058,7 +844,6 @@ namespace Modeling
         {
             return UnitUtils.ConvertToInternalUnits(value, UnitTypeId.Centimeters);
         }
-
         public XYZ GetNearestLine(List<XYZ> points, String path)
         {
             List<XYZ> ups = new List<XYZ>();
@@ -1156,8 +941,6 @@ namespace Modeling
                 throw new InvalidOperationException("No closest point found.");
             }
         }
-
-
         public XYZ ConverCADPointToRevitPoint(Point3d point)
         {
             return new XYZ(point.X, point.Y, point.Z);
@@ -1176,144 +959,143 @@ namespace Modeling
                 );
             return newPoint;
         }
-        public List<Autodesk.Revit.DB.Line> CurveLoopToLineList(CurveLoop curveLoop)
-        {
-            List<Autodesk.Revit.DB.Line> lineList = new List<Autodesk.Revit.DB.Line>();
-            List<Autodesk.Revit.DB.Curve> curveList = curveLoop.ToList();
-            foreach (Autodesk.Revit.DB.Curve curve in curveList)
-            {
-                lineList.Add(Autodesk.Revit.DB.Line.CreateBound(curve.GetEndPoint(0), curve.GetEndPoint(1)));
-            }
-            return lineList;
-        }
-        public bool IsInsideOutline(XYZ TargetPoint, CurveLoop curveloop)
-        {
-            bool result = true;
-            int insertCount = 0;
-            List<Autodesk.Revit.DB.Line> lines = CurveLoopToLineList(curveloop);
-            Autodesk.Revit.DB.Line rayLine = Autodesk.Revit.DB.Line.CreateBound(TargetPoint, TargetPoint.Add(new XYZ(1, 0, 0) * 100000000));
+        //public List<Autodesk.Revit.DB.Line> CurveLoopToLineList(CurveLoop curveLoop)
+        //{
+        //    List<Autodesk.Revit.DB.Line> lineList = new List<Autodesk.Revit.DB.Line>();
+        //    List<Autodesk.Revit.DB.Curve> curveList = curveLoop.ToList();
+        //    foreach (Autodesk.Revit.DB.Curve curve in curveList)
+        //    {
+        //        lineList.Add(Autodesk.Revit.DB.Line.CreateBound(curve.GetEndPoint(0), curve.GetEndPoint(1)));
+        //    }
+        //    return lineList;
+        //}
+        //public bool IsInsideOutline(XYZ TargetPoint, CurveLoop curveloop)
+        //{
+        //    bool result = true;
+        //    int insertCount = 0;
+        //    List<Autodesk.Revit.DB.Line> lines = CurveLoopToLineList(curveloop);
+        //    Autodesk.Revit.DB.Line rayLine = Autodesk.Revit.DB.Line.CreateBound(TargetPoint, TargetPoint.Add(new XYZ(1, 0, 0) * 100000000));
 
-            foreach (Autodesk.Revit.DB.Line areaLine in lines)
-            {
-                SetComparisonResult interResult = areaLine.Intersect(rayLine, out IntersectionResultArray resultArray);
-                IntersectionResult insPoint = resultArray?.get_Item(0);
-                if (insPoint != null)
-                {
-                    insertCount++;
-                }
-            }
+        //    foreach (Autodesk.Revit.DB.Line areaLine in lines)
+        //    {
+        //        SetComparisonResult interResult = areaLine.Intersect(rayLine, out IntersectionResultArray resultArray);
+        //        IntersectionResult insPoint = resultArray?.get_Item(0);
+        //        if (insPoint != null)
+        //        {
+        //            insertCount++;
+        //        }
+        //    }
 
-            // To varify the point is inside the outline or not.
-            if (insertCount % 2 == 0) //even
-            {
-                result = false;
-                return result;
-            }
-            else
-            {
-                return result;
-            }
-        }
+        //    // To varify the point is inside the outline or not.
+        //    if (insertCount % 2 == 0) //even
+        //    {
+        //        result = false;
+        //        return result;
+        //    }
+        //    else
+        //    {
+        //        return result;
+        //    }
+        //}
+        //public List<Line> FindClosestListAndLineToXYZ(List<List<Line>> line_list_list, XYZ point)
+        //{
+        //    // 初始化最近的線段和清單
+        //    Line closestLine = null;
+        //    List<Line> closestList = null;
+        //    double minDistance = double.MaxValue;
 
+        //    // 定義一個幫助函數，用於計算線段的中點距離 point 的距離
+        //    double CalculateDistanceToXYZ(Line line)
+        //    {
+        //        XYZ midPoint = (line.GetEndPoint(0) + line.GetEndPoint(1)) / 2;
+        //        return point.DistanceTo(midPoint);
+        //    }
+
+        //    // 遍歷每個清單，找到最近的線段和清單
+        //    foreach (List<Line> line_list in line_list_list)
+        //    {
+        //        if (line_list != null)
+        //        {
+        //            foreach (Line line in line_list)
+        //            {
+        //                double distance = CalculateDistanceToXYZ(line);
+        //                if (distance < minDistance)
+        //                {
+        //                    minDistance = distance;
+        //                    closestList = line_list;
+        //                    closestLine = line;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    //MessageBox.Show(closestLine.GetEndPoint(0).ToString());
+        //    return closestList;
+        //}
+        //private string GetParameterInformation(Parameter para, Document document)
+        //{
+        //    string defName = para.Definition.Name;
+        //    switch (para.StorageType)
+        //    {
+        //        case StorageType.Double:
+        //            return defName + ":" + para.AsValueString();
+
+        //        case StorageType.ElementId:
+        //            ElementId id = para.AsElementId();
+        //            if (id.IntegerValue >= 0)
+        //                return defName + ":" + document.GetElement(id).Name;
+        //            //在2014以前取得元件的方法為get_Element()，而在2014方法更新為GetElement()
+        //            else
+        //                return defName + ":" + id.IntegerValue.ToString();
+
+        //        case StorageType.Integer:
+        //            // if (ParameterType.YesNo == para.Definition.ParameterType) //在2022以前的做法
+        //            if (SpecTypeId.Boolean.YesNo == para.Definition.GetDataType()) //在2023以後的做法
+        //            {
+        //                if (para.AsInteger() == 0)
+        //                    return defName + ":" + "False";
+        //                else
+        //                    return defName + ":" + "True";
+        //            }
+        //            else
+        //            {
+        //                return defName + ":" + para.AsInteger().ToString();
+        //            }
+
+        //        case StorageType.String:
+        //            return defName + ":" + para.AsString();
+
+        //        default:
+        //            return "未公開的參數";
+        //    }
+        //}
+        //public CurveLoop GetLandingsParameter(List<Line> landLines)
+        //{
+        //    // 平台邊界線的點
+        //    XYZ landingfirstLineStartPoint;
+        //    XYZ landingfirstLineEndPoint;
+        //    XYZ landinglastLineStartPoint;
+        //    XYZ landinglastLineEndPoint;
+
+        //    // 樓梯平台閉合曲線
+        //    CurveLoop landingLoop = new CurveLoop();
+
+        //    //第一個平台
+        //    landingfirstLineStartPoint = landLines[0].GetEndPoint(0);
+        //    landingfirstLineEndPoint = landLines[0].GetEndPoint(1);
+        //    landinglastLineStartPoint = landLines[1].GetEndPoint(0);
+        //    landinglastLineEndPoint = landLines[1].GetEndPoint(1);
+
+        //    Line curve1 = Line.CreateBound(landingfirstLineStartPoint, landingfirstLineEndPoint);
+        //    Line curve2 = Line.CreateBound(landingfirstLineEndPoint, landinglastLineEndPoint);
+        //    Line curve3 = Line.CreateBound(landinglastLineEndPoint, landinglastLineStartPoint);
+        //    Line curve4 = Line.CreateBound(landinglastLineStartPoint, landingfirstLineStartPoint);
+
+        //    landingLoop.Append(curve1);
+        //    landingLoop.Append(curve2);
+        //    landingLoop.Append(curve3);
+        //    landingLoop.Append(curve4);
+
+        //    return landingLoop;
+        //}
     }
-    //public class StairPlacement
-    //{
-    //    private readonly Document _doc;
-    //    private readonly UIDocument _uiDoc;
-
-    //    public StairPlacement(UIDocument uiDoc)
-    //    {
-    //        _uiDoc = uiDoc;
-    //        _doc = _uiDoc.Document;
-    //    }
-
-    //    public Level GetBottomFloor()
-    //    {
-    //        // 獲取用戶選擇的元件（在這裡假設是匯入的CAD圖元件）
-    //        Reference refer = _uiDoc.Selection.PickObject(ObjectType.Element);
-    //        Element selectedElement = _doc.GetElement(refer);
-    //        GeometryObject geoObj = selectedElement.GetGeometryObjectFromReference(refer);
-    //        Category targetCategory = null;
-    //        ElementId graphicsStyleId = null;
-
-    //        // 判斷梯段或平台圖層*未完成*
-    //        if (geoObj.GraphicsStyleId != ElementId.InvalidElementId)
-    //        {
-    //            graphicsStyleId = geoObj.GraphicsStyleId;
-    //            //if (_doc.GetElement(geoObj.GraphicsStyleId) is GraphicsStyle gs)
-    //            //{
-    //            //    targetCategory = gs.GraphicsStyleCategory;
-    //            //    // Get the name of the CAD layer which is selected (Column).
-    //            //    String name = gs.GraphicsStyleCategory.Name;
-    //            //}
-    //        }
-
-    //        Level level = _doc.GetElement(selectedElement.LevelId) as Level;
-
-    //        // 獲取選擇的元件所在的樓層
-    //        Level bottomFloor = _doc.GetElement(selectedElement.LevelId) as Level;
-
-    //        return bottomFloor;
-    //    }
-
-    //    public Level GetTopFloor(Level bottomFloor)
-    //    {
-    //        // 獲取所有樓層
-    //        FilteredElementCollector collector = new FilteredElementCollector(_doc)
-    //            .OfClass(typeof(Level));
-
-    //        // 找到位於 bottomFloor 上方的最近的樓層
-    //        Level topFloor = null;
-    //        double maxElevation = double.MaxValue;
-
-    //        foreach (Level level in collector)
-    //        {
-    //            double elevation = level.Elevation;
-
-    //            // 排除掉與 bottomFloor 相同或在它以下的樓層
-    //            if (elevation > bottomFloor.Elevation && elevation < maxElevation)
-    //            {
-    //                topFloor = level;
-    //                maxElevation = elevation;
-    //            }
-    //        }
-
-    //        return topFloor;
-    //    }
-    //}
-
-    //public class StairParameter
-    //{
-    //    public int ActualRisersNumber { get; set; }
-    //    public int DesiredRisersNumber { get; set; }
-    //    public double ActualRisersHight { get; set; }
-    //    public double ActualRunWidth { get; set; }
-    //    public int ActualTreadsNumber { get; set; }
-    //    public double ActualTreadsDepth { get; set; }
-    //    public double BaseElevation { get; set; }
-    //    public double TopElevation { get; set; }
-    //    public double Height { get; set; }
-
-    //    public StairParameter()
-    //    {
-    //        ActualRisersNumber = 0;
-    //        DesiredRisersNumber = 0;
-    //        ActualRisersHight = 0;
-    //        ActualRunWidth = 0;
-    //        ActualTreadsNumber = 0;
-    //        ActualTreadsDepth = 0;
-    //        BaseElevation = 0;
-    //        TopElevation = 0;
-    //        Height = 0;
-    //    }
-    //}
-
-    //public class LandingParameter
-    //{
-    //    public Double Thickness { get; set; }
-    //    public LandingParameter()
-    //    {
-    //        Thickness = Algorithm.CentimetersToUnits(15);
-    //    }
-    //}
 }

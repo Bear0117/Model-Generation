@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Windows.Forms;
-using System.Windows.Media.Animation;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
-using Aspose.Cells.Charts;
-using System.Net;
-// using Teigha.DatabaseServices;
-// using Aspose.Pdf.LogicalStructure;
 
 namespace Modeling
 {
@@ -225,8 +216,7 @@ namespace Modeling
         private double UnitsToCentimeters(double value)
         {
             return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Centimeters);
-        }
-        
+        }        
         private List<Face> GetFace(Element element, XYZ viewDirection)
         {
             GeometryElement geometryElement = element.get_Geometry(new Options());
@@ -254,24 +244,6 @@ namespace Modeling
             }
             return newFace;
         }
-        private List<Face> GetHorrizontalFace(List<Face> faces)
-        {
-            List<Face> result = new List<Face>();
-            foreach (Face face in faces)
-            {
-                XYZ targetFaceNormal = face.ComputeNormal(UV.Zero);
-                XYZ Zdirection = XYZ.BasisZ;
-                double dotProduct = Zdirection.DotProduct(targetFaceNormal);
-                //Zdirection.DotProduct(targetFaceNormal))  == 1 或是 == -1
-
-                if (Math.Abs(dotProduct - 1.0) < 1e-9|| Math.Abs(dotProduct + 1.0) < 1e-9)
-                {
-                    result.Add(face);
-                }
-            }
-            return result;
-        }
-
         private (List<Line>, List<Line>, List<Line>) GetAndClassifyLine(List<Face> faces)
         {
             List<Line> verticalLineList = new List<Line>();
@@ -319,7 +291,6 @@ namespace Modeling
             }
             return allLines;
         }
-
         private List<Line> AlignAndSortLines(List<Line> lines, XYZ targetDirection, Func<XYZ, double> sortingCriteria)
         {
             List<Line> newLine = new List<Line>();
@@ -400,14 +371,12 @@ namespace Modeling
             }
             return mergedLines;
         }
-
         private bool AreLinesOnSameLine(Line line1, Line line2, double tolerance)
         {
             // 判斷兩條線段是否在同一直線上，這裡使用 XYZ 誤差作為 tolerance
             return line1.Direction.IsAlmostEqualTo(line2.Direction) &&
                    Math.Abs(line1.GetEndPoint(1).DistanceTo(line2.Origin)) < tolerance;
         }
-
         private Line MergeTwoLines(Line line1, Line line2)
         {
             // 合併兩條線段，這裡使用兩條線段的端點來創建一條新的線段
@@ -416,7 +385,6 @@ namespace Modeling
 
             return Line.CreateBound(startPoint, endPoint);
         }
- 
         private XYZ GetOffsetByStairOrientation(XYZ point/*, XYZ orientation*/, double value)
         {
             XYZ newVector = point.Multiply(value);
@@ -424,8 +392,23 @@ namespace Modeling
 
             return returnPoint;
         }
+        //private List<Face> GetHorrizontalFace(List<Face> faces)
+        //{
+        //    List<Face> result = new List<Face>();
+        //    foreach (Face face in faces)
+        //    {
+        //        XYZ targetFaceNormal = face.ComputeNormal(UV.Zero);
+        //        XYZ Zdirection = XYZ.BasisZ;
+        //        double dotProduct = Zdirection.DotProduct(targetFaceNormal);
+        //        //Zdirection.DotProduct(targetFaceNormal))  == 1 或是 == -1
 
-
+        //        if (Math.Abs(dotProduct - 1.0) < 1e-9 || Math.Abs(dotProduct + 1.0) < 1e-9)
+        //        {
+        //            result.Add(face);
+        //        }
+        //    }
+        //    return result;
+        //}
     }
 }
 

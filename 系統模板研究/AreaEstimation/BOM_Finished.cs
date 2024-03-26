@@ -3,25 +3,15 @@ using Autodesk.Revit.UI;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.ApplicationServices;
-using Application = Autodesk.Revit.ApplicationServices.Application;
 using System;
 using Autodesk.Revit.UI.Selection;
 using System.IO;
 using System.Text;
 using System.Linq;
-using Aspose.Cells.Charts;
-using Aspose.Pdf.Facades;
-using System.Windows.Media.Animation;
-using Teigha.DatabaseServices;
 using Solid = Autodesk.Revit.DB.Solid;
 using Line = Autodesk.Revit.DB.Line;
 using Face = Autodesk.Revit.DB.Face;
 using Curve = Autodesk.Revit.DB.Curve;
-using System.Windows.Media;
-using Dimension = Autodesk.Revit.DB.Dimension;
-using System.Drawing.Printing;
-using Aspose.Pdf;
 
 
 [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
@@ -805,6 +795,7 @@ public class BOM_AllLanding : IExternalCommand
         return profiles;
     }
 
+
     public bool IsInsideOutline(XYZ TargetPoint, CurveLoop curveloop)
     {
         bool result = true;
@@ -964,12 +955,10 @@ public class BOM_AllLanding : IExternalCommand
         }
         return list_new;
     }
-
     public static double CentimetersToUnits(double value)
     {
         return UnitUtils.ConvertToInternalUnits(value, UnitTypeId.Centimeters);
     }
-
     public static double UnitsToCentimeters(double value)
     {
         return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Centimeters);
@@ -978,7 +967,6 @@ public class BOM_AllLanding : IExternalCommand
     {
         return UnitUtils.ConvertToInternalUnits(value, UnitTypeId.Millimeters);
     }
-    
     public static double UnitsToMillimeters(double value)
     {
         return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Millimeters);
@@ -996,8 +984,6 @@ public class BOM_AllLanding : IExternalCommand
             );
         return newPoint;
     }
-
-    // 將平方英吋轉換為平方單位
     public double SquareUnitToSquareCentimeter(double squareInch)
     {
         double conversionFactor = 929.0304;
@@ -1018,234 +1004,234 @@ public class BOM_AllLanding : IExternalCommand
         return newPoint;
     }
 
-    public List<XYZ> RemoveDuplicatePoints(List<XYZ> points, double tolerance)
-    {
-        // 新建一个列表来保存唯一的点
-        List<XYZ> uniquePoints = new List<XYZ>();
+    //public List<XYZ> RemoveDuplicatePoints(List<XYZ> points, double tolerance)
+    //{
+    //    // 新建一个列表来保存唯一的点
+    //    List<XYZ> uniquePoints = new List<XYZ>();
 
-        // 遍历所有点
-        foreach (XYZ point in points)
-        {
-            // 假设点是唯一的
-            bool isDuplicate = false;
+    //    // 遍历所有点
+    //    foreach (XYZ point in points)
+    //    {
+    //        // 假设点是唯一的
+    //        bool isDuplicate = false;
 
-            // 与uniquePoints中已有的点进行距离比较
-            foreach (XYZ uniquePoint in uniquePoints)
-            {
-                // 如果距离小于指定的容差，则认为这是一个重复的点
-                if (point.DistanceTo(uniquePoint) < tolerance)
-                {
-                    isDuplicate = true;
-                    break;
-                }
-            }
+    //        // 与uniquePoints中已有的点进行距离比较
+    //        foreach (XYZ uniquePoint in uniquePoints)
+    //        {
+    //            // 如果距离小于指定的容差，则认为这是一个重复的点
+    //            if (point.DistanceTo(uniquePoint) < tolerance)
+    //            {
+    //                isDuplicate = true;
+    //                break;
+    //            }
+    //        }
 
-            // 如果点是唯一的，则添加到uniquePoints列表中
-            if (!isDuplicate)
-            {
-                uniquePoints.Add(point);
-            }
-        }
+    //        // 如果点是唯一的，则添加到uniquePoints列表中
+    //        if (!isDuplicate)
+    //        {
+    //            uniquePoints.Add(point);
+    //        }
+    //    }
 
-        // 返回包含唯一点的列表
-        return uniquePoints;
-    }
+    //    // 返回包含唯一点的列表
+    //    return uniquePoints;
+    //}
 
-    public Dictionary<double, List<XYZ>> GroupPointsByZ(List<XYZ> points) //將相同Z座標的點存到同一個List
-    {
-        Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
+    //public Dictionary<double, List<XYZ>> GroupPointsByZ(List<XYZ> points) //將相同Z座標的點存到同一個List
+    //{
+    //    Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
 
-        foreach (XYZ point in points)
-        {
-            double z = point.Z;
+    //    foreach (XYZ point in points)
+    //    {
+    //        double z = point.Z;
 
-            if (!groupedPoints.ContainsKey(z))
-            {
-                groupedPoints[z] = new List<XYZ>();
-            }
+    //        if (!groupedPoints.ContainsKey(z))
+    //        {
+    //            groupedPoints[z] = new List<XYZ>();
+    //        }
 
-            groupedPoints[z].Add(point);
-        }
+    //        groupedPoints[z].Add(point);
+    //    }
 
-        // 現在，pointDictionary 中的每個鍵值對應到一個 Z 座標，相應的值是具有相同 Z 座標的點的列表
-        foreach (KeyValuePair<double, List<XYZ>> entry in groupedPoints)
-        {
-            double zCoordinate = entry.Key;
-            List<XYZ> pointsWithSameZ = entry.Value;
+    //    // 現在，pointDictionary 中的每個鍵值對應到一個 Z 座標，相應的值是具有相同 Z 座標的點的列表
+    //    foreach (KeyValuePair<double, List<XYZ>> entry in groupedPoints)
+    //    {
+    //        double zCoordinate = entry.Key;
+    //        List<XYZ> pointsWithSameZ = entry.Value;
 
-            // 在這裡對 pointsWithSameZ 做任何你需要的處理
-            MessageBox.Show($" Z 座標為 {UnitsToCentimeters(zCoordinate)} 的點數量: {pointsWithSameZ.Count}");
-            foreach (XYZ p in pointsWithSameZ)
-            {
-                MessageBox.Show($"座標: {XYZUnitsToCentimeters(p)}");
-            }
-        }
+    //        // 在這裡對 pointsWithSameZ 做任何你需要的處理
+    //        MessageBox.Show($" Z 座標為 {UnitsToCentimeters(zCoordinate)} 的點數量: {pointsWithSameZ.Count}");
+    //        foreach (XYZ p in pointsWithSameZ)
+    //        {
+    //            MessageBox.Show($"座標: {XYZUnitsToCentimeters(p)}");
+    //        }
+    //    }
 
-        return groupedPoints;
-    }
-    public Dictionary<double, List<XYZ>> GroupPointsByY(List<XYZ> points) //將相同Y座標的點存到同一個List
-    {
-        Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
+    //    return groupedPoints;
+    //}
+    //public Dictionary<double, List<XYZ>> GroupPointsByY(List<XYZ> points) //將相同Y座標的點存到同一個List
+    //{
+    //    Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
 
-        foreach (XYZ point in points)
-        {
-            double y = point.Y;
+    //    foreach (XYZ point in points)
+    //    {
+    //        double y = point.Y;
 
-            if (!groupedPoints.ContainsKey(y))
-            {
-                groupedPoints[y] = new List<XYZ>();
-            }
+    //        if (!groupedPoints.ContainsKey(y))
+    //        {
+    //            groupedPoints[y] = new List<XYZ>();
+    //        }
 
-            groupedPoints[y].Add(point);
-        }
+    //        groupedPoints[y].Add(point);
+    //    }
 
-        return groupedPoints;
-    }
-    public Dictionary<double, List<XYZ>> GroupPointsByX(List<XYZ> points) //將相同 X 座標的點存到同一個List
-    {
-        Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
+    //    return groupedPoints;
+    //}
+    //public Dictionary<double, List<XYZ>> GroupPointsByX(List<XYZ> points) //將相同 X 座標的點存到同一個List
+    //{
+    //    Dictionary<double, List<XYZ>> groupedPoints = new Dictionary<double, List<XYZ>>();
 
-        foreach (XYZ point in points)
-        {
-            double x = point.X;
+    //    foreach (XYZ point in points)
+    //    {
+    //        double x = point.X;
 
-            if (!groupedPoints.ContainsKey(x))
-            {
-                groupedPoints[x] = new List<XYZ>();
-            }
+    //        if (!groupedPoints.ContainsKey(x))
+    //        {
+    //            groupedPoints[x] = new List<XYZ>();
+    //        }
 
-            groupedPoints[x].Add(point);
-        }
+    //        groupedPoints[x].Add(point);
+    //    }
 
-        return groupedPoints;
-    }
-    public List<Line> xMaxAndMinPointsInList(List<XYZ> coordinateGroup) // 在相同 Y 座標裡的點找出 X 最大及最小的點連線
-    {
-        List<Line> horrizontalLines = new List<Line>();
+    //    return groupedPoints;
+    //}
+    //public List<Line> xMaxAndMinPointsInList(List<XYZ> coordinateGroup) // 在相同 Y 座標裡的點找出 X 最大及最小的點連線
+    //{
+    //    List<Line> horrizontalLines = new List<Line>();
 
-        // 獲取 Y 相同的点的 X 最大和最小值
-        if (coordinateGroup.Count > 1)
-        {
-            List<XYZ> arrangePoints_X = coordinateGroup.OrderBy(point => point.X).ToList();
+    //    // 獲取 Y 相同的点的 X 最大和最小值
+    //    if (coordinateGroup.Count > 1)
+    //    {
+    //        List<XYZ> arrangePoints_X = coordinateGroup.OrderBy(point => point.X).ToList();
 
-            XYZ minXPoint = arrangePoints_X.First();
-            XYZ maxXPoint = arrangePoints_X.Last();
+    //        XYZ minXPoint = arrangePoints_X.First();
+    //        XYZ maxXPoint = arrangePoints_X.Last();
 
-            // 使用 LINQ 查询来获取 X 坐标最小的点
-            minXPoint = arrangePoints_X.First(point => point.X == arrangePoints_X.Min(p => p.X));
-            // 使用 LINQ 查询来获取 X 坐标最大的点
-            maxXPoint = arrangePoints_X.First(point => point.X == arrangePoints_X.Max(p => p.X));
+    //        // 使用 LINQ 查询来获取 X 坐标最小的点
+    //        minXPoint = arrangePoints_X.First(point => point.X == arrangePoints_X.Min(p => p.X));
+    //        // 使用 LINQ 查询来获取 X 坐标最大的点
+    //        maxXPoint = arrangePoints_X.First(point => point.X == arrangePoints_X.Max(p => p.X));
 
 
-            Line yLine = Line.CreateBound(minXPoint, maxXPoint);
-            horrizontalLines.Add(yLine);
+    //        Line yLine = Line.CreateBound(minXPoint, maxXPoint);
+    //        horrizontalLines.Add(yLine);
 
-        }
+    //    }
 
-        MessageBox.Show("水平方向的線:" + horrizontalLines.Count.ToString());
+    //    MessageBox.Show("水平方向的線:" + horrizontalLines.Count.ToString());
 
-        foreach (Line line in horrizontalLines)
-        {
-            MessageBox.Show(XYZUnitsToCentimeters(line.GetEndPoint(0)).ToString() + XYZUnitsToCentimeters(line.GetEndPoint(1)).ToString());
-        }
+    //    foreach (Line line in horrizontalLines)
+    //    {
+    //        MessageBox.Show(XYZUnitsToCentimeters(line.GetEndPoint(0)).ToString() + XYZUnitsToCentimeters(line.GetEndPoint(1)).ToString());
+    //    }
 
-        return horrizontalLines;
-    }
-    public List<Line> yMaxAndMinPointsInList(List<XYZ> coordinateGroup) // 在相同 X 座標裡的點找出 Y 最大及最小的點連線
-    {
-        List<Line> verticalLines = new List<Line>();
+    //    return horrizontalLines;
+    //}
+    //public List<Line> yMaxAndMinPointsInList(List<XYZ> coordinateGroup) // 在相同 X 座標裡的點找出 Y 最大及最小的點連線
+    //{
+    //    List<Line> verticalLines = new List<Line>();
 
-        // 獲取 X 相同的点的 Y 最大和最小值
-        if (coordinateGroup.Count > 1)
-        {
-            List<XYZ> arrangePoints_Y = coordinateGroup.OrderBy(point => point.Y).ToList();
+    //    // 獲取 X 相同的点的 Y 最大和最小值
+    //    if (coordinateGroup.Count > 1)
+    //    {
+    //        List<XYZ> arrangePoints_Y = coordinateGroup.OrderBy(point => point.Y).ToList();
 
-            XYZ minXPoint = arrangePoints_Y.First();
-            XYZ maxXPoint = arrangePoints_Y.Last();
+    //        XYZ minXPoint = arrangePoints_Y.First();
+    //        XYZ maxXPoint = arrangePoints_Y.Last();
 
-            // 使用 LINQ 查询来获取 X 坐标最小的点
-            minXPoint = arrangePoints_Y.First(point => point.Y == arrangePoints_Y.Min(p => p.Y));
-            // 使用 LINQ 查询来获取 X 坐标最大的点
-            maxXPoint = arrangePoints_Y.First(point => point.Y == arrangePoints_Y.Max(p => p.Y));
+    //        // 使用 LINQ 查询来获取 X 坐标最小的点
+    //        minXPoint = arrangePoints_Y.First(point => point.Y == arrangePoints_Y.Min(p => p.Y));
+    //        // 使用 LINQ 查询来获取 X 坐标最大的点
+    //        maxXPoint = arrangePoints_Y.First(point => point.Y == arrangePoints_Y.Max(p => p.Y));
 
-            Line xLine = Line.CreateBound(minXPoint, maxXPoint);
-            verticalLines.Add(xLine);
-        }
+    //        Line xLine = Line.CreateBound(minXPoint, maxXPoint);
+    //        verticalLines.Add(xLine);
+    //    }
 
-        MessageBox.Show("垂直方向的線:" + verticalLines.Count.ToString());
+    //    MessageBox.Show("垂直方向的線:" + verticalLines.Count.ToString());
 
-        foreach (Line line in verticalLines)
-        {
-            MessageBox.Show(XYZUnitsToCentimeters(line.GetEndPoint(0)).ToString() + XYZUnitsToCentimeters(line.GetEndPoint(1)).ToString());
-        }
+    //    foreach (Line line in verticalLines)
+    //    {
+    //        MessageBox.Show(XYZUnitsToCentimeters(line.GetEndPoint(0)).ToString() + XYZUnitsToCentimeters(line.GetEndPoint(1)).ToString());
+    //    }
 
-        return verticalLines;
-    }
-    public (List<Line>, List<Line>) LandingBoundaryLines(Dictionary<double, List<XYZ>> pointDictionary)
-    {
-        List<Line> horrizontalLines = new List<Line>(); // 存 Y 相同的點的，其 X 最大和最小值相連的線
-        List<Line> verticalLines = new List<Line>(); // 存 X 相同的點的，其 Y 最大和最小值相連的線
+    //    return verticalLines;
+    //}
+    //public (List<Line>, List<Line>) LandingBoundaryLines(Dictionary<double, List<XYZ>> pointDictionary)
+    //{
+    //    List<Line> horrizontalLines = new List<Line>(); // 存 Y 相同的點的，其 X 最大和最小值相連的線
+    //    List<Line> verticalLines = new List<Line>(); // 存 X 相同的點的，其 Y 最大和最小值相連的線
 
-        foreach (KeyValuePair<double, List<XYZ>> z_kvp in pointDictionary)
-        {
-            double zCoordinate = z_kvp.Key; // Z 座標
-            List<XYZ> z_coordinateGroup = z_kvp.Value; // 相同 Z 座標裡的點座標
+    //    foreach (KeyValuePair<double, List<XYZ>> z_kvp in pointDictionary)
+    //    {
+    //        double zCoordinate = z_kvp.Key; // Z 座標
+    //        List<XYZ> z_coordinateGroup = z_kvp.Value; // 相同 Z 座標裡的點座標
 
-            // 输出現在所選到的 Z 座標
-            MessageBox.Show("Z 坐标: " + UnitsToCentimeters(zCoordinate));
+    //        // 输出現在所選到的 Z 座標
+    //        MessageBox.Show("Z 坐标: " + UnitsToCentimeters(zCoordinate));
 
-            // 將相同Y、Z座標的點放進List中
-            Dictionary<double, List<XYZ>> yCoordinatePointsDict = GroupPointsByY(z_coordinateGroup);
+    //        // 將相同Y、Z座標的點放進List中
+    //        Dictionary<double, List<XYZ>> yCoordinatePointsDict = GroupPointsByY(z_coordinateGroup);
 
-            foreach (KeyValuePair<double, List<XYZ>> y_kvp in yCoordinatePointsDict)
-            {
-                double yCoordinate = y_kvp.Key; // Y 座標
-                List<XYZ> y_coordinateGroup = y_kvp.Value; // 相同 Y 座標裡的點座標
+    //        foreach (KeyValuePair<double, List<XYZ>> y_kvp in yCoordinatePointsDict)
+    //        {
+    //            double yCoordinate = y_kvp.Key; // Y 座標
+    //            List<XYZ> y_coordinateGroup = y_kvp.Value; // 相同 Y 座標裡的點座標
 
-                // 输出現在所選到的 Y 座標
-                MessageBox.Show("Y 坐标: " + UnitsToCentimeters(yCoordinate));
-                MessageBox.Show("相同Y、Z座標的點共有: " + y_coordinateGroup.Count.ToString());
+    //            // 输出現在所選到的 Y 座標
+    //            MessageBox.Show("Y 坐标: " + UnitsToCentimeters(yCoordinate));
+    //            MessageBox.Show("相同Y、Z座標的點共有: " + y_coordinateGroup.Count.ToString());
 
-                //// 編歷在當前 Y 座標裡的座標點並輸出
-                //foreach (XYZ point in y_coordinateGroup)
-                //{
-                //    MessageBox.Show("坐标点: (" + UnitsToCentimeters(point.X) + ", " + UnitsToCentimeters(point.Y) + ", " + UnitsToCentimeters(point.Z) + ")");
-                //}
+    //            //// 編歷在當前 Y 座標裡的座標點並輸出
+    //            //foreach (XYZ point in y_coordinateGroup)
+    //            //{
+    //            //    MessageBox.Show("坐标点: (" + UnitsToCentimeters(point.X) + ", " + UnitsToCentimeters(point.Y) + ", " + UnitsToCentimeters(point.Z) + ")");
+    //            //}
 
-                horrizontalLines = xMaxAndMinPointsInList(y_coordinateGroup); // 在當前 Z 列表中 Y 座標相同的點的 X 最大值和最小值相連成線
-            }
+    //            horrizontalLines = xMaxAndMinPointsInList(y_coordinateGroup); // 在當前 Z 列表中 Y 座標相同的點的 X 最大值和最小值相連成線
+    //        }
 
-            // 將相同X、Z座標的點放進List中
-            Dictionary<double, List<XYZ>> xCoordinatePointsDict = GroupPointsByX(z_coordinateGroup);
-            foreach (KeyValuePair<double, List<XYZ>> x_kvp in xCoordinatePointsDict)
-            {
-                double xCoordinate = x_kvp.Key; // X 座標
-                List<XYZ> x_coordinateGroup = x_kvp.Value; // 相同 X 座標裡的點座標
+    //        // 將相同X、Z座標的點放進List中
+    //        Dictionary<double, List<XYZ>> xCoordinatePointsDict = GroupPointsByX(z_coordinateGroup);
+    //        foreach (KeyValuePair<double, List<XYZ>> x_kvp in xCoordinatePointsDict)
+    //        {
+    //            double xCoordinate = x_kvp.Key; // X 座標
+    //            List<XYZ> x_coordinateGroup = x_kvp.Value; // 相同 X 座標裡的點座標
 
-                // 输出現在所選到的 X 座標
-                MessageBox.Show(" X 坐标: " + UnitsToCentimeters(xCoordinate));
-                MessageBox.Show("相同、Z座標的點共有: " + x_coordinateGroup.Count.ToString());
+    //            // 输出現在所選到的 X 座標
+    //            MessageBox.Show(" X 坐标: " + UnitsToCentimeters(xCoordinate));
+    //            MessageBox.Show("相同、Z座標的點共有: " + x_coordinateGroup.Count.ToString());
 
-                //// 編歷在當前 X 座標裡的座標點並輸出
-                //foreach (XYZ point in x_coordinateGroup)
-                //{
-                //    MessageBox.Show("坐标点: (" + UnitsToCentimeters(point.X) + ", " + UnitsToCentimeters(point.Y) + ", " + UnitsToCentimeters(point.Z) + ")");
-                //}
+    //            //// 編歷在當前 X 座標裡的座標點並輸出
+    //            //foreach (XYZ point in x_coordinateGroup)
+    //            //{
+    //            //    MessageBox.Show("坐标点: (" + UnitsToCentimeters(point.X) + ", " + UnitsToCentimeters(point.Y) + ", " + UnitsToCentimeters(point.Z) + ")");
+    //            //}
 
-                verticalLines = yMaxAndMinPointsInList(x_coordinateGroup); // 在當前 Z 列表中 X 座標相同的點的 Y 最大值和最小值相連成線
-            }
-        }
-        return (horrizontalLines, verticalLines);
-    }
-    private double GetFaceHeight(Face face)
-    {
-        // 获取面的 BoundingBox
-        BoundingBoxUV boundingBoxUV = face.GetBoundingBox();
-        double faceHeight = boundingBoxUV.Max.V - boundingBoxUV.Min.V;
+    //            verticalLines = yMaxAndMinPointsInList(x_coordinateGroup); // 在當前 Z 列表中 X 座標相同的點的 Y 最大值和最小值相連成線
+    //        }
+    //    }
+    //    return (horrizontalLines, verticalLines);
+    //}
+    //private double GetFaceHeight(Face face)
+    //{
+    //    // 获取面的 BoundingBox
+    //    BoundingBoxUV boundingBoxUV = face.GetBoundingBox();
+    //    double faceHeight = boundingBoxUV.Max.V - boundingBoxUV.Min.V;
 
-        // 将高度从内部单位转换为可读的单位（例如，英尺）
-        return faceHeight;
-    }
+    //    // 将高度从内部单位转换为可读的单位（例如，英尺）
+    //    return faceHeight;
+    //}
 
 }
 
