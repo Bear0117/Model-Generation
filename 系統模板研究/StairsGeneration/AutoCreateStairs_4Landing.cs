@@ -41,7 +41,7 @@ using Transaction = Autodesk.Revit.DB.Transaction;
 namespace Modeling
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    class AutoCreateStairs_5Landing : IExternalCommand
+    class AutoCreateStairs_4Landing : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -176,10 +176,10 @@ namespace Modeling
             horizontalrunLines_1 = horizontalrunLines_classify.Item1;
             horizontalrunLines_2 = horizontalrunLines_classify.Item2;
 
-            StringBuilder stv_1 = new StringBuilder();
-            StringBuilder stv_2 = new StringBuilder();
-            StringBuilder sth_1 = new StringBuilder();
-            StringBuilder sth_2 = new StringBuilder();
+            //StringBuilder stv_1 = new StringBuilder();
+            //StringBuilder stv_2 = new StringBuilder();
+            //StringBuilder sth_1 = new StringBuilder();
+            //StringBuilder sth_2 = new StringBuilder();
 
             //MessageBox.Show(verticalrunLines_1.Count.ToString());
             //foreach (Line line in verticalrunLines_1)
@@ -394,7 +394,7 @@ namespace Modeling
             // 抓平台裡的所有線
             List<Line> alllandLines = new List<Line>();
             List<CurveLoop> curvelooplist_Landing = new List<CurveLoop>();
-
+            
             GeometryElement geoElem_land = elem_land.get_Geometry(new Options());
 
             int polyLine_count = 0;
@@ -566,8 +566,8 @@ namespace Modeling
                     IList<Curve> pathCurves1 = createRuns1.Item3;
 
                     //CurveLoop landingLoop1 = GetLandingsParameter(landLines_1);
-
-                    (IList<Curve>, IList<Curve>, IList<Curve>) createRuns2 = GetRunsParameter(finalrun[1]);
+                    //
+                    var createRuns2 = GetRunsParameter(finalrun[1]);
                     IList<Curve> bdryCurves2 = createRuns2.Item1;
                     IList<Curve> riserCurves2 = createRuns2.Item2;
                     IList<Curve> pathCurves2 = createRuns2.Item3;
@@ -588,16 +588,16 @@ namespace Modeling
                     //newRun1.LookupParameter("突沿長度").Set(2);
 
                     StairsLanding newLanding2 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[1], newRun1.TopElevation);
-                    StairsLanding newLanding3 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[2], newLanding2.BaseElevation);
+
+                    StairsLanding newLanding3 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[2], newLanding2.BaseElevation+ newLanding2.Thickness);
 
 
-                    StairsRun newRun2 = StairsRun.CreateSketchedRun(doc, newStairsId, newRun1.TopElevation, bdryCurves2, riserCurves2, pathCurves2);
+                    StairsRun newRun2 = StairsRun.CreateSketchedRun(doc, newStairsId, newLanding3.BaseElevation, bdryCurves2, riserCurves2, pathCurves2);
                     //newRun2.ActualRunWidth = Math.Abs(runLines_2[0].GetEndPoint(0).Y - runLines_2[0].GetEndPoint(1).Y);
                     //newRun2.LookupParameter("從豎板開始").Set(0);
                     //newRun2.LookupParameter("突沿長度").Set(2);
 
                     StairsLanding newLanding4 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[3], newRun2.TopElevation);
-                    StairsLanding newLanding5 = StairsLanding.CreateSketchedLanding(doc, newStairsId, finallanding[4], newLanding4.BaseElevation);
 
                     //StairsRun newRun3 = StairsRun.CreateSketchedRun(doc, newStairsId, newRun2.TopElevation, bdryCurves3, riserCurves3, pathCurves3);
 

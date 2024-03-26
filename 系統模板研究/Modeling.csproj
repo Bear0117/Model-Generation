@@ -92,6 +92,7 @@
     <Compile Include="Previous Functions\AutoCreateOpenedWall_new.cs" />
     <Compile Include="Previous Functions\AutoCreateOpening_A.cs" />
     <Compile Include="AdjustWallHeight.cs" />
+    <Compile Include="StairsGeneration\AutoCreateStairs_4Landing.cs" />
     <Compile Include="Test Function\AutoCreateModelLine_Test.cs" />
     <Compile Include="Previous Functions\AdjustWallLength.cs" />
     <Compile Include="Test Function\AutoCreateSlabs_Test2.cs" />

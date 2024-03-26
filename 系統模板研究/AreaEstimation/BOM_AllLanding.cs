@@ -120,10 +120,10 @@ public class BOM_AllLanding : IExternalCommand
                 file.WriteLine($"{"3. 實際級深"},{item.實際級深}");
                 file.WriteLine($"{"4. 實際梯級數"},{item.實際梯級數}");
                 file.WriteLine($"{"5. 所有梯段路徑長度"},{item.所有梯段路徑長度}");
-                file.WriteLine($"{"6. 所有平台底部高度"},{item.所有平台底部高度}");
+                // file.WriteLine($"{"6. 所有平台底部高度"},{item.所有平台底部高度}");
                 // file.WriteLine($"{"1. 中間平台底部高度"},{item.中間平台底部高度}");
                 // file.WriteLine($"{"2. 結束平台底部高度"},{item.結束平台底部高度}");
-                file.WriteLine($"{"7. 所有梯段底部斜長度"},{item.所有梯段底部斜長度}");
+                file.WriteLine($"{"6. 所有梯段底部斜長度"},{item.所有梯段底部斜長度}");
 
                 file.WriteLine();
 
@@ -324,9 +324,12 @@ public class BOM_AllLanding : IExternalCommand
                 // stairLandingBottomLevel = UnitsToMeters(stairsLanding.BaseElevation) - stairLandingThick;
             }
 
-            stairLandingThick = UnitsToMeters(stairLandingList1[stairLandingList1.Count - 1].Thickness);
-            stairLandingBottomLevel = UnitsToMeters(stairLandingList1[stairLandingList1.Count - 1].BaseElevation - stairLandingList1[0].BaseElevation)- stairLandingThick;
-            
+            stairLandingThick = stairLandingList1[stairLandingList1.Count - 1].Thickness;
+            MessageBox.Show(stairLandingThick.ToString());
+            //stairLandingBottomLevel = UnitsToMeters(stairLandingList1[stairLandingList1.Count - 1].BaseElevation - stairLandingList1[0].BaseElevation)- stairLandingThick;
+            MessageBox.Show(UnitsToCentimeters((stairLandingList1[stairLandingList1.Count - 1].BaseElevation- stairLandingThick)).ToString());
+            stairLandingBottomLevel = UnitsToMeters(stairLandingList1[stairLandingList1.Count-1].BaseElevation - stairLandingThick);
+
             //平台的參數
             foreach (StairsLanding stairLanding in stairLandingsList)
             {
@@ -357,7 +360,7 @@ public class BOM_AllLanding : IExternalCommand
                         {
                             // 抓取幾何面
                             FaceArray faces = solid.Faces;
-                            MessageBox.Show("平台面數量:" + faces.Size.ToString());
+                            //MessageBox.Show("平台面數量:" + faces.Size.ToString());
                             foreach (Face face in faces)
                             {
                                 XYZ targetFaceNormal = face.ComputeNormal(UV.Zero);
@@ -368,22 +371,22 @@ public class BOM_AllLanding : IExternalCommand
                                 if (Math.Abs(dotProduct - 1.0) < 1e-9)
                                 {
                                     topFace = face;
-                                    MessageBox.Show("這是頂面");
+                                    //MessageBox.Show("這是頂面");
                                     // 計算頂面的面積
                                     double topFaceArea = SquareUnitToSquareMeter(topFace.Area);
                                     allTopFaceArea.Add(topFaceArea);
-                                    MessageBox.Show("頂面面積: " + topFaceArea.ToString());
+                                    //MessageBox.Show("頂面面積: " + topFaceArea.ToString());
 
                                 }
 
                                 else if (Math.Abs(dotProduct + 1.0) < 1e-9)
                                 {
                                     bottomFace = face;
-                                    MessageBox.Show("這是底面");
+                                    //MessageBox.Show("這是底面");
                                     // 計算底面的面積
                                     double bottomFaceArea = SquareUnitToSquareMeter(bottomFace.Area);
                                     allBottomFaceArea.Add(bottomFaceArea);
-                                    MessageBox.Show("底面面積: " + bottomFaceArea.ToString());
+                                    //MessageBox.Show("底面面積: " + bottomFaceArea.ToString());
 
                                 }
 
@@ -418,11 +421,11 @@ public class BOM_AllLanding : IExternalCommand
         totalArea = (double)(threadsArea + risersArea + stairRunBottomArea + allLandingArea);
 
 
-        MessageBox.Show(panelName + "\n" + panelCode + "\n" +
-            stairActualRiserHight.ToString() + "\n" + stairActualTreadDepth.ToString() + "\n" +
-            stairActualNumRisers.ToString() + "\n" + stairRunBottomLength.ToString() + "\n" +
-            allLandingArea.ToString()  + "\n" + threadsArea.ToString() + "\n" + risersArea.ToString() + "\n" +
-            stairRunBottomArea.ToString() + "\n" + totalArea.ToString() );
+        //MessageBox.Show(panelName + "\n" + panelCode + "\n" +
+        //    stairActualRiserHight.ToString() + "\n" + stairActualTreadDepth.ToString() + "\n" +
+        //    stairActualNumRisers.ToString() + "\n" + stairRunBottomLength.ToString() + "\n" +
+        //    allLandingArea.ToString()  + "\n" + threadsArea.ToString() + "\n" + risersArea.ToString() + "\n" +
+        //    stairRunBottomArea.ToString() + "\n" + totalArea.ToString() );
 
 
         //BOM表

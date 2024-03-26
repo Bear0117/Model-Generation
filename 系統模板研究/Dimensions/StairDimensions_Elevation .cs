@@ -13,6 +13,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using Aspose.Cells.Charts;
 using System.Net;
+// using Teigha.DatabaseServices;
 // using Aspose.Pdf.LogicalStructure;
 
 namespace Modeling
@@ -63,6 +64,7 @@ namespace Modeling
                 List<Line> stairVerticalLines = new List<Line>();
                 List<Line> stairSlopeLines = new List<Line>();
                 List<Line> stairAllLines = new List<Line>();
+                List<List<Face>> stairAllFace = new List<List<Face>>();
                 
                 //抓取平台邊緣線並分類
                 foreach (StairsLanding stairLanding in stairLandingsList)
@@ -70,29 +72,63 @@ namespace Modeling
                     ViewSection sectionView = uidoc.ActiveView as ViewSection;
 
                     List<Face> stairLandingFace = GetFace(stairLanding, sectionView.ViewDirection);
+                    stairAllFace.Add(stairLandingFace);
 
-                    List<Line> stairLandingHorrizontalLine = GetAndClassifyLine(stairLandingFace).Item1;
-                    List<Line> stairLandingVerticalLine = GetAndClassifyLine(stairLandingFace).Item2;
-                    List<Line> stairLandingSlopeLine = GetAndClassifyLine(stairLandingFace).Item3;
+                    List<Line> stairLandingHorrizontalLines = GetAndClassifyLine(stairLandingFace).Item1;
+                    List<Line> stairLandingVerticalLines = GetAndClassifyLine(stairLandingFace).Item2;
+                    List<Line> stairLandingSlopeLines = GetAndClassifyLine(stairLandingFace).Item3;
 
-                    stairHorrizontalLines = AddLine(stairHorrizontalLines, stairLandingHorrizontalLine);
-                    stairVerticalLines = AddLine(stairVerticalLines, stairLandingVerticalLine);
-                    stairSlopeLines = AddLine(stairSlopeLines, stairLandingSlopeLine);
+                    stairLandingHorrizontalLines = AlignAndSortLines(stairLandingHorrizontalLines, XYZ.BasisX, point => point.X);
+                    stairLandingHorrizontalLines = AlignAndSortLines(stairLandingHorrizontalLines, XYZ.BasisX, point => point.Z);
+                    stairLandingVerticalLines = AlignAndSortLines(stairLandingVerticalLines, XYZ.BasisX, point => point.X);
+                    stairLandingVerticalLines = AlignAndSortLines(stairLandingVerticalLines, XYZ.BasisX, point => point.Z);
+                    stairLandingSlopeLines = AlignAndSortLines(stairLandingSlopeLines, XYZ.BasisX, point => point.Z);
+                    stairLandingSlopeLines = AlignAndSortLines(stairLandingSlopeLines, XYZ.BasisX, point => point.X);
+                    stairLandingSlopeLines = AlignAndSortLines(stairLandingSlopeLines, XYZ.BasisX, point => point.Y);
+
+                    stairLandingHorrizontalLines = RemoveSameLines(stairLandingHorrizontalLines);
+                    stairLandingVerticalLines = RemoveSameLines(stairLandingVerticalLines);
+                    stairLandingSlopeLines = RemoveSameLines(stairLandingSlopeLines);
+
+                    stairLandingHorrizontalLines = MergeLines(stairLandingHorrizontalLines, 0.00001);
+                    stairLandingVerticalLines = MergeLines(stairLandingVerticalLines, 0.00001);
+                    stairLandingSlopeLines = MergeLines(stairLandingSlopeLines, 0.00001);
+
+                    stairHorrizontalLines = AddLine(stairHorrizontalLines, stairLandingHorrizontalLines);
+                    //stairVerticalLines = AddLine(stairVerticalLines, stairLandingVerticalLines);
+                    stairSlopeLines = AddLine(stairSlopeLines, stairLandingSlopeLines);
                 }
-                
+
                 foreach (StairsRun stairRun in stairRunsList)
                 {
                     ViewSection sectionView = uidoc.ActiveView as ViewSection;
 
                     List<Face> stairRunFace = GetFace(stairRun, sectionView.ViewDirection);
+                    stairAllFace.Add(stairRunFace);
 
-                    List<Line> stairRunHorrizontalLine = GetAndClassifyLine(stairRunFace).Item1;
-                    List<Line> stairRunVerticalLine = GetAndClassifyLine(stairRunFace).Item2;
-                    List<Line> stairRunSlopeLine = GetAndClassifyLine(stairRunFace).Item3;
+                    List<Line> stairRunHorrizontalLines = GetAndClassifyLine(stairRunFace).Item1;
+                    List<Line> stairRunVerticalLines = GetAndClassifyLine(stairRunFace).Item2;
+                    List<Line> stairRunSlopeLines = GetAndClassifyLine(stairRunFace).Item3;
 
-                    stairHorrizontalLines = AddLine(stairHorrizontalLines, stairRunHorrizontalLine);
-                    stairVerticalLines = AddLine(stairVerticalLines, stairRunVerticalLine);
-                    stairSlopeLines = AddLine(stairSlopeLines, stairRunSlopeLine);
+                    stairRunHorrizontalLines = AlignAndSortLines(stairRunHorrizontalLines, XYZ.BasisX, point => point.X);
+                    stairRunHorrizontalLines = AlignAndSortLines(stairRunHorrizontalLines, XYZ.BasisX, point => point.Z);
+                    stairRunVerticalLines = AlignAndSortLines(stairRunVerticalLines, XYZ.BasisX, point => point.X);
+                    stairRunVerticalLines = AlignAndSortLines(stairRunVerticalLines, XYZ.BasisX, point => point.Z);
+                    stairRunSlopeLines = AlignAndSortLines(stairRunSlopeLines, XYZ.BasisX, point => point.Z);
+                    stairRunSlopeLines = AlignAndSortLines(stairRunSlopeLines, XYZ.BasisX, point => point.X);
+                    stairRunSlopeLines = AlignAndSortLines(stairRunSlopeLines, XYZ.BasisX, point => point.Y);
+
+                    stairRunHorrizontalLines = RemoveSameLines(stairRunHorrizontalLines);
+                    stairRunVerticalLines = RemoveSameLines(stairRunVerticalLines);
+                    stairRunSlopeLines = RemoveSameLines(stairRunSlopeLines);
+
+                    stairRunHorrizontalLines = MergeLines(stairRunHorrizontalLines, 0.00001);
+                    stairRunVerticalLines = MergeLines(stairRunVerticalLines, 0.00001);
+                    stairRunSlopeLines = MergeLines(stairRunSlopeLines, 0.00001);
+
+                    stairHorrizontalLines = AddLine(stairHorrizontalLines, stairRunHorrizontalLines);
+                    //stairVerticalLines = AddLine(stairVerticalLines, stairLandingVerticalLines);
+                    stairSlopeLines = AddLine(stairSlopeLines, stairRunSlopeLines);
                 }
 
                 stairHorrizontalLines = AlignAndSortLines(stairHorrizontalLines, XYZ.BasisX, point => point.X);
@@ -115,7 +151,6 @@ namespace Modeling
                 //// 顯示所有座標在 TaskDialog 中
                 //TaskDialog.Show("Line Coordinates", coordinatesStringBuilder.ToString());
 
-
                 stairHorrizontalLines = RemoveSameLines(stairHorrizontalLines);
                 stairVerticalLines = RemoveSameLines(stairVerticalLines);
                 stairSlopeLines = RemoveSameLines(stairSlopeLines);
@@ -128,7 +163,6 @@ namespace Modeling
                 //stairAllLines = AddLine(stairAllLines, stairVerticalLines);
                 stairAllLines = AddLine(stairAllLines, stairSlopeLines);
                 
-
                 Transaction tran = new Transaction(doc, "Create Dimension");
                 tran.Start();
 
@@ -162,6 +196,19 @@ namespace Modeling
                         }
                     }
                 }
+
+                //List<Face> stairHorrizontalFace = new List<Face>();
+                //foreach (List<Face> faces in stairAllFace)
+                //{
+                //    stairHorrizontalFace = GetHorrizontalFace(faces);
+                //}
+                //ReferenceArray ref = new ReferenceArray();
+                //for (int i = 0; i < stairAllFace.Count - 1; i++)
+                //{
+                //    ref = ref.Append(stairAllFace[i]);
+                //}
+                
+
                 tran.Commit();
 
                 MessageBox.Show("建立標註完成");
@@ -198,7 +245,7 @@ namespace Modeling
                     foreach (Face face in faces)
                     {
                         XYZ targetFaceNormal = face.ComputeNormal(UV.Zero);
-                        if (targetFaceNormal.DotProduct(viewDirection) > 0)
+                        if (targetFaceNormal.DotProduct(viewDirection) == 1)
                         {
                             newFace.Add(face);
                         }
@@ -207,6 +254,24 @@ namespace Modeling
             }
             return newFace;
         }
+        private List<Face> GetHorrizontalFace(List<Face> faces)
+        {
+            List<Face> result = new List<Face>();
+            foreach (Face face in faces)
+            {
+                XYZ targetFaceNormal = face.ComputeNormal(UV.Zero);
+                XYZ Zdirection = XYZ.BasisZ;
+                double dotProduct = Zdirection.DotProduct(targetFaceNormal);
+                //Zdirection.DotProduct(targetFaceNormal))  == 1 或是 == -1
+
+                if (Math.Abs(dotProduct - 1.0) < 1e-9|| Math.Abs(dotProduct + 1.0) < 1e-9)
+                {
+                    result.Add(face);
+                }
+            }
+            return result;
+        }
+
         private (List<Line>, List<Line>, List<Line>) GetAndClassifyLine(List<Face> faces)
         {
             List<Line> verticalLineList = new List<Line>();
