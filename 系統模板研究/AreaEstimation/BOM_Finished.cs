@@ -15,7 +15,7 @@ using Curve = Autodesk.Revit.DB.Curve;
 
 
 [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-public class BOM_AllLanding : IExternalCommand
+public class BOM_Finished : IExternalCommand
 {
     public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
     {
