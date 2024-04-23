@@ -708,7 +708,7 @@ namespace Modeling
                                                                 }
                                                                 else if (text.TextString.Contains("+"))
                                                                 {
-                                                                    string pattern = @"+(\d+)";
+                                                                    string pattern = @"\+(\d+)";
                                                                     Match match = Regex.Match(text.TextString, pattern);
                                                                     if (match.Success)
                                                                     {
@@ -722,7 +722,7 @@ namespace Modeling
                                                                 }
                                                                 else if (text.TextString.Contains("-"))
                                                                 {
-                                                                    string pattern = @"-(\d+)";
+                                                                    string pattern = @"\-(\d+)";
                                                                     Match match = Regex.Match(text.TextString, pattern);
                                                                     if (match.Success)
                                                                     {
@@ -799,7 +799,7 @@ namespace Modeling
                                                                 }
                                                                 else if (text_m.Text.Contains("+"))
                                                                 {
-                                                                    string pattern = @"+(\d+)";
+                                                                    string pattern = @"\+(\d+)";
                                                                     Match match = Regex.Match(text_m.Text, pattern);
                                                                     if (match.Success)
                                                                     {
@@ -812,7 +812,7 @@ namespace Modeling
                                                                 }
                                                                 else if (text_m.Text.Contains("-"))
                                                                 {
-                                                                    string pattern = @"-(\d+)";
+                                                                    string pattern = @"\-(\d+)";
                                                                     Match match = Regex.Match(text_m.Text, pattern);
                                                                     if (match.Success)
                                                                     {

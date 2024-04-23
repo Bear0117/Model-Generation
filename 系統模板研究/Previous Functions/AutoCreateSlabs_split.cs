@@ -285,13 +285,7 @@ namespace Modeling
                     }
                 }
             }
-            //foreach (SlabModel s in finalRecSlab)
-            //{
-            //    MessageBox.Show(s.Thickness.ToString());
-            //}
 
-            // Create slabs according to the outline in  "FinalRecSlab".
-            //MessageBox.Show(finalRecSlab.Count.ToString());
             CreateFloor(doc, finalRecSlab, level);
 
             transGroup.Assimilate();
@@ -507,16 +501,6 @@ namespace Modeling
             return profileLoop;
         }
 
-        public XYZ RoundPoint(XYZ point, double gridline_size)
-        {
-
-            XYZ newPoint = new XYZ(
-                CentimetersToUnits(Math.Round(UnitsToCentimeters(point.X) * 2) / 2),
-                CentimetersToUnits(Math.Round(UnitsToCentimeters(point.Y) * 2) / 2),
-                CentimetersToUnits(Math.Round(UnitsToCentimeters(point.Z) * 2) / 2)
-                );
-            return newPoint;
-        }
 
         public double UnitsToCentimeters(double value)
         {
@@ -747,44 +731,6 @@ namespace Modeling
             return midPoint;
         }
 
-        public XYZ GetPointInCurveLoop(CurveLoop curveLoop)
-        {
-            // Initiate some parameters.
-            List<double> xCoorList = new List<double>();
-            List<double> yCoorList = new List<double>();
-            double zCoor = 0;
-
-            // 
-            foreach (Autodesk.Revit.DB.Curve curve in curveLoop.ToList())
-            {
-                xCoorList.Add(curve.GetEndPoint(0).X);
-                xCoorList.Add(curve.GetEndPoint(1).X);
-                yCoorList.Add(curve.GetEndPoint(0).Y);
-                yCoorList.Add(curve.GetEndPoint(1).Y);
-                zCoor = curve.GetEndPoint(0).Z;
-            }
-
-            // Sort the X and Y coordinate values.
-            xCoorList.Sort();
-            yCoorList.Sort();
-
-            // Get the distinct values of sorted values.
-            List<double> xSorted = GetDistinctList(xCoorList);
-            List<double> ySorted = GetDistinctList(yCoorList);
-
-            XYZ max = new XYZ(xSorted.Max(), ySorted.Max(), zCoor);
-            XYZ min = new XYZ(xSorted.Min(), ySorted.Min(), zCoor);
-            //XYZ midPoint = (max + min) / 2;
-            XYZ midPoint = min  + (max - min) / 100;
-
-            return midPoint;
-        }
-
-        public XYZ GetPointOnCurveLoop(CurveLoop curveLoop)
-        {
-            List<Autodesk.Revit.DB.Curve> list_curve = curveLoop.ToList();
-            return list_curve[0].GetEndPoint(0);
-        }
 
         public List<SlabModel> GetLocation(List<SlabModel> SlabModels)
         {
@@ -806,46 +752,6 @@ namespace Modeling
                 s.Location = midpoint;
             }
             return SlabModels;
-        }
-
-        public void CreateColumn(Document doc, List<SlabModel> slabModels, Level level)
-        {
-            foreach (SlabModel s in slabModels)
-            {
-                using (Autodesk.Revit.DB.Transaction tx = new Autodesk.Revit.DB.Transaction(doc))
-                {
-                    try
-                    {
-                        tx.Start("createColumn");
-                        //if (!default_column.IsActive)
-                        //{
-                        //    default_column.Activate();
-                        //}
-                        FamilySymbol default_column = new FilteredElementCollector(doc)
-                        .OfClass(typeof(FamilySymbol))
-                        .OfCategory(BuiltInCategory.OST_Columns)
-                        .Cast<FamilySymbol>()
-                        .FirstOrDefault(q => q.Name == "default") as FamilySymbol;
-                        FamilyInstance familyInstance = doc.Create.NewFamilyInstance(s.Location, default_column, level, StructuralType.Column);
-                        tx.Commit();
-                    }
-                    catch (System.Exception ex)
-                    {
-                        TaskDialog td = new TaskDialog("error")
-                        {
-                            Title = "error",
-                            AllowCancellation = true,
-                            MainInstruction = "error",
-                            MainContent = "Error" + ex.Message,
-                            CommonButtons = TaskDialogCommonButtons.Close
-                        };
-                        td.Show();
-
-                        Debug.Print(ex.Message);
-                        tx.RollBack();
-                    }
-                }
-            }
         }
 
         public List<SlabModel> GetPairedLabel(List<SlabModel> SlabModels, String path, String layer_name)
@@ -1111,101 +1017,6 @@ namespace Modeling
             return ModelPathUtils.ConvertModelPathToUserVisiblePath(cadLinkType.GetExternalFileReference().GetAbsolutePath());
         }
 
-        public void ChangeBeamType(Document doc, string beamSize)
-        {
-
-            char separator = 'x';
-            string[] parts = beamSize.Split(separator);
-            double width = int.Parse(parts[0]);
-            double depth = int.Parse(parts[1]);
-
-            FilteredElementCollector Collector = new FilteredElementCollector(doc);
-            List<FamilySymbol> familySymbolList = Collector.OfClass(typeof(FamilySymbol))
-            .OfCategory(BuiltInCategory.OST_StructuralFraming)
-            .Cast<FamilySymbol>().ToList();
-
-            Boolean IsColumnTypeExist = false;
-            foreach (FamilySymbol fs in familySymbolList)
-            {
-                if (fs.Name != beamSize)
-                {
-                    continue;
-                }
-                else
-                {
-                    IsColumnTypeExist = true;
-                    break;
-                }
-            }
-            if (!IsColumnTypeExist)
-            {
-                using (Autodesk.Revit.DB.Transaction t_createNewColumnType = new Autodesk.Revit.DB.Transaction(doc, "Ｃreate New Beam Type"))
-                {
-                    try
-                    {
-                        t_createNewColumnType.Start();
-
-                        FamilySymbol default_FamilySymbol = new FilteredElementCollector(doc)
-                        .OfClass(typeof(FamilySymbol))
-                        .OfCategory(BuiltInCategory.OST_StructuralFraming)
-                        .Cast<FamilySymbol>()
-                        .FirstOrDefault(q => q.Name == "default") as FamilySymbol;
-
-                        // set the "h" and "b" to a new value:
-                        FamilySymbol newFamSym = default_FamilySymbol.Duplicate(beamSize) as FamilySymbol;
-                        Parameter parah = newFamSym.LookupParameter("h");
-                        Parameter parab = newFamSym.LookupParameter("b");
-                        parah.Set(CentimetersToUnits(depth));
-                        parab.Set(CentimetersToUnits(width));
-
-                        t_createNewColumnType.Commit();
-                    }
-                    catch (System.Exception ex)
-                    {
-                        TaskDialog td = new TaskDialog("error")
-                        {
-                            Title = "error",
-                            AllowCancellation = true,
-                            MainInstruction = "error",
-                            MainContent = "Error" + ex.Message,
-                            CommonButtons = TaskDialogCommonButtons.Close
-                        };
-                        td.Show();
-
-                        Debug.Print(ex.Message);
-                        t_createNewColumnType.RollBack();
-                    }
-                }
-            }
-            using (Autodesk.Revit.DB.Transaction t = new Autodesk.Revit.DB.Transaction(doc, "Change Beam Type"))
-            {
-                t.Start();
-
-                // The familyinstance you want to change -> e.g. UB-Universal Beam 305x165x40UB
-                List<FamilyInstance> beams = new FilteredElementCollector(doc, doc.ActiveView.Id)
-               .OfClass(typeof(FamilyInstance))
-               .OfCategory(BuiltInCategory.OST_StructuralFraming)
-               .Cast<FamilyInstance>()
-               .Where(q => q.Name == "default").ToList();
-
-                // The target familyinstance(familysymbol) what it should be.
-                foreach (FamilyInstance beam in beams)
-                {
-                    if (new FilteredElementCollector(doc)
-                .OfClass(typeof(FamilySymbol))
-                .OfCategory(BuiltInCategory.OST_StructuralFraming)
-                .Cast<FamilySymbol>()
-                .FirstOrDefault(q => q.Name == beamSize) is FamilySymbol fs)
-                    {
-                        beam.Symbol = fs;
-                    }
-                    else
-                        continue;
-                }
-
-                t.Commit();
-            }
-        }
 
         public XYZ PointMilimeterToUnit(XYZ point)
         {

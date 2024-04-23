@@ -671,7 +671,6 @@ namespace Modeling
             }
             else
             {
-                
                 JoinGeometryUtils.UnjoinGeometry(doc, e1, e2);
                 if ((!JoinGeometryUtils.AreElementsJoined(doc, e1, e2)))
                 {

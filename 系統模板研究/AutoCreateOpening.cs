@@ -157,7 +157,7 @@ namespace Modeling
                     }
                     openingwall.Add(comparewall[finalnumber]);
                 }
-            } 
+            }
 
             Transform transform = null;
             foreach (GeometryObject gObj in geoElem)
@@ -176,17 +176,18 @@ namespace Modeling
                     foreach (CADTextModel walltext in text)
                     {
                         XYZ mid_new = new XYZ(wall.Midpoint.X, wall.Midpoint.Y, 0) * 0.1;
-                        comparedistance = mid_new.DistanceTo(transform.OfPoint(walltext.Location * 10) /10);
+                        comparedistance = mid_new.DistanceTo(transform.OfPoint(walltext.Location * 10) / 10);
                         if (comparedistance < distanceBetween)
                         {
                             distanceBetween = comparedistance;
+                            // WText is the floor height of window.
                             wall.HText = walltext.HText;
                             wall.WText = walltext.WText;
                         }
                     }
                 }
             }
-            
+
 
             // Get the level height.
             FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(Level));
@@ -213,6 +214,15 @@ namespace Modeling
                 }
             }
 
+
+            // Create bbox for label position
+            //foreach (CADTextModel walltext in text)
+            //{
+            //    DrawPositionBox(doc, walltext.Location);
+            //}
+
+
+
             // Create openings.
             foreach (Wallmodel openwall in openingwall)
             {
@@ -230,7 +240,7 @@ namespace Modeling
         }
         private void CreateOpening(Document doc, Autodesk.Revit.DB.Curve wallLine, double h, double fl, double kerbHeight)
         {
-            
+
             if (fl < kerbHeight)
             {
                 h += fl;
@@ -261,9 +271,10 @@ namespace Modeling
             // Find the wall closest to the point
             Wall closestWall = null;
             double closestDistance = double.MaxValue;
-            foreach (Wall wall in walls)
+            foreach (Element elem in walls)
             {
                 bool hWall;
+                if (!(elem is Wall wall)) continue;
                 LocationCurve location = wall.Location as LocationCurve;
                 XYZ midPoint = (location.Curve.GetEndPoint(0) + location.Curve.GetEndPoint(1)) / 2;
                 if (Math.Abs(location.Curve.GetEndPoint(0).Y - location.Curve.GetEndPoint(1).Y) < CentimetersToUnits(0.001))
@@ -392,7 +403,7 @@ namespace Modeling
             // Create window.
             Transaction tw = new Transaction(doc, "Create window on wall");
             tw.Start();
-            if(closestWall != null)
+            if (closestWall != null)
             {
                 Level level = doc.GetElement(closestWall.LevelId) as Level;
                 XYZ wallMidpoint = (startPoint + endPoint) / 2 + new XYZ(0, 0, CentimetersToUnits(fl));
@@ -647,6 +658,26 @@ namespace Modeling
                 //}
             }
             return CADModels;
+        }
+
+        private void DrawPositionBox(Document doc, XYZ centerPoint)
+        {
+            double halfSideLength = UnitUtils.ConvertToInternalUnits(2.5, UnitTypeId.Centimeters); // 正方形边长的一半
+            XYZ[] points = new XYZ[4];
+            points[0] = new XYZ(centerPoint.X - halfSideLength, centerPoint.Y - halfSideLength, centerPoint.Z);
+            points[1] = new XYZ(centerPoint.X + halfSideLength, centerPoint.Y - halfSideLength, centerPoint.Z);
+            points[2] = new XYZ(centerPoint.X + halfSideLength, centerPoint.Y + halfSideLength, centerPoint.Z);
+            points[3] = new XYZ(centerPoint.X - halfSideLength, centerPoint.Y + halfSideLength, centerPoint.Z);
+            using (Transaction trans = new Transaction(doc, "Create Model Line Square"))
+            {
+                trans.Start();
+                for (int i = 0; i < 4; i++)
+                {
+                    Line line = Line.CreateBound(points[i], points[(i + 1) % 4]);
+                    DetailCurve dl1 = doc.Create.NewDetailCurve(doc.ActiveView, line);
+                }
+                trans.Commit();
+            }
         }
 
         // Functions of operation.
