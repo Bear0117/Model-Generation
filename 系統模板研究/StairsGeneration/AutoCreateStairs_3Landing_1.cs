@@ -14,12 +14,12 @@ using Line = Autodesk.Revit.DB.Line;
 using Curve = Autodesk.Revit.DB.Curve;
 using Document = Autodesk.Revit.DB.Document;
 using Transaction = Autodesk.Revit.DB.Transaction;
+using System.Windows.Forms;
 
-
-namespace Modeling
+namespace Stair_API
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    class AutoCreateStairs_3Landing : IExternalCommand
+    class AutoCreateStairs_3Landing_1 : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -59,10 +59,40 @@ namespace Modeling
                 return Result.Failed;
             }
 
+            Reference refer_run_1 = uidoc.Selection.PickObject(ObjectType.PointOnElement, "Select a CAD Layer");
+            Element elem_run_1 = doc.GetElement(refer_run_1);
+            GeometryObject geoObj_run_1 = elem_run_1.GetGeometryObjectFromReference(refer_run_1);
+            GeometryElement geoElem_run_1 = elem_run_1.get_Geometry(new Options());
+            Category targetCategory_run_1 = null;
+            ElementId graphicsStyleId_run_1 = null;
+            string riser_layer_name_1 = "STAIR_RISER"; //Default
+            if (geoObj_run_1.GraphicsStyleId != ElementId.InvalidElementId)
+            {
+                graphicsStyleId_run_1 = geoObj_run_1.GraphicsStyleId;
+                using (GraphicsStyle gs_run_1 = doc.GetElement(geoObj_run_1.GraphicsStyleId) as GraphicsStyle)
+                {
+                    if (gs_run_1 != null)
+                    {
+                        targetCategory_run_1 = gs_run_1.GraphicsStyleCategory;
+                        riser_layer_name_1 = gs_run_1.GraphicsStyleCategory.Name;
+                    }
+                }
+
+            }
+            if (geoElem_run_1 == null || graphicsStyleId_run_1 == null)
+            {
+                message = "GeometryElement or ID does not exist！";
+                return Result.Failed;
+            }
+
             // 抓梯段裡的所有線
             List<Line> allrunLines = new List<Line>();
             List<Line> verticalLines = new List<Line>();
             List<Line> horizontalLines = new List<Line>();
+
+            List<Line> allrunLines_1 = new List<Line>();
+            List<Line> verticalLines_1 = new List<Line>();
+            List<Line> horizontalLines_1 = new List<Line>();
             foreach (GeometryObject gObj_run in geoElem_run)
             {
                 GeometryInstance geomInstance_run = gObj_run as GeometryInstance;
@@ -86,6 +116,7 @@ namespace Modeling
                             //}
                             //Line newLine = Line.CreateBound(Algorithm.RoundPoint(line.GetEndPoint(0), 5), Algorithm.RoundPoint(line.GetEndPoint(1), 5));
                             //allrunLines.Add(newLine);
+                            allrunLines_1.Add(line);
                             allrunLines.Add(line);
                         }
 
@@ -96,42 +127,125 @@ namespace Modeling
                             Line line_1 = Line.CreateBound(Algorithm.RoundPoint(points[0], 5), Algorithm.RoundPoint(points[1], 5));
                             Line line_2 = Line.CreateBound(Algorithm.RoundPoint(points[1], 5), Algorithm.RoundPoint(points[2], 5));
 
+                            allrunLines_1.Add(line_1);
+                            allrunLines_1.Add(line_2);
                             allrunLines.Add(line_1);
                             allrunLines.Add(line_2);
                         }
                     }
 
                     //判斷線是垂直或水平
-                    foreach (Line line in allrunLines)
+                    foreach (Line line in allrunLines_1)
                     {
                         // 判断线的方向
                         if (IsVertical(line)) // 自定義函數，用于检查线是否垂直
                         {
-                            verticalLines.Add(line);
+                            verticalLines_1.Add(line);
                         }
                         else if (IsHorizontal(line)) // 自定義函數，用于检查线是否水平
                         {
-                            horizontalLines.Add(line);
+                            horizontalLines_1.Add(line);
                         }
                     }
-                    //MessageBox.Show("所有選到的線總共有:" + allriserCurves.Count.ToString());
+                    // MessageBox.Show("所有選到的線總共有:" + horizontalLines.Count.ToString());
                 }
             }
+            List<Line> newverticalrunLines_1 = ArrangeHorizontalLines(verticalLines_1);
+            foreach (Line line in newverticalrunLines_1)
+            {
+                verticalLines.Add(line);
+            }
+            List<Line> newhorizontalrunLines_1 = ArrangeHorizontalLines(horizontalLines_1);
+            foreach (Line line in newhorizontalrunLines_1)
+            {
+                horizontalLines.Add(line);
+            }
 
-            //將垂直梯段調整方線並依序排列
-            List<Line> newverticalrunLines = ArrangeVerticalLines(verticalLines);
+            List<Line> allrunLines_2 = new List<Line>();
+            List<Line> verticalLines_2 = new List<Line>();
+            List<Line> horizontalLines_2 = new List<Line>();
+            foreach (GeometryObject gObj_run_1 in geoElem_run_1)
+            {
+                GeometryInstance geomInstance_run_1 = gObj_run_1 as GeometryInstance;
+
+                if (null != geomInstance_run_1)
+                {
+                    foreach (GeometryObject insObj_run_1 in geomInstance_run_1.SymbolGeometry)
+                    {
+                        if (insObj_run_1.GraphicsStyleId.IntegerValue != graphicsStyleId_run_1.IntegerValue)
+                        {
+                            continue;
+                        }
+
+                        if (insObj_run_1.GetType().ToString() == "Autodesk.Revit.DB.Line")
+                        {
+                            Line line = insObj_run_1 as Line;
+                            line = Line.CreateBound(Algorithm.RoundPoint(line.GetEndPoint(0), 5), Algorithm.RoundPoint(line.GetEndPoint(1), 5));
+                            //if (Math.Abs(line.GetEndPoint(0).Y - line.GetEndPoint(1).Y) < CentimetersToUnits(1))
+                            //{
+                            //    continue;
+                            //}
+                            //Line newLine = Line.CreateBound(Algorithm.RoundPoint(line.GetEndPoint(0), 5), Algorithm.RoundPoint(line.GetEndPoint(1), 5));
+                            //allrunLines.Add(newLine);
+                            allrunLines_2.Add(line);
+                            allrunLines.Add(line);
+                        }
+
+                        if (insObj_run_1.GetType().ToString() == "Autodesk.Revit.DB.PolyLine")
+                        {
+                            PolyLine polyLine = insObj_run_1 as PolyLine;
+                            IList<XYZ> points = polyLine.GetCoordinates();
+                            Line line_1 = Line.CreateBound(Algorithm.RoundPoint(points[0], 5), Algorithm.RoundPoint(points[1], 5));
+                            Line line_2 = Line.CreateBound(Algorithm.RoundPoint(points[1], 5), Algorithm.RoundPoint(points[2], 5));
+
+                            allrunLines_2.Add(line_1);
+                            allrunLines_2.Add(line_2);
+                            allrunLines.Add(line_1);
+                            allrunLines.Add(line_2);
+                        }
+                    }
+
+                    //判斷線是垂直或水平
+                    foreach (Line line in allrunLines_2)
+                    {
+                        // 判断线的方向
+                        if (IsVertical(line)) // 自定義函數，用于检查线是否垂直
+                        {
+                            verticalLines_2.Add(line);
+                        }
+                        else if (IsHorizontal(line)) // 自定義函數，用于检查线是否水平
+                        {
+                            horizontalLines_2.Add(line);
+                        }
+                    }
+                    // MessageBox.Show("所有選到的線總共有:" + horizontalLines.Count.ToString());
+                }
+            }
+            List<Line> newverticalrunLines_2 = ArrangeHorizontalLines(verticalLines_2);
+            foreach (Line line in newverticalrunLines_2)
+            {
+                verticalLines.Add(line);
+            }
+            List<Line> newhorizontalrunLines_2 = ArrangeHorizontalLines(horizontalLines_2);
+            foreach (Line line in newhorizontalrunLines_2)
+            {
+                horizontalLines.Add(line);
+            }
+
+
+            ////將垂直梯段調整方線並依序排列
+            //List<Line> newverticalrunLines = ArrangeVerticalLines(verticalLines);
 
             // 將垂直梯段分為兩邊
-            List<Line> verticalrunLines_1 = ClassifyVerticalLine(newverticalrunLines).Item1;
-            List<Line> verticalrunLines_2 = ClassifyVerticalLine(newverticalrunLines).Item2;
+            List<Line> verticalrunLines_1 = ClassifyVerticalLine(verticalLines).Item1;
+            List<Line> verticalrunLines_2 = ClassifyVerticalLine(verticalLines).Item2;
 
-
-            //將水平梯段調整方線並依序排列
-            List<Line> newhorizontalrunLines = ArrangeHorizontalLines(horizontalLines);
+            ////將水平梯段調整方線並依序排列
+            //List<Line> newhorizontalrunLines = ArrangeHorizontalLines(horizontalLines);
 
             // 將水平梯段分為兩邊
-            List<Line> horizontalrunLines_1 = ClassifyHorizontalLine(newhorizontalrunLines).Item1;
-            List<Line> horizontalrunLines_2 = ClassifyHorizontalLine(newhorizontalrunLines).Item2;
+            List<Line> horizontalrunLines_1 = ClassifyHorizontalLine(horizontalLines).Item1;
+            List<Line> horizontalrunLines_2 = ClassifyHorizontalLine(horizontalLines).Item2;
 
             //抓取路徑圖層
             Reference refer_path = uidoc.Selection.PickObject(ObjectType.PointOnElement, "Select a CAD Layer");
@@ -152,8 +266,6 @@ namespace Modeling
                         //path = gs_path.GraphicsStyleCategory.Name;
                     }
                 }
-
-
             }
             if (geoElem_path == null || graphicsStyleId_path == null)
             {
@@ -221,7 +333,6 @@ namespace Modeling
             //MessageBox.Show(vhpathLines.Count.ToString());
 
             foreach (Line line in vhpathLines)
-
             {
                 vhpathpoints.Add(line.GetEndPoint(0));
                 vhpathpoints.Add(line.GetEndPoint(1));
@@ -240,6 +351,7 @@ namespace Modeling
                 horizontalrunLines_1,
                 horizontalrunLines_2
             };
+
 
             int count = 0;
 
@@ -280,6 +392,7 @@ namespace Modeling
                 if (closestList_run != null && up != null)
                 {
                     closestList_run = SortLines(closestList_run, up);
+                    closestList_run = ArrangeHorizontalLines(closestList_run);
                     finalrun.Add(closestList_run);
                     up = closestList_run[closestList_run.Count - 1].GetEndPoint(1);
                     runlines_list.Remove(closestList_run);
@@ -290,8 +403,7 @@ namespace Modeling
                     break;
                 }
             }
-
-
+            
             // 抓平台的圖層
             Reference refer_land = uidoc.Selection.PickObject(ObjectType.PointOnElement, "Select a CAD Layer");
             Element elem_land = doc.GetElement(refer_land);
@@ -447,6 +559,8 @@ namespace Modeling
                 {
                     stairsTrans.Start();
 
+                    MessageBox.Show(allrunLines.Count.ToString());
+
                     Element stair = doc.GetElement(newStairsId) as Element;
                     stair.LookupParameter("所需梯級數").Set(allrunLines.Count);
                     stair.LookupParameter("實際級深").Set(Math.Abs(finalrun[0][0].GetEndPoint(0).X - finalrun[0][1].GetEndPoint(0).X));
@@ -457,7 +571,6 @@ namespace Modeling
                     IList<Curve> pathCurves1 = createRuns1.Item3;
 
                     //CurveLoop landingLoop1 = GetLandingsParameter(landLines_1);
-                    //
                     var createRuns2 = GetRunsParameter(finalrun[1]);
                     IList<Curve> bdryCurves2 = createRuns2.Item1;
                     IList<Curve> riserCurves2 = createRuns2.Item2;

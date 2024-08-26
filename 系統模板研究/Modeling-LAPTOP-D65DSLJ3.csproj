@@ -76,7 +76,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoCreateColumns_Grid.cs" />
-    <Compile Include="AutoCreateWall_linePairs.cs" />
     <Compile Include="Previous Functions\AdjustSlabElevation.cs" />
     <Compile Include="Algorithm.cs" />
     <Compile Include="AreaEstimation\AutoCalculateStairsArea.cs" />
@@ -86,10 +85,7 @@
     <Compile Include="Previous Functions\AutoCreateOpenedWall_new.cs" />
     <Compile Include="Previous Functions\AutoCreateOpening_A.cs" />
     <Compile Include="AdjustWallHeight.cs" />
-    <Compile Include="StairsGeneration\AutoCreateStairs_2Landing.cs" />
-    <Compile Include="StairsGeneration\BOM_Finished.cs" />
-    <Compile Include="StairsGeneration\StairDimensions_Elevation .cs" />
-    <Compile Include="StairsGeneration\StairLandindDimensions_FloorPlane.cs" />
+    <Compile Include="StairsGeneration\AutoCreateStairs_3Landing_1.cs" />
     <Compile Include="Test Function\AutoCreateModelLine_Test.cs" />
     <Compile Include="Previous Functions\AdjustWallLength.cs" />
     <Compile Include="Test Function\AutoCreateSlabs_Test2.cs" />

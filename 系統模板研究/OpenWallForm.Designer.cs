@@ -43,19 +43,23 @@
             // 
             // cb_level
             // 
+            this.cb_level.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cb_level.Font = new System.Drawing.Font("微軟正黑體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.cb_level.FormattingEnabled = true;
-            this.cb_level.Location = new System.Drawing.Point(143, 112);
+            this.cb_level.Location = new System.Drawing.Point(251, 112);
             this.cb_level.Name = "cb_level";
-            this.cb_level.Size = new System.Drawing.Size(130, 32);
+            this.cb_level.Size = new System.Drawing.Size(165, 32);
             this.cb_level.TabIndex = 3;
             this.cb_level.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // Text_Level
             // 
+            this.Text_Level.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Text_Level.AutoSize = true;
             this.Text_Level.Font = new System.Drawing.Font("微軟正黑體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.Text_Level.Location = new System.Drawing.Point(42, 115);
+            this.Text_Level.Location = new System.Drawing.Point(12, 112);
             this.Text_Level.Name = "Text_Level";
             this.Text_Level.Size = new System.Drawing.Size(57, 24);
             this.Text_Level.TabIndex = 4;
@@ -64,29 +68,35 @@
             // 
             // Text_kerb
             // 
+            this.Text_kerb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.Text_kerb.Font = new System.Drawing.Font("微軟正黑體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.Text_kerb.Location = new System.Drawing.Point(144, 174);
+            this.Text_kerb.Location = new System.Drawing.Point(252, 174);
             this.Text_kerb.Name = "Text_kerb";
-            this.Text_kerb.Size = new System.Drawing.Size(130, 33);
+            this.Text_kerb.Size = new System.Drawing.Size(165, 33);
             this.Text_kerb.TabIndex = 5;
             this.Text_kerb.TextChanged += new System.EventHandler(this.textBox1_TextChanged_1);
             // 
             // Text1
             // 
+            this.Text1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Text1.AutoSize = true;
             this.Text1.Font = new System.Drawing.Font("微軟正黑體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.Text1.Location = new System.Drawing.Point(14, 183);
+            this.Text1.Location = new System.Drawing.Point(12, 177);
             this.Text1.Name = "Text1";
-            this.Text1.Size = new System.Drawing.Size(118, 24);
+            this.Text1.Size = new System.Drawing.Size(237, 24);
             this.Text1.TabIndex = 6;
-            this.Text1.Text = "Kerb Height";
+            this.Text1.Text = "Neglect Kerbs lower than";
             this.Text1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.Text1.Click += new System.EventHandler(this.Text1_Click);
             // 
             // label1
             // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("微軟正黑體", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.label1.Location = new System.Drawing.Point(70, 37);
+            this.label1.Location = new System.Drawing.Point(148, 52);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(203, 27);
             this.label1.TabIndex = 7;
@@ -95,9 +105,10 @@
             // 
             // btn_OK
             // 
-            this.btn_OK.Location = new System.Drawing.Point(75, 292);
+            this.btn_OK.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.btn_OK.Location = new System.Drawing.Point(133, 282);
             this.btn_OK.Name = "btn_OK";
-            this.btn_OK.Size = new System.Drawing.Size(75, 23);
+            this.btn_OK.Size = new System.Drawing.Size(116, 23);
             this.btn_OK.TabIndex = 8;
             this.btn_OK.Text = "OK";
             this.btn_OK.UseVisualStyleBackColor = true;
@@ -105,9 +116,10 @@
             // 
             // btn_Cancel
             // 
-            this.btn_Cancel.Location = new System.Drawing.Point(187, 292);
+            this.btn_Cancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.btn_Cancel.Location = new System.Drawing.Point(245, 282);
             this.btn_Cancel.Name = "btn_Cancel";
-            this.btn_Cancel.Size = new System.Drawing.Size(75, 23);
+            this.btn_Cancel.Size = new System.Drawing.Size(116, 23);
             this.btn_Cancel.TabIndex = 9;
             this.btn_Cancel.Text = "Cancel";
             this.btn_Cancel.UseVisualStyleBackColor = true;
@@ -115,9 +127,10 @@
             // 
             // label2
             // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("微軟正黑體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.label2.Location = new System.Drawing.Point(287, 183);
+            this.label2.Location = new System.Drawing.Point(430, 183);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(37, 24);
             this.label2.TabIndex = 10;
@@ -125,6 +138,9 @@
             // 
             // GridSizeText
             // 
+            this.GridSizeText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.GridSizeText.AutoSize = true;
             this.GridSizeText.Font = new System.Drawing.Font("微軟正黑體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.GridSizeText.Location = new System.Drawing.Point(12, 251);
@@ -137,18 +153,20 @@
             // 
             // GridSizeNumber
             // 
+            this.GridSizeNumber.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.GridSizeNumber.Font = new System.Drawing.Font("微軟正黑體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.GridSizeNumber.Location = new System.Drawing.Point(144, 242);
+            this.GridSizeNumber.Location = new System.Drawing.Point(252, 242);
             this.GridSizeNumber.Name = "GridSizeNumber";
-            this.GridSizeNumber.Size = new System.Drawing.Size(130, 33);
+            this.GridSizeNumber.Size = new System.Drawing.Size(165, 33);
             this.GridSizeNumber.TabIndex = 12;
             this.GridSizeNumber.TextChanged += new System.EventHandler(this.GridSizeNumber_TextChanged);
             // 
             // label4
             // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("微軟正黑體", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.label4.Location = new System.Drawing.Point(280, 251);
+            this.label4.Location = new System.Drawing.Point(423, 251);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(46, 24);
             this.label4.TabIndex = 13;
@@ -158,7 +176,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(336, 317);
+            this.ClientSize = new System.Drawing.Size(476, 317);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.GridSizeNumber);
             this.Controls.Add(this.GridSizeText);
