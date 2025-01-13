@@ -18,7 +18,7 @@ using Aspose.Pdf.Drawing;
 namespace Modeling
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    class AutoCreateOpening_A : IExternalCommand
+    class AutoCreateOpening_old : IExternalCommand
     {
         string layername = null;
 

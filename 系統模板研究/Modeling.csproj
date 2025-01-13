@@ -76,7 +76,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoCreateColumns_Grid.cs" />
-    <Compile Include="AutoCreateWall_linePairs.cs" />
+    <Compile Include="AutoCreateOpening.cs" />
+    <Compile Include="AutoCreateWalls.cs" />
+    <Compile Include="AutoCreateAdditionalWalls.cs" />
+    <Compile Include="ModelingParamInit.cs" />
     <Compile Include="Previous Functions\AdjustSlabElevation.cs" />
     <Compile Include="Algorithm.cs" />
     <Compile Include="AreaEstimation\AutoCalculateStairsArea.cs" />
@@ -84,7 +87,7 @@
     <Compile Include="AutoCreateBeams.cs" />
     <Compile Include="AutoCreateColumns.cs" />
     <Compile Include="Previous Functions\AutoCreateOpenedWall_new.cs" />
-    <Compile Include="Previous Functions\AutoCreateOpening_A.cs" />
+    <Compile Include="Previous Functions\AutoCreateOpening_old.cs" />
     <Compile Include="AdjustWallHeight.cs" />
     <Compile Include="StairsGeneration\AutoCreateStairs_2Landing.cs" />
     <Compile Include="StairsGeneration\BOM_Finished.cs" />
@@ -93,7 +96,7 @@
     <Compile Include="Test Function\AutoCreateModelLine_Test.cs" />
     <Compile Include="Previous Functions\AdjustWallLength.cs" />
     <Compile Include="Test Function\AutoCreateSlabs_Test2.cs" />
-    <Compile Include="AutoCreateOpening.cs" />
+    <Compile Include="AutoCreateWindows.cs" />
     <Compile Include="AutoCreateSlab.cs" />
     <Compile Include="StairsGeneration\AutoCreateStairs_3Landing.cs" />
     <Compile Include="StairsGeneration\AutoCreateStairs_ClickCADLayer.cs" />
@@ -152,11 +155,13 @@
     <Compile Include="Previous Functions\AutoCreateOpenedWall.cs" />
     <Compile Include="Previous Functions\AutoCreateWall.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UIPanel.cs" />
     <Compile Include="UserControl1.xaml.cs">
       <DependentUpon>UserControl1.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="ModelingParam.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +184,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="assets\beam.png" />
+    <Content Include="assets\column.png" />
+    <Content Include="assets\contrast-adjustment.png" />
+    <Content Include="assets\settings.png" />
+    <Content Include="assets\slab.png" />
+    <Content Include="assets\wall.png" />
+    <Content Include="assets\window.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

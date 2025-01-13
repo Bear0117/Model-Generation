@@ -61,20 +61,23 @@ namespace Modeling
                 return Result.Failed;
             }
 
-            // Decide gridline size by users.
-            double gridline_size;
-            GridlineForm form = new GridlineForm();
-            form.ShowDialog();
-            gridline_size = form.gridlineSize;
+            // Initialize Parameters.
+            ModelingParam.Initialize();
+            double gridline_size = ModelingParam.parameters.General.GridSize * 10; // unit: mm
+            double[] beamWidthRange = ModelingParam.parameters.BeamParam.beamWidthRange;
+            double beamWidthMin = beamWidthRange[0];
+            double beamWidthMax = beamWidthRange[1];
+            double beamMaxLength = ModelingParam.parameters.BeamParam.beamMinLength;
 
             // To get the "Level" of imported CAD 
             Level level = doc.GetElement(elem.LevelId) as Level;
             //MessageBox.Show(level.Name.ToString());
 
             // Pair two lines for creating beams. 
-            const double NormBeamWidth = 150; // The maximum width of beams.(Unit:cm)
+            //const double NormBeamWidth = 150; // The maximum width of beams.(Unit:cm)
+
             string path = GetCADPath(elem.GetTypeId(), doc);
-            List<CADModel> curveArray_List = GetCurveArray(geoElem, graphicsStyleId);// A list of Original CADModels.
+            List<CADModel> curveArray_List = GetCurveArray(geoElem, graphicsStyleId, gridline_size);// A list of Original CADModels.
             List<CADModel> NotMatchCadModel = new List<CADModel>(); // A list to store unpaired CADModel.     
             List<List<CADModel>> CADModelList_List = new List<List<CADModel>>();// A list to store paired CADModels.
 
@@ -118,9 +121,9 @@ namespace Modeling
                         double distanceTwoLine = distanceList.Min();
 
                         // The width of beams must between 10cm to 150cm, and the length larger than 80cm.
-                        if (UnitsToCentimeters(distanceTwoLine) < NormBeamWidth
-                            && UnitsToCentimeters(distanceTwoLine) > CentimetersToUnits(10)
-                            && CadModel_A.Length > CentimetersToUnits(80))
+                        if (UnitsToCentimeters(distanceTwoLine) < beamWidthMax
+                            && UnitsToCentimeters(distanceTwoLine) > CentimetersToUnits(beamWidthMin)
+                            && CadModel_A.Length > CentimetersToUnits(beamMaxLength))
                         {
                             // Remove CADModel_B from original lsit
                             CADModel CadModel_shortDistance = cADModel_B_List[distanceList.IndexOf(distanceTwoLine)];
@@ -150,8 +153,7 @@ namespace Modeling
                     foreach (CADModel CadModel_B_No in curveArray_List_copy)
                     {
                         if ((float)Math.Abs(CadModel_A_No.Rotation) == (float)Math.Abs(CadModel_B_No.Rotation)
-                            && Math.Abs(CadModel_A_No.Length - CadModel_B_No.Length) < CentimetersToUnits(0.5)
-                            && UnitsToCentimeters(CadModel_A_No.Location.DistanceTo(CadModel_B_No.Location)) > 10)
+                            && Math.Abs(CadModel_A_No.Length - CadModel_B_No.Length) < CentimetersToUnits(0.5))
                         {
                             double distance = CadModel_A_No.Location.DistanceTo(CadModel_B_No.Location);
                             distanceList_No.Add(distance);
@@ -165,9 +167,9 @@ namespace Modeling
                         double distanceTwoLine_No = distanceList_No.Min();
 
                         // The width of beams must between 10cm to 150cm, and the length larger than 100cm.
-                        if (UnitsToCentimeters(distanceTwoLine_No) < NormBeamWidth
-                            && UnitsToCentimeters(distanceTwoLine_No) > 10
-                            && CadModel_A_No.Length > CentimetersToUnits(100))
+                        if (UnitsToCentimeters(distanceTwoLine_No) < beamWidthMax
+                            && UnitsToCentimeters(distanceTwoLine_No) > beamWidthMin
+                            && CadModel_A_No.Length > CentimetersToUnits(beamMaxLength))
                         {
                             // Remove CADModel_B from original lsit
                             CADModel CadModel_shortDistance_No = cADModel_B_List_No[distanceList_No.IndexOf(distanceTwoLine_No)];
@@ -197,10 +199,13 @@ namespace Modeling
                 CADModel cADModel_A = cadModelList[0];
                 CADModel cADModel_B = cadModelList[1];
 
-                XYZ cADModel_A_StratPoint = Algorithm.RoundPoint(cADModel_A.CurveArray.get_Item(0).GetEndPoint(0), gridline_size);
-                XYZ cADModel_A_EndPoint = Algorithm.RoundPoint(cADModel_A.CurveArray.get_Item(0).GetEndPoint(1), gridline_size);
-                XYZ cADModel_B_StratPoint = Algorithm.RoundPoint(cADModel_B.CurveArray.get_Item(0).GetEndPoint(0), gridline_size);
-                XYZ cADModel_B_EndPoint = Algorithm.RoundPoint(cADModel_B.CurveArray.get_Item(0).GetEndPoint(1), gridline_size);
+                XYZ cADModel_A_StratPoint = cADModel_A.CurveArray.get_Item(0).GetEndPoint(0);
+                XYZ cADModel_A_EndPoint = cADModel_A.CurveArray.get_Item(0).GetEndPoint(1);
+                XYZ cADModel_B_StratPoint = cADModel_B.CurveArray.get_Item(0).GetEndPoint(0);
+                XYZ cADModel_B_EndPoint = cADModel_B.CurveArray.get_Item(0).GetEndPoint(1);
+
+                //MessageBox.Show(Algorithm.UnitsToMillimeters(cADModel_A_StratPoint[0]).ToString() + " and " + Algorithm.UnitsToMillimeters(cADModel_A_StratPoint[1]).ToString() + " and " + Algorithm.UnitsToMillimeters(cADModel_A_StratPoint[2]).ToString());
+
 
                 XYZ ChangeXYZ = new XYZ();
 
@@ -212,22 +217,21 @@ namespace Modeling
                     cADModel_B_StratPoint = cADModel_B_EndPoint;
                     cADModel_B_EndPoint = ChangeXYZ;
                 }
-                XYZ beamLocation = Algorithm.RoundPoint((cADModel_A_StratPoint + cADModel_B_EndPoint) / 2, gridline_size);
+                //XYZ beamLocation = Algorithm.RoundPoint((cADModel_A_StratPoint + cADModel_B_EndPoint) / 2, gridline_size);
 
 
 
-                ///XYZ extension = (cADModel_A_StratPoint - cADModel_A_EndPoint) / (cADModel_A_StratPoint - cADModel_A_EndPoint).GetLength();
-                Autodesk.Revit.DB.Curve curve = Autodesk.Revit.DB.Line.CreateBound(
-                    Algorithm.RoundPoint(GetMiddlePoint(cADModel_A_StratPoint, cADModel_B_StratPoint), gridline_size),
-                    Algorithm.RoundPoint(GetMiddlePoint(cADModel_A_EndPoint, cADModel_B_EndPoint), gridline_size)
-                    );
+                //XYZ extension = (cADModel_A_StratPoint - cADModel_A_EndPoint) / (cADModel_A_StratPoint - cADModel_A_EndPoint).GetLength();
+                XYZ mp1 = GetMiddlePoint(cADModel_A_StratPoint, cADModel_B_StratPoint);
+                XYZ mp2 = GetMiddlePoint(cADModel_A_EndPoint, cADModel_B_EndPoint);
+                Curve curve = Line.CreateBound(mp1, mp2);
 
-                Autodesk.Revit.DB.Line lineb = cADModel_A.CurveArray.get_Item(0) as Autodesk.Revit.DB.Line;
+                Line lineb = cADModel_A.CurveArray.get_Item(0) as Line;
                 double width = lineb.Distance(cADModel_B.Location);
-                width = Math.Round(UnitsToCentimeters(width));
+                width = Math.Round(Algorithm.UnitsToMillimeters(width)) / 10;
                 String beamSize = width.ToString() + "x" + cadModelList[0].Depth;
 
-                using (Autodesk.Revit.DB.Transaction transaction = new Autodesk.Revit.DB.Transaction(doc))
+                using (Transaction transaction = new Transaction(doc))
                 {
                     transaction.Start("Beam Strart Build");
                     FilteredElementCollector collector = new FilteredElementCollector(doc);
@@ -283,7 +287,7 @@ namespace Modeling
         /// <param name="geoElem">GeometryElement</param>
         /// <param name="graphicsStyleId">GeometryElementID</param>
         /// <returns></returns>
-        private List<CADModel> GetCurveArray(GeometryElement geoElem, ElementId graphicsStyleId)
+        private List<CADModel> GetCurveArray(GeometryElement geoElem, ElementId graphicsStyleId, double gridSize)
         {
             List<CADModel> curveArray_List = new List<CADModel>();
 
@@ -308,6 +312,7 @@ namespace Modeling
                         {
                             Line line = insObj as Line;
                             Line newLine = TransformLine(transform, line);
+                            Line roundedLine = Line.CreateBound(Algorithm.RoundPoint(newLine.GetEndPoint(0), gridSize), Algorithm.RoundPoint(newLine.GetEndPoint(1), gridSize));
                             allCurveArray.Append(newLine);
                         }
 
@@ -318,9 +323,10 @@ namespace Modeling
 
                             for (int i = 0; i < points.Count - 1; i++)
                             {
-                                Line line = Line.CreateBound(points[i], points[i + 1]);
+                                Line line = Line.CreateBound(points[i], points[i+1]);
                                 line = TransformLine(transform, line);
-                                Line newLine = line;
+                                Line roundedLine = Line.CreateBound(Algorithm.RoundPoint(line.GetEndPoint(0), gridSize), Algorithm.RoundPoint(line.GetEndPoint(1), gridSize));
+                                Line newLine = roundedLine;
                                 allCurveArray.Append(newLine);
                             }
                         }
@@ -454,8 +460,8 @@ namespace Modeling
         {
             char separator = 'x';
             string[] parts = beamSize.Split(separator);
-            double width = int.Parse(parts[0]);
-            double depth = int.Parse(parts[1]);
+            double width = double.Parse(parts[0]);
+            double depth = double.Parse(parts[1]);
 
             FilteredElementCollector Collector = new FilteredElementCollector(doc);
             List<FamilySymbol> familySymbolList = Collector.OfClass(typeof(FamilySymbol))
@@ -860,60 +866,6 @@ namespace Modeling
             return CADModelList_List;
         }
 
-        public void CreateColforIndi(Document doc, XYZ location, Level level)
-        {
-            FamilySymbol default_column = new FilteredElementCollector(doc)
-            .OfClass(typeof(FamilySymbol))
-            .OfCategory(BuiltInCategory.OST_Columns)
-            .Cast<FamilySymbol>()
-            .FirstOrDefault(q => q.Name == "default") as FamilySymbol;
-
-
-
-            using (Transaction tx = new Transaction(doc))
-            {
-                try
-                {
-                    tx.Start("createColumn");
-                    if (!default_column.IsActive)
-                    {
-                        default_column.Activate();
-                    }
-
-                    string levelstring = "4F";
-                    Level placeLevel = null;
-                    FilteredElementCollector collector = new FilteredElementCollector(doc);
-                    collector.OfClass(typeof(Level));
-                    foreach (Level level_1 in collector.Cast<Level>())
-                    {
-                        //MessageBox.Show(level.Name.ToString());
-                        if (levelstring == level.Name.ToString())
-                        {
-                            placeLevel = level;
-                        }
-                    }
-
-                    FamilyInstance familyInstance = doc.Create.NewFamilyInstance(location, default_column, level, StructuralType.Column);
-                    tx.Commit();
-                }
-                catch (Exception ex)
-                {
-                    TaskDialog td = new TaskDialog("error")
-                    {
-                        Title = "error",
-                        AllowCancellation = true,
-                        MainInstruction = "error",
-                        MainContent = "Error" + ex.Message,
-                        CommonButtons = TaskDialogCommonButtons.Close
-                    };
-                    td.Show();
-
-                    Debug.Print(ex.Message);
-                    tx.RollBack();
-                }
-            }
-        }
-
         public Boolean IsSameRotation(CADModel cadmodel, double textRotation)
         {
             // Take the difference between the two angles.
@@ -942,6 +894,7 @@ namespace Modeling
                 return false;
             }
         }
+
         public double UnitsToCentimeters(double value)
         {
             return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Centimeters);

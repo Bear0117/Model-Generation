@@ -17,13 +17,13 @@ using Transaction = Autodesk.Revit.DB.Transaction;
 using System.Windows;
 using static System.Net.Mime.MediaTypeNames;
 using static Autodesk.Revit.DB.SpecTypeId;
-using Aspose.Cells.Charts;
+using System.Xml.Linq;
 // 2024
 
 namespace Modeling
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    class AutoCreateOpening : IExternalCommand
+    class AutoCreateWindows : IExternalCommand
     {
         string layername = null;
 
@@ -37,6 +37,7 @@ namespace Modeling
         //執行檔案
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            //123123
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
 
@@ -50,9 +51,6 @@ namespace Modeling
             ModelingParam.Initialize();
             double gridline_size = ModelingParam.parameters.General.GridSize * 10; // unit: mm
             double kerbHeight = ModelingParam.parameters.OpeningParam.KerbHeight;
-
-
-            Level level = doc.GetElement(elem2.LevelId) as Level;
 
             // Link the CAD with path
             string path = GetCADPath(elem2.GetTypeId(), doc);
@@ -78,7 +76,6 @@ namespace Modeling
 
             // Store all the curve in CurveArray into a Curve list.
             List<Curve> curves = new List<Curve>();
-
             foreach (CADModel a in cadcurveArray)
             {
                 foreach (Curve curve in a.CurveArray)
@@ -87,12 +84,11 @@ namespace Modeling
                 }
             }
 
-            List<CADTextModel> text = GetCADTextInfoparing(path, 0);
+            List<CADTextModel> text = GetCADTextInfoparing(path);
 
             // Pair two line as open.
-            List<List<Curve>> doorBlocks = new List<List<Curve>>();
             List<List<Curve>> Clusters = Algorithm.ClusterByParallel(curves);
-
+            //MessageBox.Show(Clusters.Count().ToString());
             // To store Wallmodel.
             List<Wallmodel> openingwall = new List<Wallmodel>();
 
@@ -144,6 +140,8 @@ namespace Modeling
                 }
             }
 
+            
+
             Transform transform = null;
             foreach (GeometryObject gObj in geoElem)
             {
@@ -173,56 +171,19 @@ namespace Modeling
                 }
             }
 
-
-            // Get the level height.
-            FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(Level));
-            //double levelHeight = CentimetersToUnits(330); // default
-            double bottomEleation = level.Elevation;
-
-            List<double> levelDistancesList = new List<double>();
-
-            // retrieve all the Level elements in the document
-            IEnumerable<Level> levels = collector.Cast<Level>();
-
-            // loop through all the levels
-            foreach (Level level_1 in levels)
-            {
-                // get the level elevation.
-                double levelElevation = level_1.Elevation;
-                if (Math.Abs(levelElevation - bottomEleation) < CentimetersToUnits(0.1))
-                {
-                    level = level_1;
-                }
-                if (levelElevation - bottomEleation > CentimetersToUnits(0.1))
-                {
-                    levelDistancesList.Add(levelElevation);
-                }
-            }
-
-
-            // Create bbox for label position
-            //foreach (CADTextModel walltext in text)
-            //{
-            //    DrawPositionBox(doc, walltext.Location);
-            //}
-
-
-
             // Create openings.
             foreach (Wallmodel openwall in openingwall)
             {
+                //MessageBox.Show("Count!");
                 // THIS PROGRAM SHOULD BE CLARIFIED AND UPDATED.
-                if (Math.Abs(openwall.Width - 209) < 1 || Math.Abs(openwall.Width - 358) < 1)
-                {
-                    continue;
-                }
+                //if (Math.Abs(openwall.Width - 209) < 1 || Math.Abs(openwall.Width - 358) < 1)
+                //{
+                //    continue;
+                //}
 
                 double h = Convert.ToDouble(openwall.HText);
                 double fl = Convert.ToDouble(openwall.WText);
-                Transaction tw = new Transaction(doc, "Create opening on wall");
-                tw.Start();
                 CreateOpening(doc, openwall.Wallaxes, h, fl, kerbHeight);
-                tw.Commit();
             }
             return Result.Succeeded;
         }
@@ -240,7 +201,7 @@ namespace Modeling
             XYZ endPoint = wallLine.GetEndPoint(1);
             XYZ openPoint = (startPoint + endPoint) / 2;
             bool hOpen;
-            if (Math.Abs(startPoint.Y - endPoint.Y) < CentimetersToUnits(0.001))
+            if (Math.Abs(startPoint.Y - endPoint.Y) < CentimetersToUnits(1))
             {
                 hOpen = true;
             }
@@ -265,7 +226,7 @@ namespace Modeling
                 if (!(elem is Wall wall)) continue;
                 LocationCurve location = wall.Location as LocationCurve;
                 XYZ midPoint = (location.Curve.GetEndPoint(0) + location.Curve.GetEndPoint(1)) / 2;
-                if (Math.Abs(location.Curve.GetEndPoint(0).Y - location.Curve.GetEndPoint(1).Y) < CentimetersToUnits(0.001))
+                if (Math.Abs(location.Curve.GetEndPoint(0).Y - location.Curve.GetEndPoint(1).Y) < CentimetersToUnits(1))
                 {
                     hWall = true;
                 }
@@ -311,97 +272,95 @@ namespace Modeling
                 }
             }
 
-            //string windowSize = Math.Round(UnitsToCentimeters(startPoint.DistanceTo(endPoint))).ToString() + "x" + h.ToString();
+            string windowSize = (Math.Round(Algorithm.UnitsToMillimeters(startPoint.DistanceTo(endPoint))) / 10).ToString() + "x" + h.ToString();
 
-            //// To collect all the window tpye in Revit Project.
-            //FilteredElementCollector Collector = new FilteredElementCollector(doc);
-            //List<FamilySymbol> familySymbolList = Collector.OfClass(typeof(FamilySymbol))
-            //.OfCategory(BuiltInCategory.OST_Windows)
-            //.Cast<FamilySymbol>().ToList();
+            // To collect all the window tpye in Revit Project.
+            FilteredElementCollector Collector = new FilteredElementCollector(doc);
+            List<FamilySymbol> familySymbolList = Collector.OfClass(typeof(FamilySymbol))
+            .OfCategory(BuiltInCategory.OST_Windows)
+            .Cast<FamilySymbol>().ToList();
 
-            //// To verify whether the window type is exist or not. If not, create a new one.
-            //bool IsWindowTypeExist = false;
-            //foreach (FamilySymbol fs in familySymbolList)
-            //{
-            //    if (fs.Name != windowSize)
-            //    {
-            //        continue;
-            //    }
-            //    else
-            //    {
-            //        IsWindowTypeExist = true;
-            //        break;
-            //    }
-            //}
-            //if (!IsWindowTypeExist)
-            //{
-            //    using (Transaction t_createNewColumnType = new Transaction(doc, "Ｃreate New Window Type"))
-            //    {
-            //        try
-            //        {
-            //            t_createNewColumnType.Start();
+            // To verify whether the window type is exist or not. If not, create a new one.
+            bool IsWindowTypeExist = false;
+            foreach (FamilySymbol fs in familySymbolList)
+            {
+                if (fs.Name != windowSize)
+                {
+                    continue;
+                }
+                else
+                {
+                    IsWindowTypeExist = true;
+                    break;
+                }
+            }
+            if (!IsWindowTypeExist)
+            {
+                using (Transaction t_createNewColumnType = new Transaction(doc, "Ｃreate New Window Type"))
+                {
+                    try
+                    {
+                        t_createNewColumnType.Start();
 
-            //            FamilySymbol default_FamilySymbol = new FilteredElementCollector(doc)
-            //            .OfClass(typeof(FamilySymbol))
-            //            .OfCategory(BuiltInCategory.OST_Windows)
-            //            .Cast<FamilySymbol>()
-            //            .FirstOrDefault(q => q.Name == "default") as FamilySymbol;
+                        FamilySymbol default_FamilySymbol = new FilteredElementCollector(doc)
+                        .OfClass(typeof(FamilySymbol))
+                        .OfCategory(BuiltInCategory.OST_Windows)
+                        .Cast<FamilySymbol>()
+                        .FirstOrDefault(q => q.Name == "default") as FamilySymbol;
 
-            //            FamilySymbol newFamSym = default_FamilySymbol.Duplicate(windowSize) as FamilySymbol;
-            //            // set the radius to a new value:
-            //            IList<Parameter> pars = newFamSym.GetParameters("高度");
-            //            pars[0].Set(CentimetersToUnits(h));
-            //            IList<Parameter> pars_2 = newFamSym.GetParameters("寬度");
-            //            pars_2[0].Set(startPoint.DistanceTo(endPoint));
+                        FamilySymbol newFamSym = default_FamilySymbol.Duplicate(windowSize) as FamilySymbol;
+                        // set the radius to a new value:
+                        IList<Parameter> pars = newFamSym.GetParameters("高度");
+                        pars[0].Set(CentimetersToUnits(h));
+                        IList<Parameter> pars_2 = newFamSym.GetParameters("寬度");
+                        pars_2[0].Set(startPoint.DistanceTo(endPoint));
 
-            //            t_createNewColumnType.Commit();
-            //        }
-            //        catch (System.Exception ex)
-            //        {
-            //            TaskDialog td = new TaskDialog("error")
-            //            {
-            //                Title = "error",
-            //                AllowCancellation = true,
-            //                MainInstruction = "error",
-            //                MainContent = "Error" + ex.Message,
-            //                CommonButtons = TaskDialogCommonButtons.Close
-            //            };
-            //            td.Show();
+                        t_createNewColumnType.Commit();
+                    }
+                    catch (System.Exception ex)
+                    {
+                        TaskDialog td = new TaskDialog("error")
+                        {
+                            Title = "error",
+                            AllowCancellation = true,
+                            MainInstruction = "error",
+                            MainContent = "Error" + ex.Message,
+                            CommonButtons = TaskDialogCommonButtons.Close
+                        };
+                        td.Show();
 
-            //            Debug.Print(ex.Message);
-            //            t_createNewColumnType.RollBack();
-            //        }
-            //    }
-            //}
+                        Debug.Print(ex.Message);
+                        t_createNewColumnType.RollBack();
+                    }
+                }
+            }
 
-            //// Get the window0 type
-            //FamilySymbol windowType = null;
-            //foreach (FamilySymbol symbol in new FilteredElementCollector(doc)
-            //    .OfClass(typeof(FamilySymbol))
-            //    .OfCategory(BuiltInCategory.OST_Windows)
-            //    .Cast<FamilySymbol>())
-            //{
-            //    if (symbol.Name == windowSize)
-            //    {
-            //        windowType = symbol;
-            //        break;
-            //    }
-            //}
+            // Get the window0 type
+            FamilySymbol windowType = null;
+            foreach (FamilySymbol symbol in new FilteredElementCollector(doc)
+                .OfClass(typeof(FamilySymbol))
+                .OfCategory(BuiltInCategory.OST_Windows)
+                .Cast<FamilySymbol>())
+            {
+                if (symbol.Name == windowSize)
+                {
+                    windowType = symbol;
+                    break;
+                }
+            }
 
             // Create window.
-            
+            Transaction tw = new Transaction(doc, "Create window on wall");
+            tw.Start();
             if (closestWall != null)
             {
                 Level level = doc.GetElement(closestWall.LevelId) as Level;
-                //XYZ wallMidpoint = (startPoint + endPoint) / 2 + new XYZ(0, 0, CentimetersToUnits(fl));
-                Opening opening = doc.Create.NewOpening(closestWall, startPoint, endPoint + new XYZ(0, 0, CentimetersToUnits(h)));
-                
-                opening.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET).Set(CentimetersToUnits(fl));
-                //opening.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM).Set(CentimetersToUnits(h));
-                //FamilyInstance window = doc.Create.NewFamilyInstance(wallMidpoint, windowType, closestWall, level, StructuralType.NonStructural);
-                //Parameter levelParam = window.get_Parameter(BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM);
-                //levelParam?.Set(level.Id);
+                XYZ wallMidpoint = (startPoint + endPoint) / 2 + new XYZ(0, 0, Algorithm.CentimetersToUnits(fl));
+                FamilyInstance window = doc.Create.NewFamilyInstance(wallMidpoint, windowType, closestWall, level, StructuralType.NonStructural);
+                Parameter levelParam = window.get_Parameter(BuiltInParameter.INSTANCE_REFERENCE_LEVEL_PARAM);
+                levelParam?.Set(level.Id);
             }
+            tw.Commit();
         }
 
         // Get all the CurveArray in CAD and put them into a list.
@@ -493,7 +452,7 @@ namespace Modeling
         }
 
         // Get the text in CAD.
-        public List<CADTextModel> GetCADTextInfoparing(string dwgFile, double underbeam)
+        public List<CADTextModel> GetCADTextInfoparing(string dwgFile)
         {
             List<CADTextModel> CADModels = new List<CADTextModel>();
             List<CADText> HTEXT = new List<CADText>();
@@ -542,22 +501,28 @@ namespace Modeling
 
                                                     else if (text.TextString.Contains("FL"))
                                                     {
-                                                        Regex regex = new Regex(@"FL(\d+)");
-                                                        Match match = regex.Match(text.TextString);
-                                                        if (match.Success)
-                                                        {
-                                                            string fl = match.Groups[1].Value;
-                                                            fltext.Location = ConverCADPointToRevitPoint(text.Position);
-                                                            fltext.Text = fl;
-                                                            FLTEXT.Add(fltext);
-                                                        }
+                                                        fltext.Text = ExtractNumber(text.TextString);
+                                                        //MessageBox.Show(fltext.Text);
+                                                        fltext.Location = ConverCADPointToRevitPoint(text.Position);
+                                                        //MessageBox.Show(fltext.Location.ToString());
+                                                        FLTEXT.Add(fltext);
+                                                        //Regex regex = new Regex(@"FL(\d+(\.\d+)?)");
+                                                        //Match match = regex.Match(text.TextString);
+                                                        //if (match.Success)
+                                                        //{
+                                                        //    string fl = match.Groups[1].Value;
+                                                        //    fltext.Location = ConverCADPointToRevitPoint(text.Position);
+                                                        //    fltext.Text = fl;
+                                                        //    MessageBox.Show(fl);
+                                                        //    FLTEXT.Add(fltext);
+                                                        //}   
                                                     }
                                                     else continue;
                                                 }
 
                                                 if (entity.GetRXClass().Name == "AcDbMText")
                                                 {
-                                                    Teigha.DatabaseServices.MText mText = (Teigha.DatabaseServices.MText)entity;
+                                                    MText mText = (MText)entity;
 
                                                     if (mText.Text.Contains("h"))
                                                     {
@@ -575,15 +540,20 @@ namespace Modeling
 
                                                     else if (mText.Text.Contains("FL"))
                                                     {
-                                                        Regex regex = new Regex(@"FL(\d+)");
-                                                        Match match = regex.Match(mText.Text);
-                                                        if (match.Success)
-                                                        {
-                                                            string fl = match.Groups[1].Value;
-                                                            fltext.Location = ConverCADPointToRevitPoint(mText.Location);
-                                                            fltext.Text = fl;
-                                                            FLTEXT.Add(fltext);
-                                                        }
+                                                        fltext.Text = ExtractNumber(mText.Text);
+                                                        //MessageBox.Show(fltext.Text);
+                                                        fltext.Location = ConverCADPointToRevitPoint(mText.Location);
+                                                        //MessageBox.Show(fltext.Location.ToString());
+                                                        FLTEXT.Add(fltext);
+                                                        //Regex regex = new Regex(@"FL(\d+(\.\d+)?)");
+                                                        //Match match = regex.Match(mText.Text);
+                                                        //if (match.Success)
+                                                        //{
+                                                        //    string fl = match.Groups[1].Value;
+                                                        //    fltext.Location = ConverCADPointToRevitPoint(mText.Location);
+                                                        //    fltext.Text = fl;
+                                                        //    FLTEXT.Add(fltext);
+                                                        //}
                                                     }
                                                     else continue;
                                                 }

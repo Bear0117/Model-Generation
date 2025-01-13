@@ -61,11 +61,10 @@ namespace Modeling
                 return Result.Failed;
             }
 
-            // Decide gridline size by users.
-            double gridline_size;
-            GridlineForm form = new GridlineForm();
-            form.ShowDialog();
-            gridline_size = form.gridlineSize;
+            // Initialize Parameters.
+            ModelingParam.Initialize();
+            double gridline_size = ModelingParam.parameters.General.GridSize * 10; // unit: mm
+            double[] slabThicknessRange = ModelingParam.parameters.SlabParam.slabThicknessRange;
 
             // Get the level of CAD drawing.
             Level level = doc.GetElement(elem.LevelId) as Level;
@@ -133,10 +132,6 @@ namespace Modeling
             //MessageBox.Show(slabOutlines.Count.ToString());
             //MessageBox.Show(openOutlines.Count.ToString());
 
-
-
-
-
             // 設定樓板位置座標
             slabModels = GetLocation(slabModels);
 
@@ -146,14 +141,12 @@ namespace Modeling
 
             // To create rectangular slabs
 
-            
-        
             //List<SlabModel> finalRecSlab = new List<SlabModel>();
             //foreach (SlabModel slabOutline in slabModels_paired)
             //{
             //    finalRecSlab.Add(slabOutline);
             //}
-            CreateFloor(doc, slabModels_paired, level, openOutlines);
+            CreateFloor(doc, slabModels_paired, level, openOutlines, slabThicknessRange);
 
             transGroup.Assimilate();
             return Result.Succeeded;
@@ -227,7 +220,7 @@ namespace Modeling
             return lineList;
         }
 
-        public void CreateFloor(Autodesk.Revit.DB.Document doc, List<SlabModel> slabs, Level level, List<CurveLoop> opens)
+        public void CreateFloor(Autodesk.Revit.DB.Document doc, List<SlabModel> slabs, Level level, List<CurveLoop> opens, double[] slabThicknessRange)
         {
             foreach (SlabModel c in slabs)
             {
@@ -239,6 +232,10 @@ namespace Modeling
 
                         tx.Start("Create Slab.");
                         string familyName = "RC slab(" + c.Thickness.ToString() + ")";
+                        double thickness = c.Thickness;
+                        MessageBox.Show(thickness.ToString());
+                        if (thickness < slabThicknessRange[0] || thickness > slabThicknessRange[1]) continue;
+
 
                         //MessageBox.Show(familyName);
                         FilteredElementCollector Collector = new FilteredElementCollector(doc);
@@ -327,9 +324,6 @@ namespace Modeling
                 //break;////////////////////////////////////////
             }
         }
-
-        
-
 
         public bool IsInsideOutline(XYZ TargetPoint, CurveLoop curveloop)
         {
@@ -461,7 +455,7 @@ namespace Modeling
                             continue;
 
                         if (insObj.GetType().ToString() == "Autodesk.Revit.DB.Line")
-                            continue;
+                            MessageBox.Show("Line!");
 
                         if (insObj.GetType().ToString() == "Autodesk.Revit.DB.PolyLine")
                         {
@@ -487,7 +481,6 @@ namespace Modeling
                                 Line line = Line.CreateBound(points_list[i], points_list[i + 1]);
                                 line = TransformLine(transform, line);
                                 prof.Append(line);
-
                             }
 
                             if (isValid)
@@ -498,6 +491,7 @@ namespace Modeling
                     }
                 }
             }
+            //MessageBox.Show(count.ToString());
             return allOutlines;
         }
 

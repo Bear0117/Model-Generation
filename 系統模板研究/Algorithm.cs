@@ -216,9 +216,7 @@ namespace Modeling
                 XYZ line2_Direction = (line2.GetEndPoint(1) - line2.GetEndPoint(0)).Normalize();
                 if (line1_Direction.IsAlmostEqualTo(line2_Direction) || line1_Direction.Negate().IsAlmostEqualTo(line2_Direction))
                 {
-
                     return true;
-
                 }
                 else
                 {
@@ -614,6 +612,36 @@ namespace Modeling
             return clusters;
         }
 
+        public static bool AreOverlapping(Curve curve1, Curve curve2)
+        {
+            Line line1 = (Line)curve1;
+            Line line2 = (Line)curve2;
+
+            // 判斷是否為垂直線
+            bool isVertical = Math.Abs(line1.GetEndPoint(0).X - line1.GetEndPoint(1).X) < CentimetersToUnits(1);
+
+            if (isVertical)
+            {
+                // 垂直線檢查：比較 Y 範圍
+                double line1YMin = Math.Min(line1.GetEndPoint(0).Y, line1.GetEndPoint(1).Y);
+                double line1YMax = Math.Max(line1.GetEndPoint(0).Y, line1.GetEndPoint(1).Y);
+                double line2YMin = Math.Min(line2.GetEndPoint(0).Y, line2.GetEndPoint(1).Y);
+                double line2YMax = Math.Max(line2.GetEndPoint(0).Y, line2.GetEndPoint(1).Y);
+
+                return line1YMax > line2YMin - CentimetersToUnits(1) && line2YMax > line1YMin - CentimetersToUnits(1);
+            }
+            else
+            {
+                // 水平線檢查：比較 X 範圍
+                double line1XMin = Math.Min(line1.GetEndPoint(0).X, line1.GetEndPoint(1).X);
+                double line1XMax = Math.Max(line1.GetEndPoint(0).X, line1.GetEndPoint(1).X);
+                double line2XMin = Math.Min(line2.GetEndPoint(0).X, line2.GetEndPoint(1).X);
+                double line2XMax = Math.Max(line2.GetEndPoint(0).X, line2.GetEndPoint(1).X);
+
+                return line1XMax > line2XMin - CentimetersToUnits(1) && line2XMax > line1XMin - CentimetersToUnits(1);
+            }
+        }
+
         /// <summary>
         /// Cluster line segments if they were all piled upon a single line.
         /// </summary>
@@ -621,52 +649,6 @@ namespace Modeling
         /// <returns></returns>
         public static List<List<Curve>> ClusterByParallel(List<Curve> crvs)
         {
-            //List<int> ids = Enumerable.Range(0, crvs.Count).ToList();
-            //List<List<Curve>> clusters = new List<List<Curve>>();
-            //while (ids.Count != 0)
-            //{
-            //    List<Curve> cluster = new List<Curve>();
-            //    List<int> idCluster = new List<int>() { ids[0] };
-            //    List<int> idTemp = new List<int>() { ids[0] };
-            //    ids.Remove(ids[0]);
-            //    while (idTemp.Count != 0)
-            //    {
-            //        List<int> idNextTemp = new List<int>();
-            //        for (int i = 0; i < idTemp.Count; i++)
-            //        {
-            //            int intersectionCount = 0;
-            //            List<int> idDel = new List<int>();
-            //            for (int j = 0; j < ids.Count; j++)
-            //            {
-            //                if (!idTemp.Contains(ids[j]))
-            //                {
-            //                    // Use this only to line segments
-            //                    if (IsIntersected(crvs[idTemp[i]], crvs[ids[j]])
-            //                        && IsParallel(crvs[idTemp[i]] as Line, crvs[ids[j]] as Line))
-            //                    {
-            //                        idCluster.Add(ids[j]);
-            //                        idNextTemp.Add(ids[j]);
-            //                        idDel.Add(ids[j]);
-            //                        intersectionCount += 1;
-            //                    }
-            //                }
-            //            }
-            //            if (intersectionCount == 0) { continue; }
-            //            foreach (int element in idDel)
-            //            {
-            //                ids.Remove(element);
-            //            }
-            //        }
-            //        idTemp = idNextTemp;
-            //    }
-            //    foreach (int id in idCluster)
-            //    {
-            //        cluster.Add(crvs[id]);
-            //    }
-            //    clusters.Add(cluster);
-            //}
-
-
             List<Curve> curveArray_List_copy = new List<Curve>(); // 複製得到的模型
             foreach (Curve curves in crvs)
             {
@@ -693,7 +675,8 @@ namespace Modeling
                     {
                         // 若梁的2個線不等長，最大誤差為50mm。方向為絕對值（sin120° = sin60°）
                         if (IsParallel(Curve_A, Curve_B)
-                            && Math.Abs(Curve_A.Length - Curve_B.Length) < 50 * 0.003281) // 0.164 foot = 50mm * 0.003281
+                            && Math.Abs(Curve_A.Length - Curve_B.Length) < 50 * 0.003281
+                            && AreOverlapping(Curve_A, Curve_B)) // 0.164 foot = 50mm * 0.003281
                         {
                             Curve Curve_A_copy = Curve_A.Clone();
                             //Curve_A_copy.MakeUnbound();
@@ -708,7 +691,7 @@ namespace Modeling
                     {
                         double distanceTwoLine = distanceList.Min();
                         // 篩選不正常的寬度。若不正常則將CadModel_B放回數組
-                        if (distanceTwoLine * 304.8 < NormBeamWidth && distanceTwoLine > 100 * 0.003281
+                        if (distanceTwoLine * 304.8 < NormBeamWidth && distanceTwoLine > 50 * 0.003281
                             && Curve_A.Length > 1 * 0.003281) // 梁寬介於10與"正常梁寬"之間的兩組模型線，為了避免配對到距離太遠的線
                         {
                             //將配對到的B模型線從原數組中去除

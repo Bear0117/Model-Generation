@@ -42,12 +42,10 @@ namespace Modeling
                 }
             }
 
-            // Decide gridline size by users.
-            double gridline_size;
-            GridlineForm form = new GridlineForm();
-            form.ShowDialog();
-            gridline_size = form.gridlineSize;
-
+            // Initialize Parameters.
+            ModelingParam.Initialize();
+            double gridline_size = ModelingParam.parameters.General.GridSize * 10; // unit: mm
+            double[] columnWidthRange = ModelingParam.parameters.ColumnParam.columnWidthsRange;
 
             TransactionGroup transGroup = new TransactionGroup(doc, "Grab the lines in column layer");
             transGroup.Start();
@@ -102,9 +100,13 @@ namespace Modeling
                                 XYZ point_t = transform.OfPoint(point);
                                 points_t.Add(point_t);
                             }
-                            XYZ point_a = points_t[0];
-                            XYZ point_b = points_t[2];
-                            XYZ center = Algorithm.RoundPoint(GetMiddlePoint(point_a, point_b), gridline_size);
+                            XYZ point_a = Algorithm.RoundPoint(points_t[0], gridline_size);
+                            XYZ point_b = Algorithm.RoundPoint(points_t[2], gridline_size);
+                            double disX = Math.Abs(Algorithm.UnitsToCentimeters(point_a.X - point_b.X));
+                            double disY = Math.Abs(Algorithm.UnitsToCentimeters(point_a.Y - point_b.Y));
+                            if (disX < columnWidthRange[0] || disX > columnWidthRange[1] || disY < columnWidthRange[0] ||disY > columnWidthRange[1]) continue;
+
+                            XYZ center = GetMiddlePoint(point_a, point_b);
                             using (Transaction tx = new Transaction(doc))
                             {
                                 try
@@ -168,8 +170,8 @@ namespace Modeling
             string[] parts = columnSize.Split(separator);
             // Int32.Parse:字串轉整數
             // double.Parse：字串轉浮點數
-            double width =  int.Parse(parts[0]);
-            double depth = int.Parse(parts[1]);
+            double width = double.Parse(parts[0]);
+            double depth = double.Parse(parts[1]);
             // Size: 50x30
 
             FilteredElementCollector Collector = new FilteredElementCollector(doc);
@@ -263,10 +265,16 @@ namespace Modeling
             return MiddlePoint;
         }
 
+        //public string GetColumnSize(XYZ point_a, XYZ point_b)
+        //{
+        //    String columnSize = Math.Abs(Math.Round(Algorithm.UnitsToMillimeters(point_a.X - point_b.X)) / 10).ToString() + "x"
+        //                        + Math.Abs(Math.Round(Algorithm.UnitsToMillimeters(point_a.Y - point_b.Y)) / 10).ToString();
+        //    return columnSize;
+        //}
         public string GetColumnSize(XYZ point_a, XYZ point_b)
         {
-            String columnSize = Math.Abs(Math.Round(Algorithm.UnitsToCentimeters(point_a.X - point_b.X))).ToString() + "x"
-                                + Math.Abs(Math.Round(Algorithm.UnitsToCentimeters(point_a.Y - point_b.Y))).ToString();
+            String columnSize = Math.Abs(Math.Round(Algorithm.UnitsToMillimeters(point_a.X - point_b.X)) / 10).ToString() + "x"
+                                + Math.Abs(Math.Round(Algorithm.UnitsToMillimeters(point_a.Y - point_b.Y)) / 10).ToString();
             return columnSize;
         }
     }
