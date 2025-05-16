@@ -46,7 +46,6 @@ namespace Modeling
             {
                 System.Windows.MessageBox.Show($"Failed to load parameters: {ex.Message}", "Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
-            //MessageBox.Show("Parameters Written Successfully!");
         }
     }
 
@@ -64,12 +63,12 @@ namespace Modeling
     {
         public double GridSize { get; set; }
         public double LevelHeight { get; set; }
+        public double Gap {  get; set; }
     }
 
-    public class ColumnParam { public double[] columnWidthsRange { get; set; } }
+    public class ColumnParam { public double[] ColumnWidthsRange { get; set; } }
     public class BeamParam {
-        public double[] beamWidthRange { get; set; }
-        public double beamMinLength { get; set; }
+        public double[] BeamWidthRange { get; set; }
     }
     public class SlabParam { public double[] slabThicknessRange { get; set; } }
     public class WallParam { 

@@ -38,10 +38,8 @@ namespace Modeling
             }
 
             // Decide gridline size by users.
-            double gridline_size;
-            GridlineForm form = new GridlineForm();
-            form.ShowDialog();
-            gridline_size = form.gridlineSize;
+            ModelingParam.Initialize();
+            double gridline_size = ModelingParam.parameters.General.GridSize * 10; // unit: mm
 
             // Hide the selected layer.
             Transaction trans = new Transaction(doc, "隱藏圖層");

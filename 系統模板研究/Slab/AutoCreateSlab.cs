@@ -162,33 +162,6 @@ namespace Modeling
             return curveArray;
         }
 
-
-        public List<XYZ> RemoveNearDuplicates(List<XYZ> points, double tolerance = 0.01)
-        {
-            List<XYZ> distinctPoints = new List<XYZ>();
-
-            foreach (var point in points)
-            {
-                bool isNearDuplicate = false;
-
-                foreach (var distinctPoint in distinctPoints)
-                {
-                    if (point.DistanceTo(distinctPoint) < tolerance)
-                    {
-                        isNearDuplicate = true;
-                        break;
-                    }
-                }
-
-                if (!isNearDuplicate)
-                {
-                    distinctPoints.Add(point);
-                }
-            }
-
-            return distinctPoints;
-        }
-
         public CurveLoop RoundCurveLoop(CurveLoop curveLoop, double gridline_size)
         {
             List<Autodesk.Revit.DB.Curve> curveList = curveLoop.ToList();
@@ -233,7 +206,7 @@ namespace Modeling
                         tx.Start("Create Slab.");
                         string familyName = "RC slab(" + c.Thickness.ToString() + ")";
                         double thickness = c.Thickness;
-                        MessageBox.Show(thickness.ToString());
+                        //MessageBox.Show(thickness.ToString());
                         if (thickness < slabThicknessRange[0] || thickness > slabThicknessRange[1]) continue;
 
 
@@ -371,44 +344,6 @@ namespace Modeling
             return list_new;
         }
 
-        public CurveLoop ListToCurveLooop(List<XYZ> c)
-        {
-            List<double> xCoor = new List<double>();
-            List<double> yCoor = new List<double>();
-            double zCoor = 0;
-            foreach (XYZ point in c)
-            {
-                xCoor.Add(point.X);
-                yCoor.Add(point.Y);
-                zCoor = point.Z;
-            }
-
-            xCoor.Sort();
-            yCoor.Sort();
-
-            List<double> xSorted = GetDistinctList(xCoor);
-            List<double> ySorted = GetDistinctList(yCoor);
-            CurveLoop profileLoop = new CurveLoop();
-            XYZ point1 = new XYZ(xSorted[0], ySorted[0], zCoor);
-            XYZ point2 = new XYZ(xSorted[1], ySorted[0], zCoor);
-            XYZ point3 = new XYZ(xSorted[1], ySorted[1], zCoor);
-            XYZ point4 = new XYZ(xSorted[0], ySorted[1], zCoor);
-            Autodesk.Revit.DB.Line line1 = Autodesk.Revit.DB.Line.CreateBound(point1, point2);
-            Autodesk.Revit.DB.Line line2 = Autodesk.Revit.DB.Line.CreateBound(point2, point3);
-            Autodesk.Revit.DB.Line line3 = Autodesk.Revit.DB.Line.CreateBound(point3, point4);
-            Autodesk.Revit.DB.Line line4 = Autodesk.Revit.DB.Line.CreateBound(point4, point1);
-            profileLoop.Append(line1);
-            profileLoop.Append(line2);
-            profileLoop.Append(line3);
-            profileLoop.Append(line4);
-            return profileLoop;
-        }
-
-        public double UnitsToCentimeters(double value)
-        {
-            return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Centimeters);
-        }
-
         public double CentimetersToUnits(double value)
         {
             return UnitUtils.ConvertToInternalUnits(value, UnitTypeId.Centimeters);
@@ -502,6 +437,7 @@ namespace Modeling
             Autodesk.Revit.DB.Line newLine = Autodesk.Revit.DB.Line.CreateBound(startPoint, endPoint);
             return newLine;
         }
+
         public XYZ GetPolygonMidPoint(CurveLoop curveLoop)
         {
             // Initiate some parameters.
@@ -533,45 +469,6 @@ namespace Modeling
             XYZ midPoint = max + (min - max) / 100;
 
             return midPoint;
-        }
-
-        public XYZ GetPointInCurveLoop(CurveLoop curveLoop)
-        {
-            // Initiate some parameters.
-            List<double> xCoorList = new List<double>();
-            List<double> yCoorList = new List<double>();
-            double zCoor = 0;
-
-            // 
-            foreach (Autodesk.Revit.DB.Curve curve in curveLoop.ToList())
-            {
-                xCoorList.Add(curve.GetEndPoint(0).X);
-                xCoorList.Add(curve.GetEndPoint(1).X);
-                yCoorList.Add(curve.GetEndPoint(0).Y);
-                yCoorList.Add(curve.GetEndPoint(1).Y);
-                zCoor = curve.GetEndPoint(0).Z;
-            }
-
-            // Sort the X and Y coordinate values.
-            xCoorList.Sort();
-            yCoorList.Sort();
-
-            // Get the distinct values of sorted values.
-            List<double> xSorted = GetDistinctList(xCoorList);
-            List<double> ySorted = GetDistinctList(yCoorList);
-
-            XYZ max = new XYZ(xSorted.Max(), ySorted.Max(), zCoor);
-            XYZ min = new XYZ(xSorted.Min(), ySorted.Min(), zCoor);
-            //XYZ midPoint = (max + min) / 2;
-            XYZ midPoint = min + (max - min) / 100;
-
-            return midPoint;
-        }
-
-        public XYZ GetPointOnCurveLoop(CurveLoop curveLoop)
-        {
-            List<Autodesk.Revit.DB.Curve> list_curve = curveLoop.ToList();
-            return list_curve[0].GetEndPoint(0);
         }
 
         public List<SlabModel> GetLocation(List<SlabModel> SlabModels)

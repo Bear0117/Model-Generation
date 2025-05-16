@@ -1,0 +1,1111 @@
+Folder PATH listing
+Volume serial number is B0B0-EE2A
+C:.
+¦   .gitattributes
+¦   .gitignore
+¦   tree.txt
+¦   ??????.sln
+¦   
++---.git
+¦   ¦   COMMIT_EDITMSG
+¦   ¦   config
+¦   ¦   description
+¦   ¦   FETCH_HEAD
+¦   ¦   HEAD
+¦   ¦   index
+¦   ¦   ms-persist.xml
+¦   ¦   ORIG_HEAD
+¦   ¦   
+¦   +---hooks
+¦   ¦       applypatch-msg.sample
+¦   ¦       commit-msg.sample
+¦   ¦       fsmonitor-watchman.sample
+¦   ¦       post-update.sample
+¦   ¦       pre-applypatch.sample
+¦   ¦       pre-commit.sample
+¦   ¦       pre-merge-commit.sample
+¦   ¦       pre-push.sample
+¦   ¦       pre-rebase.sample
+¦   ¦       pre-receive.sample
+¦   ¦       prepare-commit-msg.sample
+¦   ¦       push-to-checkout.sample
+¦   ¦       update.sample
+¦   ¦       
+¦   +---info
+¦   ¦       exclude
+¦   ¦       
+¦   +---logs
+¦   ¦   ¦   HEAD
+¦   ¦   ¦   
+¦   ¦   +---refs
+¦   ¦       +---heads
+¦   ¦       ¦       master
+¦   ¦       ¦       
+¦   ¦       +---remotes
+¦   ¦           +---origin
+¦   ¦                   HEAD
+¦   ¦                   master
+¦   ¦                   Wan
+¦   ¦                   
+¦   +---objects
+¦   ¦   +---00
+¦   ¦   ¦       a7554684bf139fa67f9b345ee88044213b74c0
+¦   ¦   ¦       
+¦   ¦   +---01
+¦   ¦   ¦       a9df42f75a7d9fc69e051bcea1b365cbe19f3b
+¦   ¦   ¦       fe27aee3d623c4a65b192dec8132c99719e4d0
+¦   ¦   ¦       
+¦   ¦   +---02
+¦   ¦   ¦       50517ad3dac9f5dee260d1e1cab87396eb15e4
+¦   ¦   ¦       c7ce9c55d90062cd48c46a561251cc39cd7534
+¦   ¦   ¦       
+¦   ¦   +---05
+¦   ¦   ¦       8607dfb5b34d36a4e0796a6dd4ce341c04fb2d
+¦   ¦   ¦       ea80153e650e8c7e34f40f29a89280a931d30b
+¦   ¦   ¦       
+¦   ¦   +---06
+¦   ¦   ¦       267c552aeddefc4070885b0dd89ce221e16bef
+¦   ¦   ¦       fc30f63c4f135c164e467363e83c43a6053e66
+¦   ¦   ¦       
+¦   ¦   +---07
+¦   ¦   ¦       f9c5fce31ce95470f6a94e07e29fdff9d7537a
+¦   ¦   ¦       
+¦   ¦   +---08
+¦   ¦   ¦       50113eb42b72342bbeec1a187c750d40e2e3e6
+¦   ¦   ¦       
+¦   ¦   +---09
+¦   ¦   ¦       42eb30b6c36efcfc4818d3fb0dc3d8f34f2b49
+¦   ¦   ¦       7355f53940d2068a412ae8d0f17c237138ff1b
+¦   ¦   ¦       
+¦   ¦   +---0a
+¦   ¦   ¦       800466efad34891aed85030e83735b376331b8
+¦   ¦   ¦       85f2daedf117be0951ee214676285599a67a87
+¦   ¦   ¦       e355f704f2bbdd2e751b60332b54ccb302411d
+¦   ¦   ¦       
+¦   ¦   +---0b
+¦   ¦   ¦       308042fcaca928ab2624baea039352587dd52f
+¦   ¦   ¦       314d71bb7e4ece2801306ed802ad6ee6ae33a1
+¦   ¦   ¦       
+¦   ¦   +---0d
+¦   ¦   ¦       a7769d0e6d68f23cd5499bc147d577d026e2ed
+¦   ¦   ¦       
+¦   ¦   +---0e
+¦   ¦   ¦       9dae30a6a9c4340f7abcea3765b057485c8afb
+¦   ¦   ¦       
+¦   ¦   +---10
+¦   ¦   ¦       92495b172f69fa59b937174d72307d0450e3ce
+¦   ¦   ¦       
+¦   ¦   +---11
+¦   ¦   ¦       2d0d4f147ffada29bd34085b542a6c03a86973
+¦   ¦   ¦       
+¦   ¦   +---12
+¦   ¦   ¦       84815abda8684cbb2fab3eace03442024df8fe
+¦   ¦   ¦       
+¦   ¦   +---13
+¦   ¦   ¦       43b486b016b92458e223235db27d8132fd4bd3
+¦   ¦   ¦       45fa4639bd0f2dd4e6f808d2df3d6a0865a903
+¦   ¦   ¦       5d2bd85669decc3cbc8a101c3acb42fd56de53
+¦   ¦   ¦       82de3795b034e2d8a45c6208f68016f6c8c1ca
+¦   ¦   ¦       979b2984f15f526c3897fa62f9541e68fc98bc
+¦   ¦   ¦       
+¦   ¦   +---14
+¦   ¦   ¦       60b3a4ad409d96afd8b7f4800c5b2f45935ea0
+¦   ¦   ¦       
+¦   ¦   +---17
+¦   ¦   ¦       821c195e3e41bd45361a991ebe36e29757f717
+¦   ¦   ¦       
+¦   ¦   +---18
+¦   ¦   ¦       6e27da54e23565fe7052657146a32e4bfaa617
+¦   ¦   ¦       fc968cda2753fa43424a3599bdaaca458115da
+¦   ¦   ¦       
+¦   ¦   +---19
+¦   ¦   ¦       13e751e7023ba5e194090753ec0595207376ce
+¦   ¦   ¦       3aecc675e7d4600fde2d37cf350bce7a056948
+¦   ¦   ¦       84be4b4b7eb2b232385a52e0dffe153b149b92
+¦   ¦   ¦       
+¦   ¦   +---1a
+¦   ¦   ¦       086918cc7e88574b0afa40d0e3778adcae1d8e
+¦   ¦   ¦       257d9034d4cc16e8df0d3d7d984704c7e6b369
+¦   ¦   ¦       f7de150c99c12dd67a509fe57c10d63e4eeb04
+¦   ¦   ¦       
+¦   ¦   +---1b
+¦   ¦   ¦       cb49f681bac13ab11321ae4c43d2bd79e77b9a
+¦   ¦   ¦       
+¦   ¦   +---1d
+¦   ¦   ¦       f39af2dd46e93da04034e10e8225aa220a9d79
+¦   ¦   ¦       
+¦   ¦   +---1e
+¦   ¦   ¦       99887bfc5859c923dfd8237fcf5d11857a2db0
+¦   ¦   ¦       
+¦   ¦   +---1f
+¦   ¦   ¦       ce75173e02ece1b4f0bf7cf795969f8f701ebd
+¦   ¦   ¦       debfebdba9034efa5c17ab8da1d9dd24bd5c4e
+¦   ¦   ¦       f0c423042b46cb1d617b81efb715defbe8054d
+¦   ¦   ¦       
+¦   ¦   +---21
+¦   ¦   ¦       1ada8953e584754533e21306ef2f69a0b107b1
+¦   ¦   ¦       387df35ab59bc74d8a099007d9d7312fc2e318
+¦   ¦   ¦       73ffb0e2053552b6d9ad9739bc8a8a155c9d9f
+¦   ¦   ¦       
+¦   ¦   +---23
+¦   ¦   ¦       719b074d131e29dd4c37e6ed2cced19199322f
+¦   ¦   ¦       ea3237107fd5f08f2132d76ea02532f98fd4a4
+¦   ¦   ¦       
+¦   ¦   +---25
+¦   ¦   ¦       0b1e45c0a59865e37fb1559406eef0dcc2b77e
+¦   ¦   ¦       11357bea6aa27e7085a873bf3e46d1a8ea6c5d
+¦   ¦   ¦       4390160c14a60cca68d5cb83117163618ea7ca
+¦   ¦   ¦       9cd7cb72eef57d3b5be0d3fb2b6aae91c6adbb
+¦   ¦   ¦       
+¦   ¦   +---26
+¦   ¦   ¦       28362438fcf2972988708ed7a91d7233e9228a
+¦   ¦   ¦       588fe9a3404a4219daf897a5397d277443b6bb
+¦   ¦   ¦       
+¦   ¦   +---27
+¦   ¦   ¦       0298bfae970ab86a7cfe413df10652fcec3375
+¦   ¦   ¦       556eca0be2a4f35e75a399858932d40b4bfd31
+¦   ¦   ¦       
+¦   ¦   +---28
+¦   ¦   ¦       1b2ee606b84d32c2789ac116db2bb4a72c9f00
+¦   ¦   ¦       36aa2e1fbc1bf3896ede1a1a5f958c234791bf
+¦   ¦   ¦       6708f909d5aade2f586cc30106040e7296f013
+¦   ¦   ¦       d3ea13a0715f649c85e03650e1a6b4d6c704b8
+¦   ¦   ¦       f769c3ce81e2a51b4bd3951b7e0349b92fdcb5
+¦   ¦   ¦       
+¦   ¦   +---29
+¦   ¦   ¦       f0fea18707e11c55823fac267c12bcad1e4d62
+¦   ¦   ¦       
+¦   ¦   +---2b
+¦   ¦   ¦       2a27c56d48499c86d14fc637309cbcce276695
+¦   ¦   ¦       
+¦   ¦   +---2c
+¦   ¦   ¦       b4c333fe89779e024f7cad9a2aba0648a71d04
+¦   ¦   ¦       
+¦   ¦   +---2e
+¦   ¦   ¦       64a47a749cc8ed81fdd383e578cb9dc9d3b530
+¦   ¦   ¦       7955c976239dd42fe88817b6a02a33b4694aaa
+¦   ¦   ¦       b45a296b4d981de0e95895c2e12987b4c28153
+¦   ¦   ¦       
+¦   ¦   +---2f
+¦   ¦   ¦       be854c3190c4526460b532028f649d29eb529f
+¦   ¦   ¦       
+¦   ¦   +---30
+¦   ¦   ¦       438be60558fb18fc2c02290662d933beafa582
+¦   ¦   ¦       9f912156fcd563451810b34b6d7ffb06450bdb
+¦   ¦   ¦       
+¦   ¦   +---31
+¦   ¦   ¦       137573d873ad6e8e326489510e4ac8dfe1fa3e
+¦   ¦   ¦       c03e09771bfb613b386d20405b29037fa05298
+¦   ¦   ¦       
+¦   ¦   +---32
+¦   ¦   ¦       3a3ca856a920bf3a0d8b9798055165c432ea41
+¦   ¦   ¦       
+¦   ¦   +---33
+¦   ¦   ¦       760806f3157ec75a7caeea00320b424817e3da
+¦   ¦   ¦       d50d6713f363d81e064b1ad0d2ca46a3be4481
+¦   ¦   ¦       
+¦   ¦   +---34
+¦   ¦   ¦       1cfd06b6e963913048fcde11c28866794336f5
+¦   ¦   ¦       
+¦   ¦   +---35
+¦   ¦   ¦       14bb7a3d5351824a30080152878a8d825a2d4c
+¦   ¦   ¦       e1a2e9a9c47582019482bcd1aa81c3e244557d
+¦   ¦   ¦       
+¦   ¦   +---37
+¦   ¦   ¦       982d046a96fa0b49bf8748f4d5466ecc3d1e91
+¦   ¦   ¦       
+¦   ¦   +---38
+¦   ¦   ¦       84cb372f44d942bcb163cd646f0fc8e8e31787
+¦   ¦   ¦       
+¦   ¦   +---39
+¦   ¦   ¦       08cf7df36727a4694e8d916fdbbedb6f184663
+¦   ¦   ¦       1e8ef7a753f5f6fc0f5ff98cfa2323067a146d
+¦   ¦   ¦       645652af62950ebf3b28ec3a5400dcec30b1c4
+¦   ¦   ¦       a174babe222945251970f3bce653315b4674e8
+¦   ¦   ¦       
+¦   ¦   +---3a
+¦   ¦   ¦       7f162d8c853d1ef5b528cd35194c09bdff013c
+¦   ¦   ¦       
+¦   ¦   +---3b
+¦   ¦   ¦       13e0bcd81ce8aa4ce0d9e9a5141e96007dee51
+¦   ¦   ¦       
+¦   ¦   +---3c
+¦   ¦   ¦       c6d4c6716d7213f4054566fddb43996d02d596
+¦   ¦   ¦       
+¦   ¦   +---3d
+¦   ¦   ¦       24f8608611d3f7934a71c7aff679be9c049672
+¦   ¦   ¦       
+¦   ¦   +---40
+¦   ¦   ¦       92c7e338b67fe55143f02a7224335d1518db8c
+¦   ¦   ¦       af063d53cf6ff632e27ec4b2103101abbc0ee6
+¦   ¦   ¦       
+¦   ¦   +---44
+¦   ¦   ¦       5775dfdc8884cf1de5ba379f6739c3f5a6afa6
+¦   ¦   ¦       
+¦   ¦   +---45
+¦   ¦   ¦       f3332e63a9423af12d1e7b6d226e582fecb54d
+¦   ¦   ¦       
+¦   ¦   +---48
+¦   ¦   ¦       5aeb2f83207b9b68612b6c1f4a61a5b15558d4
+¦   ¦   ¦       
+¦   ¦   +---4a
+¦   ¦   ¦       154182f3b8261f9754988cab9ac9e10bd82b6f
+¦   ¦   ¦       
+¦   ¦   +---4f
+¦   ¦   ¦       6c92843156573545a631738b4880b488e0e9a9
+¦   ¦   ¦       e763441a81a9fd960f118af4594f56908388a5
+¦   ¦   ¦       
+¦   ¦   +---50
+¦   ¦   ¦       84e8012747c70762eac5a79073e75e28a0dc6b
+¦   ¦   ¦       8c1af5f935866e34b9bd563eea7a23dd06d195
+¦   ¦   ¦       ee0e622b5cabec31f7fadf34481245af2e9418
+¦   ¦   ¦       
+¦   ¦   +---52
+¦   ¦   ¦       0d5c36d7868df9ad31acd39a42c596a798477a
+¦   ¦   ¦       0f571c356bc5e45c7f9ac5b32a4c1b1c5a0580
+¦   ¦   ¦       28cfb4e74e262802d3c1819ef7ea4840f2da25
+¦   ¦   ¦       a2c0b460de3f6daa3121bfed99ff3aac01da70
+¦   ¦   ¦       
+¦   ¦   +---53
+¦   ¦   ¦       aab4d80a065094b263111ffdc2c7e8b9873edf
+¦   ¦   ¦       
+¦   ¦   +---54
+¦   ¦   ¦       15d9ef9766d01454fc8236664b46dbf2ebb2ca
+¦   ¦   ¦       c3860ec6ec96abe4ea58bdf774c5e9eb8a16f1
+¦   ¦   ¦       
+¦   ¦   +---55
+¦   ¦   ¦       21c50d7448fba0540a8365998dee75e267f274
+¦   ¦   ¦       f33328501a0b294c1d420160d4b3788411eebe
+¦   ¦   ¦       
+¦   ¦   +---56
+¦   ¦   ¦       b34f48269189f949de3e3b8cb41e8fd3da8922
+¦   ¦   ¦       
+¦   ¦   +---58
+¦   ¦   ¦       b03b9b9d734052353c711f5e47203e54e9be42
+¦   ¦   ¦       
+¦   ¦   +---59
+¦   ¦   ¦       2dbaa6444745b88c7f0712fc3816812a87b4ab
+¦   ¦   ¦       a9d8f2c4d2e0e605cdb75cbc9361b238f1151b
+¦   ¦   ¦       
+¦   ¦   +---5a
+¦   ¦   ¦       0b45889952ffe87505f60db6380fec4a7000ed
+¦   ¦   ¦       1899ef87c42a873c5fd827a683568d4799b10f
+¦   ¦   ¦       
+¦   ¦   +---5b
+¦   ¦   ¦       d6769de0ef1b9d3c69583d4311a46724d916d0
+¦   ¦   ¦       
+¦   ¦   +---5c
+¦   ¦   ¦       5c66d2c389d2f26d2f707b3ecf9d2687822d88
+¦   ¦   ¦       ca6f136a53b354da130021ee55658c2b995fd4
+¦   ¦   ¦       
+¦   ¦   +---5d
+¦   ¦   ¦       4586ffc8f70eba1569a1337359bca9051d9589
+¦   ¦   ¦       
+¦   ¦   +---5e
+¦   ¦   ¦       771cec03e618e02858d9fcc24dc377b6ac1c36
+¦   ¦   ¦       
+¦   ¦   +---60
+¦   ¦   ¦       e5ce4ff15990508071351f2cd0dd5a6e130d4d
+¦   ¦   ¦       
+¦   ¦   +---61
+¦   ¦   ¦       59042884a950eb32a7b2078c6b69287c4f2659
+¦   ¦   ¦       67161f4996771f2108758b056c6be96ce8b124
+¦   ¦   ¦       
+¦   ¦   +---65
+¦   ¦   ¦       34b0f7e2588a9f77eab8b067352a39c63f35ee
+¦   ¦   ¦       
+¦   ¦   +---66
+¦   ¦   ¦       06ea13c4caf2654fdcdb2a06c446a5291ed410
+¦   ¦   ¦       
+¦   ¦   +---67
+¦   ¦   ¦       66c0ecd4c07b6e9dd7a685b32536ce77038441
+¦   ¦   ¦       
+¦   ¦   +---68
+¦   ¦   ¦       52c96aee33905262e3b96e61f3caf63aecd213
+¦   ¦   ¦       
+¦   ¦   +---69
+¦   ¦   ¦       5347c2c64b886708390b0ca1a1d0a164caeb46
+¦   ¦   ¦       
+¦   ¦   +---6a
+¦   ¦   ¦       28c85483de40d604880c690ce4a70dcaaf70a1
+¦   ¦   ¦       dccf124518407a45563776848f83cdfddf1ab8
+¦   ¦   ¦       
+¦   ¦   +---6b
+¦   ¦   ¦       45b8acec7d174072bf37280cdbdc54813e8405
+¦   ¦   ¦       
+¦   ¦   +---6c
+¦   ¦   ¦       c65782a570f4c59ed4b841afff1db4c7bd26f4
+¦   ¦   ¦       
+¦   ¦   +---6d
+¦   ¦   ¦       0fc6972dbb22ed61ba1bd57938d82a0b165fb7
+¦   ¦   ¦       
+¦   ¦   +---6f
+¦   ¦   ¦       51ce490885c844701f039662b9f155b17c5b2b
+¦   ¦   ¦       
+¦   ¦   +---71
+¦   ¦   ¦       7b119e5bf75b1b93464ee7d55d1ac469784b05
+¦   ¦   ¦       
+¦   ¦   +---72
+¦   ¦   ¦       8156b5d85e53ebe7a77af491638ba4f405f654
+¦   ¦   ¦       
+¦   ¦   +---73
+¦   ¦   ¦       4a875e15d3ed9d28550f944cf1073fa68aa448
+¦   ¦   ¦       
+¦   ¦   +---74
+¦   ¦   ¦       4ba1d173616c7d46526f83bd75b994e8c45d60
+¦   ¦   ¦       
+¦   ¦   +---77
+¦   ¦   ¦       12f9e3e23dfce7f55d52e0014a32fc3856d170
+¦   ¦   ¦       2ede28ac944709846dba089cb3884359a5d4c9
+¦   ¦   ¦       43eb05ae891583986683badc98c427f72b60f0
+¦   ¦   ¦       4aa9517f9bab8abe34044ac3433c81d11c27b1
+¦   ¦   ¦       
+¦   ¦   +---79
+¦   ¦   ¦       f39ddae49c7b7564269e88d40ef8e49ad8e2cf
+¦   ¦   ¦       
+¦   ¦   +---7a
+¦   ¦   ¦       580e1a13d0a95f460fdb14f3d6bcfc3fcf4350
+¦   ¦   ¦       8fc28aca49ad8c0e05674a02492347e00c9179
+¦   ¦   ¦       
+¦   ¦   +---7b
+¦   ¦   ¦       595ac2218163bae9d36c6ab6994572a368fcb2
+¦   ¦   ¦       
+¦   ¦   +---7c
+¦   ¦   ¦       cbda833ee5995ec143d98dd7d14cc59a3c84c4
+¦   ¦   ¦       d1c932b1d0c35c530cfe1a47e3d1db1a07fa0e
+¦   ¦   ¦       
+¦   ¦   +---7d
+¦   ¦   ¦       ab25d4e565b1b4cfb395d54e4f027933aba98a
+¦   ¦   ¦       
+¦   ¦   +---7f
+¦   ¦   ¦       331db2d7a557178387a21c037e96bf1551ff34
+¦   ¦   ¦       a84579a6a46a9bbc6c6e1e2c22792338b812f1
+¦   ¦   ¦       
+¦   ¦   +---80
+¦   ¦   ¦       36aee00edbcb3fafb5ed9e5c66de3077bdd265
+¦   ¦   ¦       4468adead5ec04fafe106debbae1f2d8b0115b
+¦   ¦   ¦       5b00016147270b1d36fe5cbb62c75da19ccf87
+¦   ¦   ¦       
+¦   ¦   +---81
+¦   ¦   ¦       79431ebbad1840b39af4c31b8feaa301bc624a
+¦   ¦   ¦       87fc6570953e7af270c4d331949f4aaf1f18f3
+¦   ¦   ¦       
+¦   ¦   +---82
+¦   ¦   ¦       522d16ee3a6c6eced02a56c4082adeff2dcf29
+¦   ¦   ¦       90b485b0f4972c75659b3644d96e63cfe7fef0
+¦   ¦   ¦       
+¦   ¦   +---84
+¦   ¦   ¦       8a21580631780941c9e3c39d30ad38f7aec7f8
+¦   ¦   ¦       a232100da8415227e1293674bdcddc61a8fa82
+¦   ¦   ¦       c5e50c6e874966142917e92e35d0efdf9ecf31
+¦   ¦   ¦       
+¦   ¦   +---85
+¦   ¦   ¦       cfe4bf008244dff33e8fbd6ec0389facc8ca11
+¦   ¦   ¦       
+¦   ¦   +---86
+¦   ¦   ¦       bdf4670ea3b2eba4b06db2c0f8b4c9592e748c
+¦   ¦   ¦       e3deb5e751fddfef32d0d64089a213b31a2170
+¦   ¦   ¦       
+¦   ¦   +---88
+¦   ¦   ¦       6da0bf4633a488880d4ad4ec595d13c29bbe47
+¦   ¦   ¦       a024664753c6ddfd92d137321d77a4ebdae6d1
+¦   ¦   ¦       af39f638a7e44b36c668054bb41ec3f8ee2986
+¦   ¦   ¦       
+¦   ¦   +---8a
+¦   ¦   ¦       7b785d6c36006b727df9b63349e86a431a559a
+¦   ¦   ¦       cee5759231fcae01729aee8eaeca53ee875812
+¦   ¦   ¦       f1ad4dc4a0176d9c7b6b3923f11160c2521e61
+¦   ¦   ¦       
+¦   ¦   +---8b
+¦   ¦   ¦       6eef3a736f43d17a145d2033a50d2b200f58c0
+¦   ¦   ¦       
+¦   ¦   +---8c
+¦   ¦   ¦       1388fb897db1572dbc8e24b076c866b932fbf4
+¦   ¦   ¦       d311bece81a7aa55223db65fb6ae79fd6199ed
+¦   ¦   ¦       
+¦   ¦   +---8e
+¦   ¦   ¦       2f0b3f536ba41e525c5555d55877aa0570acae
+¦   ¦   ¦       92789aec3d997128f69077f63890a7b820e579
+¦   ¦   ¦       a85e657039af4656106e8bffa49ed19d912a4e
+¦   ¦   ¦       
+¦   ¦   +---8f
+¦   ¦   ¦       62b4f7bb46f0f5fed0b244c18340d7dea82b61
+¦   ¦   ¦       cd091fe06a52ae406e3bda560957fd07cd8323
+¦   ¦   ¦       
+¦   ¦   +---91
+¦   ¦   ¦       25a649f18f64d8a0eccd338f9bf78b65ad0708
+¦   ¦   ¦       b243d1e5b2417458b0c3c1bfee0140d4919178
+¦   ¦   ¦       
+¦   ¦   +---92
+¦   ¦   ¦       392ba091388d1a316a0b48768306bbf6ead2ba
+¦   ¦   ¦       7702af310e9975ace8dbe04472821ae8b9d135
+¦   ¦   ¦       d2d983df1a5cc52bae508ec594c3f9feb549d5
+¦   ¦   ¦       
+¦   ¦   +---93
+¦   ¦   ¦       502a38fdc0c6fa88b6827a440709fcaef7d9ce
+¦   ¦   ¦       dcd7cc5244cc191bc1df6cb1db6fbf8e29d85d
+¦   ¦   ¦       
+¦   ¦   +---94
+¦   ¦   ¦       91a2fda28342ab358eaf234e1afe0c07a53d62
+¦   ¦   ¦       
+¦   ¦   +---95
+¦   ¦   ¦       49bbb3ecfc2a3df474bdce482d7c43cf3d8a5e
+¦   ¦   ¦       
+¦   ¦   +---96
+¦   ¦   ¦       884c5a0561b62cce134f04ef35413ca2926679
+¦   ¦   ¦       
+¦   ¦   +---97
+¦   ¦   ¦       78d3d538dcba9612bdb444a3d6f403c0ef2d21
+¦   ¦   ¦       7985a5152c3843e3597be6006ca556e7ecff7a
+¦   ¦   ¦       
+¦   ¦   +---99
+¦   ¦   ¦       f16ad2b328fa3d9dea1deb84020e38abc05f2e
+¦   ¦   ¦       
+¦   ¦   +---9b
+¦   ¦   ¦       33563d102639a610e687ad325c67266c05ffb4
+¦   ¦   ¦       
+¦   ¦   +---9c
+¦   ¦   ¦       60f5d428b118c7ab7b276dfcb1e73f63c63cd0
+¦   ¦   ¦       
+¦   ¦   +---9d
+¦   ¦   ¦       eb85c39177cc2fc1b7f0a5a04cfc5fd1eaead5
+¦   ¦   ¦       
+¦   ¦   +---9e
+¦   ¦   ¦       737943367218bc64929be182451167e826b846
+¦   ¦   ¦       
+¦   ¦   +---9f
+¦   ¦   ¦       b054030e9eee49b26723a19317d9278505fdcd
+¦   ¦   ¦       
+¦   ¦   +---a0
+¦   ¦   ¦       647598f656de3cb69780c3a79df9d1437c5c4a
+¦   ¦   ¦       
+¦   ¦   +---a1
+¦   ¦   ¦       1c9ba4be57c08a50317614ab304fb987638ae6
+¦   ¦   ¦       70c66f58867dd52d93267e0a060dfef673ed0a
+¦   ¦   ¦       aa53102edcc86c8fecb07a5bd5ba366133a8a2
+¦   ¦   ¦       
+¦   ¦   +---a2
+¦   ¦   ¦       3daadb84358f067c6d0795bd38b7388f02ce3c
+¦   ¦   ¦       
+¦   ¦   +---a3
+¦   ¦   ¦       ad54f994567deb0374700232e2e052fb86880c
+¦   ¦   ¦       
+¦   ¦   +---a5
+¦   ¦   ¦       4cd150b25bd5a74d1542a821d3896efdec6dc3
+¦   ¦   ¦       
+¦   ¦   +---a7
+¦   ¦   ¦       832369df51e1a55b7e106796504bcb0e20f999
+¦   ¦   ¦       9544dedbb5c2c1cabd500166e791cd5e2a464a
+¦   ¦   ¦       a429b47d7343fe6b8a08a8971b3eee12468e86
+¦   ¦   ¦       
+¦   ¦   +---a9
+¦   ¦   ¦       a77f9a1e137022a1a4a9f27872c665b0f880bb
+¦   ¦   ¦       
+¦   ¦   +---aa
+¦   ¦   ¦       d8e50ac7129495d3d99dd351ad72e825c98106
+¦   ¦   ¦       e37ab0a9a2d907333f3bf09c376b338ea0d954
+¦   ¦   ¦       
+¦   ¦   +---ab
+¦   ¦   ¦       8546bf518855062c1fbe3e85f18e20e97a7fed
+¦   ¦   ¦       
+¦   ¦   +---ae
+¦   ¦   ¦       093ac5901055b74b358ce06d230d6b492689fd
+¦   ¦   ¦       
+¦   ¦   +---af
+¦   ¦   ¦       6c08f4b0d0834fd2009a99b79a99aed7a74baf
+¦   ¦   ¦       7dbebbacef595e3089c01c05671016c21a8304
+¦   ¦   ¦       d5d215fe6161e9eddc4ebc440030fd6095bc77
+¦   ¦   ¦       
+¦   ¦   +---b1
+¦   ¦   ¦       55df3a185870d47f7a84b2fa2c9fed4ee5a102
+¦   ¦   ¦       
+¦   ¦   +---b2
+¦   ¦   ¦       a3fe002c1c1364141638df72c28d24ae8b15a0
+¦   ¦   ¦       ae64998acb14615b85c78a2dcefab20e3ac9fe
+¦   ¦   ¦       d6f6e7cfb55ea0f5977fc2831b8eefc4c479ad
+¦   ¦   ¦       
+¦   ¦   +---b4
+¦   ¦   ¦       92d6af092729d77435d4c9ece6ff460216fbb0
+¦   ¦   ¦       e49dcaa010984177c97e793103bf7150818a9b
+¦   ¦   ¦       
+¦   ¦   +---b6
+¦   ¦   ¦       1e97952aa75394ee69833ad13026ef72830ac6
+¦   ¦   ¦       e0283faa14533fafc94aeb5d0189892f1b7e2b
+¦   ¦   ¦       f80c30017abe95ebcf7acffdec602745c13ef9
+¦   ¦   ¦       
+¦   ¦   +---b8
+¦   ¦   ¦       6269144d287d2c2b3924fabd1cf04af1ca5d18
+¦   ¦   ¦       
+¦   ¦   +---b9
+¦   ¦   ¦       7a3b7845490205131af07734714b47c2fadb1b
+¦   ¦   ¦       ab636714f0faf8efe8a73abfaadbdcf26349f4
+¦   ¦   ¦       
+¦   ¦   +---ba
+¦   ¦   ¦       74f75b2b0853e43ce2793a0215f8777e7fa169
+¦   ¦   ¦       
+¦   ¦   +---bc
+¦   ¦   ¦       23d6ef7e064d7d6d233e0d53b1c5bd8ad8bb0a
+¦   ¦   ¦       49bb8760b57af09331875e594fd0b988d4a2bb
+¦   ¦   ¦       d6945e2e20d5b63ab21bd1b72920eb8e9f6900
+¦   ¦   ¦       
+¦   ¦   +---bd
+¦   ¦   ¦       b56ebd1783ac7bff1f3e0ff653633789a9f07a
+¦   ¦   ¦       
+¦   ¦   +---be
+¦   ¦   ¦       6ee9f82e3f932b323428d6f4a7008347637fc2
+¦   ¦   ¦       
+¦   ¦   +---c0
+¦   ¦   ¦       eb518db70c787459dcee4ca6ec7f56cf70baa6
+¦   ¦   ¦       
+¦   ¦   +---c1
+¦   ¦   ¦       0355291405a96f6001b4b45fdbdb4979567fe3
+¦   ¦   ¦       ac196d776d58ac83f9996f9beaa2df2d508d4a
+¦   ¦   ¦       
+¦   ¦   +---c3
+¦   ¦   ¦       654dc91a4b45e6656083647a08bdd80822d34e
+¦   ¦   ¦       
+¦   ¦   +---c4
+¦   ¦   ¦       c095e606ce0155933e483fa4874c67ad094526
+¦   ¦   ¦       
+¦   ¦   +---c5
+¦   ¦   ¦       0bf5c67d3e33bfb570c56c84eaf756bea85206
+¦   ¦   ¦       ad0faa8f470269684dc87102f244386732f880
+¦   ¦   ¦       
+¦   ¦   +---c6
+¦   ¦   ¦       47279b2833651bfa1357671da2f765ee7c4979
+¦   ¦   ¦       
+¦   ¦   +---c8
+¦   ¦   ¦       2dae7e78db6bb74906028068fbb0792ded06e0
+¦   ¦   ¦       
+¦   ¦   +---c9
+¦   ¦   ¦       01d8444d404a9f907978ca773615e0326b9e00
+¦   ¦   ¦       d267a2d65d39108318ce5d7ce1b940e65b3cf8
+¦   ¦   ¦       dc8e0c93470ef24921e255b7fe4b42ed7c15cf
+¦   ¦   ¦       
+¦   ¦   +---ca
+¦   ¦   ¦       3ea6d278d8879674ca5caf269ea8b92d0b284b
+¦   ¦   ¦       
+¦   ¦   +---cb
+¦   ¦   ¦       769100e8a505254c9f11a6cde732cff295b8ce
+¦   ¦   ¦       cc6583b8c8c9a199477e218d7d2125eed80a0f
+¦   ¦   ¦       
+¦   ¦   +---cc
+¦   ¦   ¦       55064954fb7793ebe8501afa9df67d58f14513
+¦   ¦   ¦       
+¦   ¦   +---cd
+¦   ¦   ¦       0715c70e99f30a206a81bf1e29ec263170781b
+¦   ¦   ¦       8916ae3acbb61c405a638209e7d38fc22696f7
+¦   ¦   ¦       8f91a914bf00302ac7afc2ff0c2a0a8c897720
+¦   ¦   ¦       b5057cdb827009c04e1f191202f71fb40ea542
+¦   ¦   ¦       bc2b78b66a8bbe860ab8369c79139fb5e1e466
+¦   ¦   ¦       
+¦   ¦   +---ce
+¦   ¦   ¦       9a6fc8b7c4e095889d27b90b0bfb7aa7b83213
+¦   ¦   ¦       
+¦   ¦   +---cf
+¦   ¦   ¦       8f96ccbd65ee006e82f14ce55aeac929dec214
+¦   ¦   ¦       
+¦   ¦   +---d1
+¦   ¦   ¦       da6c2a807c19b4a7ed3d405e2d8a3ee978a7ac
+¦   ¦   ¦       
+¦   ¦   +---d4
+¦   ¦   ¦       cf5123990da079999455628116a472e1995353
+¦   ¦   ¦       
+¦   ¦   +---d5
+¦   ¦   ¦       1b366203156d2c4f1c1af9a1761e46e705bffc
+¦   ¦   ¦       
+¦   ¦   +---d7
+¦   ¦   ¦       e889c71a6557200dda3740eed942f40208ac8d
+¦   ¦   ¦       
+¦   ¦   +---d8
+¦   ¦   ¦       0faf5b5ca389e769174e85e5446896e34fae32
+¦   ¦   ¦       d358076075c9f91d79c2956d89c3e3e846259a
+¦   ¦   ¦       edca3ee50b6e048abdf7fca13c2c176fdb2785
+¦   ¦   ¦       
+¦   ¦   +---d9
+¦   ¦   ¦       4b2a4077b9c19dc519ac76236b0aa82f760153
+¦   ¦   ¦       63bee0fcdc4dd51e0591bdadd5d8caa7e4d632
+¦   ¦   ¦       731c1f588201784ac25c48f2a0af82cd81be9e
+¦   ¦   ¦       ab3f8f93654e899b406b09e372b9bbd453d9c3
+¦   ¦   ¦       
+¦   ¦   +---da
+¦   ¦   ¦       0d55fdb5721a75a935bce75b374d88fef9f2c9
+¦   ¦   ¦       c0b824bb90977fc49a1f327fec1c4efb52060f
+¦   ¦   ¦       
+¦   ¦   +---db
+¦   ¦   ¦       296999ca86ebc7d92f9715d22cf4a69906f2f2
+¦   ¦   ¦       593873ab48e901e79232780e450656522cb23b
+¦   ¦   ¦       5a7a6b53c2552107c54554950dab5dfb3592b0
+¦   ¦   ¦       
+¦   ¦   +---dd
+¦   ¦   ¦       5206aa294868d5a46c9950d26531939158533d
+¦   ¦   ¦       
+¦   ¦   +---df
+¦   ¦   ¦       03b2a5810568cb07bd00122a53781f90abc7b8
+¦   ¦   ¦       10f6b6f511d38fec5a2f8a30616fd3c22682ba
+¦   ¦   ¦       d95b6ec3474514125f63d3468d1616edcb35d4
+¦   ¦   ¦       
+¦   ¦   +---e0
+¦   ¦   ¦       087d663a9efc0c77b1add357d307b5db87eb94
+¦   ¦   ¦       
+¦   ¦   +---e2
+¦   ¦   ¦       95a423d3be0d6085a16fee20b9c3f8c5d51c33
+¦   ¦   ¦       c500ad2d4aa8219423c1c608cdc894075e7d3d
+¦   ¦   ¦       
+¦   ¦   +---e5
+¦   ¦   ¦       8d259b384edc6c264244b0ab2c9c1770bc0b64
+¦   ¦   ¦       
+¦   ¦   +---e6
+¦   ¦   ¦       13abba352cde65cb110938c857cab81e3f2471
+¦   ¦   ¦       d2212f8c812acf1fafeea4b1f7002f12d18a76
+¦   ¦   ¦       e36d2045800f10aa2afe69f5ba15dc1037c0d3
+¦   ¦   ¦       
+¦   ¦   +---e7
+¦   ¦   ¦       a7873111b23751ee1fed94e29a35e9d169e8fe
+¦   ¦   ¦       
+¦   ¦   +---e8
+¦   ¦   ¦       5f0daae36ac6515e6343941b5216772b035687
+¦   ¦   ¦       
+¦   ¦   +---e9
+¦   ¦   ¦       8b621662b8edb1d54514b0f7aaf77ce1870314
+¦   ¦   ¦       c2572f1c6c8ba0e305a3f53718e825509b3717
+¦   ¦   ¦       
+¦   ¦   +---ea
+¦   ¦   ¦       388cad59bd6fbf400e1863ddaffef8c472beec
+¦   ¦   ¦       70a20b34e0cda518d092a989769f41707430a4
+¦   ¦   ¦       da258e233ac2d5116e6a7bab3a8eac8a825b5f
+¦   ¦   ¦       
+¦   ¦   +---eb
+¦   ¦   ¦       257172332f16197b6da9b5e1a1ff58e90f0ccc
+¦   ¦   ¦       44d4a8c22da7e4cbff3f8de80657de46cfe4a5
+¦   ¦   ¦       
+¦   ¦   +---ec
+¦   ¦   ¦       d99899623856f68139ef5bc2b5ec007c018e52
+¦   ¦   ¦       
+¦   ¦   +---ed
+¦   ¦   ¦       694aa61ee76ff9e47cecaf82369f26bc70db8f
+¦   ¦   ¦       6d80a950dfdf75131fc84f8dc45ce8b362c312
+¦   ¦   ¦       c1a81d772aa225347124d7ff09844c50c02f2b
+¦   ¦   ¦       f9d0438427b68caa548aa57c3204f6c9f1d014
+¦   ¦   ¦       
+¦   ¦   +---ee
+¦   ¦   ¦       174ea20bc07e21ba382cc4ec2e9bca36705e14
+¦   ¦   ¦       
+¦   ¦   +---ef
+¦   ¦   ¦       1e53553620b69ca51d858fa9c7dbce43ef7177
+¦   ¦   ¦       a1a643415530f057a7045068ba9efb24c6c91c
+¦   ¦   ¦       
+¦   ¦   +---f0
+¦   ¦   ¦       185081c2a3bc2c8dd4ad5daec1a92e9c1a2d83
+¦   ¦   ¦       7c5a34df65655327154618bde347e6e2dc1dac
+¦   ¦   ¦       d3a70ceaa69fb70811f58254dc738e0f939eac
+¦   ¦   ¦       
+¦   ¦   +---f2
+¦   ¦   ¦       12ca791df9b997cc50c19725f2ff33b32d0f78
+¦   ¦   ¦       
+¦   ¦   +---f5
+¦   ¦   ¦       0dbcf2fb4d382bbf8c4e156b7a9ddda55aeb09
+¦   ¦   ¦       
+¦   ¦   +---f6
+¦   ¦   ¦       7338b809b802ff09113512f46d9ad72fa04357
+¦   ¦   ¦       c0af11cf5af7e47710867072853900d914e58f
+¦   ¦   ¦       
+¦   ¦   +---f7
+¦   ¦   ¦       3b8b6c6544db9e4479bcff8c300327557b2d21
+¦   ¦   ¦       
+¦   ¦   +---f8
+¦   ¦   ¦       d914ce8858ca767fe619d8424433b3c140da33
+¦   ¦   ¦       
+¦   ¦   +---fb
+¦   ¦   ¦       9e93d2cb0f4c0e94a58161a261330742297799
+¦   ¦   ¦       
+¦   ¦   +---fc
+¦   ¦   ¦       9b57d8e8fc1a8c7ae1ba4ef5d3308b7f442953
+¦   ¦   ¦       
+¦   ¦   +---fd
+¦   ¦   ¦       448321c8127d548a7ba0b79c1269d7c16710d4
+¦   ¦   ¦       a380a40d4ed771cf82aab9194cc62dda2aaafd
+¦   ¦   ¦       d079bfd5d94074790ad39ade3ef26de6b81bd0
+¦   ¦   ¦       
+¦   ¦   +---ff
+¦   ¦   ¦       453a368563d26202433204319508bd0f51a761
+¦   ¦   ¦       81480ea46f9e345cd647dd3c981698892bd12f
+¦   ¦   ¦       ce98e0b0982bf901c7c3b15314630e555d8c0d
+¦   ¦   ¦       
+¦   ¦   +---info
+¦   ¦   +---pack
+¦   +---refs
+¦       +---heads
+¦       ¦       master
+¦       ¦       
+¦       +---remotes
+¦       ¦   +---origin
+¦       ¦           HEAD
+¦       ¦           master
+¦       ¦           Wan
+¦       ¦           
+¦       +---tags
++---.vs
+¦   ¦   ProjectSettings.json
+¦   ¦   slnx.sqlite
+¦   ¦   VSWorkspaceState.json
+¦   ¦   
+¦   +---Modeling
+¦   ¦   ¦   project-colors.json
+¦   ¦   ¦   
+¦   ¦   +---v17
+¦   ¦           .suo
+¦   ¦           
+¦   +---??????
+¦       ¦   project-colors.json
+¦       ¦   
+¦       +---FileContentIndex
+¦       ¦   ¦   49e13783-27ba-4fcf-a5d2-5acfa1809598.vsidx
+¦       ¦   ¦   936bf9dd-98e8-4682-9dee-4d715ff34b01.vsidx
+¦       ¦   ¦   dd20458b-ea66-4580-b712-c115b6d610a3.vsidx
+¦       ¦   ¦   e60ce975-f58c-402e-ad8d-826c050c4be0.vsidx
+¦       ¦   ¦   read.lock
+¦       ¦   ¦   
+¦       ¦   +---merges
+¦       +---v17
+¦               -LAPTOP-D65DSLJ3-2.suo
+¦               -LAPTOP-D65DSLJ3.suo
+¦               
++---packages
+¦   +---Aspose.Cells.22.12.0
+¦   ¦   ¦   .signature.p7s
+¦   ¦   ¦   Aspose.Cells.22.12.0.nupkg
+¦   ¦   ¦   
+¦   ¦   +---Help
+¦   ¦   ¦       Aspose.Cells For .NET Documentation.chm
+¦   ¦   ¦       Aspose.Cells.GridJs for .NETSTANDARD Documentation.chm
+¦   ¦   ¦       
+¦   ¦   +---images
+¦   ¦   ¦       aspose_cells-for-net.png
+¦   ¦   ¦       
+¦   ¦   +---lib
+¦   ¦   ¦   +---net40
+¦   ¦   ¦   ¦       Aspose.Cells.dll
+¦   ¦   ¦   ¦       Aspose.Cells.xml
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---net40-client
+¦   ¦   ¦   ¦       Aspose.Cells.dll
+¦   ¦   ¦   ¦       Aspose.Cells.xml
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---net6.0
+¦   ¦   ¦   ¦       Aspose.Cells.dll
+¦   ¦   ¦   ¦       Aspose.Cells.xml
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---net6.0-windows7.0
+¦   ¦   ¦   ¦       Aspose.Cells.dll
+¦   ¦   ¦   ¦       Aspose.Cells.xml
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---netstandard2.0
+¦   ¦   ¦           Aspose.Cells.dll
+¦   ¦   ¦           Aspose.Cells.xml
+¦   ¦   ¦           
+¦   ¦   +---License
+¦   ¦           Aspose_End-User-License-Agreement.txt
+¦   ¦           thirdpartylicenses.Aspose.Cells.for.NET.pdf
+¦   ¦           
+¦   +---Aspose.PDF.23.2.0
+¦   ¦   ¦   .signature.p7s
+¦   ¦   ¦   Aspose.PDF.23.2.0.nupkg
+¦   ¦   ¦   
+¦   ¦   +---images
+¦   ¦   ¦       aspose_pdf-for-net.png
+¦   ¦   ¦       
+¦   ¦   +---lib
+¦   ¦   ¦   +---net4.0
+¦   ¦   ¦   ¦       Aspose.PDF.dll
+¦   ¦   ¦   ¦       Aspose.PDF.xml
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---net4.0-client
+¦   ¦   ¦   ¦       Aspose.PDF.dll
+¦   ¦   ¦   ¦       Aspose.PDF.xml
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---net5.0
+¦   ¦   ¦   ¦       Aspose.PDF.dll
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---net6.0
+¦   ¦   ¦   ¦       Aspose.PDF.dll
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---netstandard2.0
+¦   ¦   ¦   ¦       Aspose.PDF.dll
+¦   ¦   ¦   ¦       
+¦   ¦   ¦   +---netstandard2.1
+¦   ¦   ¦           Aspose.PDF.dll
+¦   ¦   ¦           
+¦   ¦   +---license
+¦   ¦           aspose_end-user-license-agreement.txt
+¦   ¦           End User License Agreement.html
+¦   ¦           thirdpartylicenses-Aspose.PDF for .NET.txt
+¦   ¦           
+¦   +---Clipper.6.4.0
+¦   ¦   ¦   .signature.p7s
+¦   ¦   ¦   Clipper.6.4.0.nupkg
+¦   ¦   ¦   
+¦   ¦   +---lib
+¦   ¦       +---net40
+¦   ¦               clipper_library.dll
+¦   ¦               
+¦   +---Newtonsoft.Json.13.0.3
+¦       ¦   .signature.p7s
+¦       ¦   LICENSE.md
+¦       ¦   Newtonsoft.Json.13.0.3.nupkg
+¦       ¦   packageIcon.png
+¦       ¦   README.md
+¦       ¦   
+¦       +---lib
+¦           +---net20
+¦           ¦       Newtonsoft.Json.dll
+¦           ¦       Newtonsoft.Json.xml
+¦           ¦       
+¦           +---net35
+¦           ¦       Newtonsoft.Json.dll
+¦           ¦       Newtonsoft.Json.xml
+¦           ¦       
+¦           +---net40
+¦           ¦       Newtonsoft.Json.dll
+¦           ¦       Newtonsoft.Json.xml
+¦           ¦       
+¦           +---net45
+¦           ¦       Newtonsoft.Json.dll
+¦           ¦       Newtonsoft.Json.xml
+¦           ¦       
+¦           +---net6.0
+¦           ¦       Newtonsoft.Json.dll
+¦           ¦       Newtonsoft.Json.xml
+¦           ¦       
+¦           +---netstandard1.0
+¦           ¦       Newtonsoft.Json.dll
+¦           ¦       Newtonsoft.Json.xml
+¦           ¦       
+¦           +---netstandard1.3
+¦           ¦       Newtonsoft.Json.dll
+¦           ¦       Newtonsoft.Json.xml
+¦           ¦       
+¦           +---netstandard2.0
+¦                   Newtonsoft.Json.dll
+¦                   Newtonsoft.Json.xml
+¦                   
++---WinForm
+¦   ¦   App.config
+¦   ¦   Form1.cs
+¦   ¦   Form1.Designer.cs
+¦   ¦   Form1.resx
+¦   ¦   Program.cs
+¦   ¦   WinForm.csproj
+¦   ¦   
+¦   +---bin
+¦   ¦   +---Debug
+¦   +---obj
+¦   ¦   +---Debug
+¦   ¦       ¦   .NETFramework,Version=v4.8.AssemblyAttributes.cs
+¦   ¦       ¦   DesignTimeResolveAssemblyReferences.cache
+¦   ¦       ¦   DesignTimeResolveAssemblyReferencesInput.cache
+¦   ¦       ¦   WinForm.csproj.AssemblyReference.cache
+¦   ¦       ¦   
+¦   ¦       +---TempPE
+¦   +---Properties
+¦           AssemblyInfo.cs
+¦           Resources.Designer.cs
+¦           Resources.resx
+¦           Settings.Designer.cs
+¦           Settings.settings
+¦           
++---??Dll
+¦       TD_Alloc_3.03_9.dll
+¦       TD_DbRoot_3.03_9.dll
+¦       TD_Db_3.03_9.dll
+¦       TD_DynBlocks_3.03_9.tx
+¦       TD_Ge_3.03_9.dll
+¦       TD_Gi_3.03_9.dll
+¦       TD_Gs_3.03_9.dll
+¦       TD_Mgd_3.03_9.dll
+¦       TD_Root_3.03_9.dll
+¦       TD_SpatialIndex_3.03_9.dll
+¦       
++---??????
+    ¦   AdjustWallHeight-DESKTOP-FNJ3ML3.cs
+    ¦   CreateModelLine.cs
+    ¦   Modeling-LAPTOP-D65DSLJ3.csproj
+    ¦   Modeling.csproj
+    ¦   packages.config
+    ¦   TwoLineToBeam.cs
+    ¦   TwoLineToDoor.cs
+    ¦   TwoLineToWall.cs
+    ¦   TwoLineToWall_A-DESKTOP-FNJ3ML3.cs
+    ¦   UIPanel.cs
+    ¦   
+    +---Adjustment
+    ¦       AdjustWallHeight.cs
+    ¦       Algorithm.cs
+    ¦       CreateWallModelline.cs
+    ¦       GapDetection.cs
+    ¦       ModelingParamInit.cs
+    ¦       
+    +---AutoCreateBeams
+    ¦       AutoCreateBeams.cs
+    ¦       AutoCreateBeams_Test.cs
+    ¦       ElemsSelect.cs
+    ¦       
+    +---bin
+    ¦   +---Debug
+    ¦   ¦   ¦   Auto Creation Icon.jpg
+    ¦   ¦   ¦   Auto Creation Icon.png
+    ¦   ¦   ¦   clipper_library.dll
+    ¦   ¦   ¦   CreatBridgeForRevit2018.dll
+    ¦   ¦   ¦   CreatBridgeForRevit2018.pdb
+    ¦   ¦   ¦   Modeling-DESKTOP-FNJ3ML3.dll
+    ¦   ¦   ¦   Modeling-DESKTOP-FNJ3ML3.pdb
+    ¦   ¦   ¦   Modeling.addin
+    ¦   ¦   ¦   Modeling.dll
+    ¦   ¦   ¦   Modeling.pdb
+    ¦   ¦   ¦   Newtonsoft.Json.dll
+    ¦   ¦   ¦   Newtonsoft.Json.xml
+    ¦   ¦   ¦   TD_Alloc_3.03_9.dll
+    ¦   ¦   ¦   TD_DbRoot_3.03_9.dll
+    ¦   ¦   ¦   TD_Db_3.03_9.dll
+    ¦   ¦   ¦   TD_DynBlocks_3.03_9.tx
+    ¦   ¦   ¦   TD_Ge_3.03_9.dll
+    ¦   ¦   ¦   TD_Gi_3.03_9.dll
+    ¦   ¦   ¦   TD_Gs_3.03_9.dll
+    ¦   ¦   ¦   TD_Mgd_3.03_9.dll
+    ¦   ¦   ¦   TD_Root_3.03_9.dll
+    ¦   ¦   ¦   TD_SpatialIndex_3.03_9.dll
+    ¦   ¦   ¦   
+    ¦   ¦   +---cs-CZ
+    ¦   ¦   +---de-DE
+    ¦   ¦   +---en-GB
+    ¦   ¦   +---en-US
+    ¦   ¦   +---es-ES
+    ¦   ¦   +---fr-FR
+    ¦   ¦   +---it-IT
+    ¦   ¦   +---ja-JP
+    ¦   ¦   +---ko-KR
+    ¦   ¦   +---pl-PL
+    ¦   ¦   +---pt-BR
+    ¦   ¦   +---ru-RU
+    ¦   ¦   +---zh-CN
+    ¦   ¦   +---zh-TW
+    ¦   +---Release
+    +---Column
+    ¦       AutoCreateColumns.cs
+    ¦       AutoCreateColumns_Grid.cs
+    ¦       
+    +---Form
+    ¦       levelHeightForm.cs
+    ¦       levelHeightForm.Designer.cs
+    ¦       levelHeightForm.resx
+    ¦       OpenWallForm.cs
+    ¦       OpenWallForm.Designer.cs
+    ¦       OpenWallForm.resx
+    ¦       
+    +---obj
+    ¦   +---Debug
+    ¦   ¦   ¦   .NETFramework,Version=v4.6.AssemblyAttributes.cs
+    ¦   ¦   ¦   .NETFramework,Version=v4.7.2.AssemblyAttributes.cs
+    ¦   ¦   ¦   .NETFramework,Version=v4.8.AssemblyAttributes.cs
+    ¦   ¦   ¦   DesignTimeResolveAssemblyReferences.cache
+    ¦   ¦   ¦   DesignTimeResolveAssemblyReferencesInput-DESKTOP-FNJ3ML3.cache
+    ¦   ¦   ¦   DesignTimeResolveAssemblyReferencesInput-LAPTOP-D65DSLJ3.cache
+    ¦   ¦   ¦   DesignTimeResolveAssemblyReferencesInput.cache
+    ¦   ¦   ¦   Modeling-DESKTOP-FNJ3ML3.dll
+    ¦   ¦   ¦   Modeling-DESKTOP-FNJ3ML3.pdb
+    ¦   ¦   ¦   Modeling.ColumnForm.resources
+    ¦   ¦   ¦   Modeling.csproj.AssemblyReference.cache
+    ¦   ¦   ¦   Modeling.csproj.CopyComplete
+    ¦   ¦   ¦   Modeling.csproj.CoreCompileInputs.cache
+    ¦   ¦   ¦   Modeling.csproj.FileListAbsolute-LAPTOP-D65DSLJ3.txt
+    ¦   ¦   ¦   Modeling.csproj.FileListAbsolute.txt
+    ¦   ¦   ¦   Modeling.csproj.GenerateResource.cache
+    ¦   ¦   ¦   Modeling.dll
+    ¦   ¦   ¦   Modeling.g.resources
+    ¦   ¦   ¦   Modeling.GridlineForm.resources
+    ¦   ¦   ¦   Modeling.LevelHeightForm.resources
+    ¦   ¦   ¦   Modeling.OpenWallForm.resources
+    ¦   ¦   ¦   Modeling.pdb
+    ¦   ¦   ¦   Modeling_MarkupCompile-DESKTOP-FNJ3ML3.cache
+    ¦   ¦   ¦   Modeling_MarkupCompile-LAPTOP-D65DSLJ3.cache
+    ¦   ¦   ¦   Modeling_MarkupCompile.cache
+    ¦   ¦   ¦   Modeling_MarkupCompile.i-DESKTOP-FNJ3ML3.cache
+    ¦   ¦   ¦   Modeling_MarkupCompile.i-LAPTOP-D65DSLJ3.cache
+    ¦   ¦   ¦   Modeling_MarkupCompile.i.cache
+    ¦   ¦   ¦   Modeling_MarkupCompile.lref
+    ¦   ¦   ¦   Semi-automated 3D Modeling.csproj.AssemblyReference.cache
+    ¦   ¦   ¦   UserControl1.baml
+    ¦   ¦   ¦   UserControl1.g.cs
+    ¦   ¦   ¦   UserControl1.g.i.cs
+    ¦   ¦   ¦   _IsIncrementalBuild
+    ¦   ¦   ¦   ??????.csproj.AssemblyReference.cache
+    ¦   ¦   ¦   ??????.csproj.CoreCompileInputs.cache
+    ¦   ¦   ¦   ??????.csproj.FileListAbsolute.txt
+    ¦   ¦   ¦   
+    ¦   ¦   +---TempPE
+    ¦   +---Release
+    ¦           .NETFramework,Version=v4.8.AssemblyAttributes.cs
+    ¦           
+    +---Others
+    ¦       AutoCalculateStairsArea.cs
+    ¦       AutoCreateModelLine_Test.cs
+    ¦       AutoCreateSlabs_Test1.cs
+    ¦       AutoCreateSlabs_Test2.cs
+    ¦       BOM.cs
+    ¦       Class1.cs
+    ¦       Class2.cs
+    ¦       ConvertToFormworkPlanningWall.cs
+    ¦       CountOverlapped.cs
+    ¦       GetCoincidentPoints.cs
+    ¦       GetPointCoordinate.cs
+    ¦       GetWallProfile.cs
+    ¦       Grounding.cs
+    ¦       IsOverlapped.cs
+    ¦       IsPointInOutlines.cs
+    ¦       Join.cs
+    ¦       PJ_catchspecificlayerandtext.cs
+    ¦       SampleCode.cs
+    ¦       TwoLineToRecWall.cs
+    ¦       
+    +---Previous Functions
+    ¦       AdjustSlabElevation.cs
+    ¦       AdjustWallLength.cs
+    ¦       AutoCreateOpenedWall.cs
+    ¦       AutoCreateOpenedWall_new.cs
+    ¦       AutoCreateOpening_old.cs
+    ¦       AutoCreateSlabs_split.cs
+    ¦       AutoCreateWall.cs
+    ¦       AutoJoin.cs
+    ¦       AutoSplitSlabs.cs
+    ¦       ChangeMaterial.cs
+    ¦       
+    +---Properties
+    ¦       AssemblyInfo.cs
+    ¦       
+    +---Slab
+    ¦       AutoCreateSlab.cs
+    ¦       
+    +---StairsGeneration
+    ¦       AutoCreateStairs_2Landing.cs
+    ¦       AutoCreateStairs_3Landing.cs
+    ¦       AutoCreateStairs_3Landing_1.cs
+    ¦       AutoCreateStairs_ClickCADLayer.cs
+    ¦       AutoCreateStairs_ClickLine.cs
+    ¦       AutoCreateStairs_Ex.cs
+    ¦       AutoCreateStairs_Test1.cs
+    ¦       AutoCreateStairs_Test2.cs
+    ¦       BOM_Finished.cs
+    ¦       StairDimensions_Elevation .cs
+    ¦       StairLandindDimensions_FloorPlane.cs
+    ¦       
+    +---Test Function
+    +---Wall
+    ¦       AutoCreateAdditionalWalls.cs
+    ¦       AutoCreateWalls.cs
+    ¦       TwoLineToWall_A.cs
+    ¦       TwoLineToWall_P.cs
+    ¦       
+    +---Windows
+            AutoCreateOpening.cs
+            AutoCreateWindows.cs
+            

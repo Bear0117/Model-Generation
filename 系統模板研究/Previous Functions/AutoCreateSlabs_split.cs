@@ -53,10 +53,8 @@ namespace Modeling
             }
 
             // Decide gridline size by users.
-            double gridline_size;
-            GridlineForm form = new GridlineForm();
-            form.ShowDialog();
-            gridline_size = form.gridlineSize;
+            ModelingParam.Initialize();
+            double gridline_size = ModelingParam.parameters.General.GridSize * 10; // unit: mm
 
             // Get the level of CAD drawing.
             Level level = doc.GetElement(elem.LevelId) as Level;

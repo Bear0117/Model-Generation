@@ -12,7 +12,7 @@ using Autodesk.Revit.UI.Selection;
 namespace Modeling
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    class AutoAdditionalCreateWalls : IExternalCommand
+    class AutoCreateAdditionalWalls : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -29,7 +29,7 @@ namespace Modeling
                 graphicsStyleId = geoObj.GraphicsStyleId;
             }
 
-            // Initialize Parameters.
+            // Initialize Parameters.A  
             ModelingParam.Initialize();
             double gridline_size = ModelingParam.parameters.General.GridSize * 10; // unit: mm
             double levelHeight = ModelingParam.parameters.General.LevelHeight; // unit: cm
@@ -111,6 +111,7 @@ namespace Modeling
             // Combine two List and process intersected lines.
             merge_Lines_v.AddRange(merge_Lines_h);
             List<Tuple<Line, int>> finalLines = AdjustLines(merge_Lines_v);
+            finalLines = RemoveDuplicateMidpointLines(finalLines);
 
             // Create Walls.
             foreach (Tuple<Line, int> wallLines in finalLines)
@@ -337,7 +338,6 @@ namespace Modeling
             return vectorToPoint.CrossProduct(direction1).IsZeroLength();
         }
 
-
         private bool AreOverlapping(Line line1, Line line2)
         {
             // 判斷是否為垂直線
@@ -377,6 +377,14 @@ namespace Modeling
 
         public List<Tuple<Line, int>> FindPairs(CurveArray curves, bool vertical, int[] wallWidths)
         {
+            if (wallWidths.Length != 2)
+                throw new ArgumentException("wallWidths 需包含 2 個值，代表最小值與最大值！");
+
+            // 取出「允許的最小、最大牆厚」(mm)
+            int minVal = Math.Min(wallWidths[0], wallWidths[1]);
+            int maxVal = Math.Max(wallWidths[0], wallWidths[1]);
+
+
             List<Tuple<Line, int>> pairedLines = new List<Tuple<Line, int>>();
             // 轉換CurveArray到List<Line>，確保所有曲線都是Line類型
             List<Line> lines = new List<Line>();
@@ -398,10 +406,10 @@ namespace Modeling
 
                     for (int j = 0; j < lines.Count; j++)
                     {
-                        if (i == j)
-                        {
-                            continue;
-                        }
+                        //if (i == j)
+                        //{
+                        //    continue;
+                        //}
                         Line compareLine = lines[j];
                         double lineYMin = Math.Min(compareLine.GetEndPoint(0).Y, compareLine.GetEndPoint(1).Y);
                         double lineYMax = Math.Max(compareLine.GetEndPoint(0).Y, compareLine.GetEndPoint(1).Y);
@@ -411,7 +419,7 @@ namespace Modeling
                         {
                             // 檢查X軸距離
                             double distance = Math.Abs(mainLine.GetEndPoint(0).X - compareLine.GetEndPoint(0).X);
-                            if (wallWidths.Any(targetDistance => Math.Abs(Algorithm.UnitsToMillimeters(distance) - targetDistance) < 0.01))
+                            if (Algorithm.UnitsToMillimeters(distance) >= minVal - 10 && Algorithm.UnitsToMillimeters(distance) <= maxVal + 10)
                             {
                                 Line wallLine = null;
                                 double width = GetWallWidth(mainLine, compareLine);
@@ -452,10 +460,10 @@ namespace Modeling
 
                     for (int j = 0; j < lines.Count; j++)
                     {
-                        if (i == j)
-                        {
-                            continue;
-                        }
+                        //if (i == j)
+                        //{
+                        //    continue;
+                        //}
                         Line compareLine = lines[j];
                         double lineXMin = Math.Min(compareLine.GetEndPoint(0).X, compareLine.GetEndPoint(1).X);
                         double lineXMax = Math.Max(compareLine.GetEndPoint(0).X, compareLine.GetEndPoint(1).X);
@@ -465,7 +473,7 @@ namespace Modeling
                         {
                             // 檢查Y軸距離
                             double distance = Math.Abs(mainLine.GetEndPoint(0).Y - compareLine.GetEndPoint(0).Y);
-                            if (wallWidths.Any(targetDistance => Math.Abs(Algorithm.UnitsToMillimeters(distance) - targetDistance) < 0.01))
+                            if (Algorithm.UnitsToMillimeters(distance) >= minVal - 10 && Algorithm.UnitsToMillimeters(distance) <= maxVal + 10)
                             {
                                 Line wallLine = null;
                                 double width = GetWallWidth(mainLine, compareLine); // Unit: mm
@@ -496,6 +504,47 @@ namespace Modeling
             }
 
             return pairedLines;
+        }
+        private XYZ GetMidpoint(Line line)
+        {
+            XYZ p0 = line.GetEndPoint(0);
+            XYZ p1 = line.GetEndPoint(1);
+            return (p0 + p1) / 2;
+        }
+
+        public List<Tuple<Line, int>> RemoveDuplicateMidpointLines(List<Tuple<Line, int>> lines, double tolerance = 0.1)
+        {
+            // 用 Dictionary 來確保同一個「中點」只會保留一條線
+            Dictionary<string, Tuple<Line, int>> midpointMap
+                = new Dictionary<string, Tuple<Line, int>>();
+
+            foreach (Tuple<Line, int> linePair in lines)
+            {
+                Line line = linePair.Item1;
+                int wallWidth = linePair.Item2;
+
+                XYZ mid = GetMidpoint(line);
+
+                // 將座標四捨五入，產生 Dictionary 的 key
+                // 也可自行考慮使用 Math.Round 或自定義誤差機制
+                string key = $"{Math.Round(mid.X, 3)}_" +
+                             $"{Math.Round(mid.Y, 3)}_" +
+                             $"{Math.Round(mid.Z, 3)}";
+                // 若你希望同一個中點、但不同牆厚時也能分開保留，就別把 wallWidth 放入 key
+
+                if (!midpointMap.ContainsKey(key))
+                {
+                    midpointMap[key] = linePair;
+                }
+                else
+                {
+                    // 如果遇到中點相同，且你只想保留其中一條，就可以什麼都不做
+                    // 或者你可以自行決定要保留較長的？較短的？等等
+                }
+            }
+
+            // 回傳最後去重後的清單
+            return midpointMap.Values.ToList();
         }
 
         void RunJoinGeometry(Document doc, Element e1, Element e2)

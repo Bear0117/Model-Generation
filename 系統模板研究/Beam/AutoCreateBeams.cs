@@ -17,9 +17,7 @@ using Transaction = Autodesk.Revit.DB.Transaction;
 using Exception = System.Exception;
 using Transform = Autodesk.Revit.DB.Transform;
 using System.Windows;
-using System.Net;
-using System.Windows.Media;
-using static System.Net.Mime.MediaTypeNames;
+using System.Text;
 
 namespace Modeling
 {
@@ -64,10 +62,10 @@ namespace Modeling
             // Initialize Parameters.
             ModelingParam.Initialize();
             double gridline_size = ModelingParam.parameters.General.GridSize * 10; // unit: mm
-            double[] beamWidthRange = ModelingParam.parameters.BeamParam.beamWidthRange;
+            double[] beamWidthRange = ModelingParam.parameters.BeamParam.BeamWidthRange;
             double beamWidthMin = beamWidthRange[0];
             double beamWidthMax = beamWidthRange[1];
-            double beamMaxLength = ModelingParam.parameters.BeamParam.beamMinLength;
+            //double beamMaxLength = ModelingParam.parameters.BeamParam.BeamMinLength;
 
             // To get the "Level" of imported CAD 
             Level level = doc.GetElement(elem.LevelId) as Level;
@@ -121,9 +119,7 @@ namespace Modeling
                         double distanceTwoLine = distanceList.Min();
 
                         // The width of beams must between 10cm to 150cm, and the length larger than 80cm.
-                        if (UnitsToCentimeters(distanceTwoLine) < beamWidthMax
-                            && UnitsToCentimeters(distanceTwoLine) > CentimetersToUnits(beamWidthMin)
-                            && CadModel_A.Length > CentimetersToUnits(beamMaxLength))
+                        if (UnitsToCentimeters(distanceTwoLine) < beamWidthMax && UnitsToCentimeters(distanceTwoLine) > CentimetersToUnits(beamWidthMin))
                         {
                             // Remove CADModel_B from original lsit
                             CADModel CadModel_shortDistance = cADModel_B_List[distanceList.IndexOf(distanceTwoLine)];
@@ -167,9 +163,7 @@ namespace Modeling
                         double distanceTwoLine_No = distanceList_No.Min();
 
                         // The width of beams must between 10cm to 150cm, and the length larger than 100cm.
-                        if (UnitsToCentimeters(distanceTwoLine_No) < beamWidthMax
-                            && UnitsToCentimeters(distanceTwoLine_No) > beamWidthMin
-                            && CadModel_A_No.Length > CentimetersToUnits(beamMaxLength))
+                        if (UnitsToCentimeters(distanceTwoLine_No) < beamWidthMax && UnitsToCentimeters(distanceTwoLine_No) > beamWidthMin)
                         {
                             // Remove CADModel_B from original lsit
                             CADModel CadModel_shortDistance_No = cADModel_B_List_No[distanceList_No.IndexOf(distanceTwoLine_No)];
@@ -192,20 +186,19 @@ namespace Modeling
             //List<List<CADModel>> sss = GetPairedLabel(CADModelList_List, path, layer_name);
             CADModelList_List = GetPairedLabel(CADModelList_List, path, layer_name, geoElem);
 
+            List<(ElementId, string)> errorData = new List<(ElementId, string)>();
             // Create beams with corresponding sizes.
             foreach (List<CADModel> cadModelList in CADModelList_List)
             {
                 // The depth is recorded in cADModel_A
                 CADModel cADModel_A = cadModelList[0];
                 CADModel cADModel_B = cadModelList[1];
+                if (cADModel_A.Depth == "") continue;
 
                 XYZ cADModel_A_StratPoint = cADModel_A.CurveArray.get_Item(0).GetEndPoint(0);
                 XYZ cADModel_A_EndPoint = cADModel_A.CurveArray.get_Item(0).GetEndPoint(1);
                 XYZ cADModel_B_StratPoint = cADModel_B.CurveArray.get_Item(0).GetEndPoint(0);
                 XYZ cADModel_B_EndPoint = cADModel_B.CurveArray.get_Item(0).GetEndPoint(1);
-
-                //MessageBox.Show(Algorithm.UnitsToMillimeters(cADModel_A_StratPoint[0]).ToString() + " and " + Algorithm.UnitsToMillimeters(cADModel_A_StratPoint[1]).ToString() + " and " + Algorithm.UnitsToMillimeters(cADModel_A_StratPoint[2]).ToString());
-
 
                 XYZ ChangeXYZ = new XYZ();
 
@@ -217,11 +210,7 @@ namespace Modeling
                     cADModel_B_StratPoint = cADModel_B_EndPoint;
                     cADModel_B_EndPoint = ChangeXYZ;
                 }
-                //XYZ beamLocation = Algorithm.RoundPoint((cADModel_A_StratPoint + cADModel_B_EndPoint) / 2, gridline_size);
 
-
-
-                //XYZ extension = (cADModel_A_StratPoint - cADModel_A_EndPoint) / (cADModel_A_StratPoint - cADModel_A_EndPoint).GetLength();
                 XYZ mp1 = GetMiddlePoint(cADModel_A_StratPoint, cADModel_B_StratPoint);
                 XYZ mp2 = GetMiddlePoint(cADModel_A_EndPoint, cADModel_B_EndPoint);
                 Curve curve = Line.CreateBound(mp1, mp2);
@@ -251,11 +240,11 @@ namespace Modeling
                     StructuralFramingUtils.DisallowJoinAtEnd(instance, 1);
                     StructuralFramingUtils.DisallowJoinAtEnd(instance, 0);
                     transaction.Commit();
+                    if(cADModel_A.Error != "") errorData.Add((instance.Id, cADModel_A.Error));
                 }
                 ChangeBeamType(doc, beamSize);
-
-                //break;/////////////////////////////////////////////////////////////////////////////////////////////
             }
+            if(errorData != null) ExportChecklistToCsv(errorData);
 
             FilteredElementCollector collector_b = new FilteredElementCollector(doc);
             List<Element> beams = collector_b
@@ -323,7 +312,7 @@ namespace Modeling
 
                             for (int i = 0; i < points.Count - 1; i++)
                             {
-                                Line line = Line.CreateBound(points[i], points[i+1]);
+                                Line line = Line.CreateBound(points[i], points[i + 1]);
                                 line = TransformLine(transform, line);
                                 Line roundedLine = Line.CreateBound(Algorithm.RoundPoint(line.GetEndPoint(0), gridSize), Algorithm.RoundPoint(line.GetEndPoint(1), gridSize));
                                 Line newLine = roundedLine;
@@ -574,61 +563,8 @@ namespace Modeling
             return ModelPathUtils.ConvertModelPathToUserVisiblePath(cadLinkType.GetExternalFileReference().GetAbsolutePath());
         }
 
-        public void CreateCol(Level level, XYZ center)
-        {
-            FamilySymbol default_column = new FilteredElementCollector(doc)
-            .OfClass(typeof(FamilySymbol))
-            .OfCategory(BuiltInCategory.OST_Columns)
-            .Cast<FamilySymbol>()
-            .FirstOrDefault(q => q.Name == "default") as FamilySymbol;
-
-            using (Transaction tx = new Transaction(doc))
-            {
-                try
-                {
-                    tx.Start("createColumn");
-                    if (!default_column.IsActive)
-                    {
-                        default_column.Activate();
-                    }
-
-                    string levelstring = "4F";
-                    Level placeLevel = null;
-                    FilteredElementCollector collector = new FilteredElementCollector(doc);
-                    collector.OfClass(typeof(Level));
-                    foreach (Level level_1 in collector.Cast<Level>())
-                    {
-                        //MessageBox.Show(level.Name.ToString());
-                        if (levelstring == level.Name.ToString())
-                        {
-                            placeLevel = level;
-                        }
-                    }
-
-                    FamilyInstance familyInstance = doc.Create.NewFamilyInstance(center, default_column, level, StructuralType.Column);
-                    tx.Commit();
-                }
-                catch (Exception ex)
-                {
-                    TaskDialog td = new TaskDialog("error")
-                    {
-                        Title = "error",
-                        AllowCancellation = true,
-                        MainInstruction = "error",
-                        MainContent = "Error" + ex.Message,
-                        CommonButtons = TaskDialogCommonButtons.Close
-                    };
-                    td.Show();
-
-                    Debug.Print(ex.Message);
-                    tx.RollBack();
-                }
-            }
-        }
-
         public List<List<CADModel>> GetPairedLabel(List<List<CADModel>> CADModelList_List, String path, String layer_name, GeometryElement geoElem)
         {
-            
             Transform transform = null;
             foreach (GeometryObject gObj in geoElem)
             {
@@ -641,23 +577,14 @@ namespace Modeling
                 MessageBox.Show("Empty!");
             }
 
-            int mCount = 0;
-            int tCount = 0;
-
             foreach (List<CADModel> cadModelList in CADModelList_List)
             {
-                string beamDepth = "0";
-                double distanceBetweenTB = double.MaxValue;
-                // double distanceBetweenMB = double.MaxValue;
-                double distanceBetweenTB_depth = double.MaxValue;
-                // double distanceBetweenMB_depth = double.MaxValue;
+
                 XYZ location_beam = (cadModelList[0].Location + cadModelList[1].Location) / 2;
-                //Level level = new FilteredElementCollector(doc)
-                //.OfClass(typeof(Level))
-                //.Cast<Level>()
-                //.FirstOrDefault(l => l.Name == "3F");
-                
-                //XYZ location_beam = cadModelList[0].Location;
+                XYZ start1 = cadModelList[0].CurveArray.get_Item(0).GetEndPoint(0);
+                XYZ end1 = cadModelList[0].CurveArray.get_Item(0).GetEndPoint(1);
+                XYZ start2 = cadModelList[1].CurveArray.get_Item(0).GetEndPoint(0);
+                XYZ end2 = cadModelList[1].CurveArray.get_Item(0).GetEndPoint(1);
 
                 using (new Services())
                 {
@@ -680,172 +607,167 @@ namespace Modeling
                                                 switch (entity2.GetRXClass().Name)
                                                 {
                                                     case "AcDbText":
-                                                        
                                                         Teigha.DatabaseServices.DBText text = (Teigha.DatabaseServices.DBText)entity2;
                                                         XYZ position = ConverCADPointToRevitPoint(text.Position);
                                                         position = PointCentimeterToUnit(position);
                                                         position = new XYZ(position.X, position.Y, location_beam.Z);
                                                         position = transform.OfPoint(position);
-                                                        if (Math.Abs(text.Rotation % Math.PI - 0) < 0.01)
-                                                        {
-                                                            position = position + new XYZ(CentimetersToUnits(100), 0, 0);
-                                                        }
-                                                        else
-                                                        {
-                                                            position = position + new XYZ(0, CentimetersToUnits(100), 0);
-                                                        }
 
+                                                        // If label in Beam lines.
+                                                        if (!IsPointInsideRectangleOnXYPlane(start1, end1, start2, end2, position)) continue;
 
+                                                        // If same rotation.
                                                         if (IsSameRotation(cadModelList[0], text.Rotation) && text.Layer == layer_name)
                                                         {
-                                                            tCount++;
-                                                            double distance_cad_text = position.DistanceTo(location_beam);
-                                                            if (distance_cad_text < distanceBetweenTB)
+                                                            if (text.TextString.Contains("±"))
                                                             {
-                                                                if (text.TextString.Contains("±"))
-                                                                {
-                                                                    string pattern = @"±(\d+)";
-                                                                    Match match = Regex.Match(text.TextString, pattern);
-                                                                    if (match.Success)
-                                                                    {
-                                                                        cadModelList[0].Elevation = 0; //mm
-                                                                        distanceBetweenTB = distance_cad_text;
-                                                                    }
-                                                                }
-                                                                else if (text.TextString.Contains("+"))
-                                                                {
-                                                                    string pattern = @"\+(\d+)";
-                                                                    Match match = Regex.Match(text.TextString, pattern);
-                                                                    if (match.Success)
-                                                                    {
-
-                                                                        string numbersString = match.Groups[1].Value;
-                                                                        double elevation = double.Parse(numbersString);
-                                                                        cadModelList[0].Elevation = elevation;
-                                                                        distanceBetweenTB = distance_cad_text;
-                                                                    }
-
-                                                                }
-                                                                else if (text.TextString.Contains("-"))
-                                                                {
-                                                                    string pattern = @"\-(\d+)";
-                                                                    Match match = Regex.Match(text.TextString, pattern);
-                                                                    if (match.Success)
-                                                                    {
-                                                                        string numbersString = match.Groups[1].Value;
-                                                                        double elevation = double.Parse(numbersString) * (-1);
-                                                                        cadModelList[0].Elevation = elevation;
-                                                                        distanceBetweenTB = distance_cad_text;
-                                                                    }
-
-                                                                }
-                                                                else
-                                                                {
-                                                                    cadModelList[0].Elevation = 0;
-                                                                    distanceBetweenTB = distance_cad_text;
-                                                                }
+                                                                string pattern = @"±(\d+)";
+                                                                Match match = Regex.Match(text.TextString, pattern);
+                                                                if (match.Success) cadModelList[0].Elevation = 0; //mm
                                                             }
-
-                                                            if (distance_cad_text < distanceBetweenTB_depth)
+                                                            else if (text.TextString.Contains("+"))
                                                             {
-                                                                if (text.TextString.Contains("H"))
+                                                                string pattern = @"\+(\d+)";
+                                                                Match match = Regex.Match(text.TextString, pattern);
+                                                                if (match.Success)
                                                                 {
+                                                                    string numbersString = match.Groups[1].Value;
+                                                                    double elevation = double.Parse(numbersString);
+                                                                    cadModelList[0].Elevation = elevation;
+                                                                }
+
+                                                            }
+                                                            else if (text.TextString.Contains("-"))
+                                                            {
+                                                                string pattern = @"\-(\d+)";
+                                                                Match match = Regex.Match(text.TextString, pattern);
+                                                                if (match.Success)
+                                                                {
+                                                                    string numbersString = match.Groups[1].Value;
+                                                                    double elevation = double.Parse(numbersString) * (-1);
+                                                                    cadModelList[0].Elevation = elevation;
+                                                                }
+
+                                                            }
+                                                            else cadModelList[0].Elevation = 0;
+
+                                                            if (text.TextString.Contains("H"))
+                                                            {
+                                                                try
+                                                                {
+                                                                    // Find the substring between "H(" and the next ")"
                                                                     int startIndex1 = text.TextString.IndexOf("H(") + 2;
                                                                     int endIndex1 = text.TextString.IndexOf(")", startIndex1);
-                                                                    beamDepth = text.TextString.Substring(startIndex1, endIndex1 - startIndex1);
-                                                                    //MessageBox.Show(beamDepth);
-                                                                    if (beamDepth.Contains("("))
-                                                                    {
-                                                                        continue;
-                                                                        //MessageBox.Show(beamDepth);
-                                                                    }
+
+                                                                    // Extract beamDepth from the substring
+                                                                    string beamDepth = text.TextString.Substring(startIndex1, endIndex1 - startIndex1);
+
+                                                                    // Try to parse and convert beamDepth
                                                                     int intBeamDepth = Int32.Parse(beamDepth) / 10;
-                                                                    beamDepth = intBeamDepth.ToString();
-                                                                    distanceBetweenTB_depth = distance_cad_text;
+                                                                    cadModelList[0].Depth = intBeamDepth.ToString(); //cm
                                                                 }
+                                                                catch (FormatException)
+                                                                {
+                                                                    // If parsing fails, show an error message with the actual text
+                                                                    MessageBox.Show($"\"{text.TextString}\" is not in the correct format.", "Error");
+                                                                    cadModelList[0].Depth = "400"; //cm
+                                                                    cadModelList[0].Error = $"\"{text.TextString}\" is not in the correct format.";
+                                                                }
+                                                                catch (ArgumentOutOfRangeException)
+                                                                {
+                                                                    // If substring extraction fails due to invalid indices
+                                                                    MessageBox.Show($"\"{text.TextString}\" does not contain the expected format (missing parentheses).", "Error");
+                                                                    cadModelList[0].Depth = "400"; //cm
+                                                                    cadModelList[0].Error = $"\"{text.TextString}\" does not contain the expected format (missing parentheses).";
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                cadModelList[0].Depth = "400"; //cm
+                                                                cadModelList[0].Error = $"\"{text.TextString}\" does not contain H.";
                                                             }
                                                         }
                                                         break;
 
                                                     case "AcDbMText":
-                                                        
                                                         Teigha.DatabaseServices.MText text_m = (Teigha.DatabaseServices.MText)entity2;
-
                                                         XYZ location = ConverCADPointToRevitPoint(text_m.Location);
                                                         location = PointCentimeterToUnit(location);
                                                         location = new XYZ(location.X, location.Y, location_beam.Z);
                                                         location = transform.OfPoint(location);
-                                                        if (Math.Abs(text_m.Rotation % Math.PI - 0) < 0.01)
-                                                        {
-                                                            location = location + new XYZ(CentimetersToUnits(100), 0, 0);
-                                                        }
-                                                        else
-                                                        {
-                                                            location = location + new XYZ(0, CentimetersToUnits(100), 0);
-                                                        }
-                                                        //CreateColforIndi(doc, location, level);
 
-                                                        if (IsSameRotation(cadModelList[0], text_m.Rotation)
-                                                            && text_m.Layer == layer_name)
-                                                        {
-                                                            mCount++;
-                                                            double distance_cad_text = location.DistanceTo(location_beam);
+                                                        // If label in Beam lines.
+                                                        if (!IsPointInsideRectangleOnXYPlane(start1, end1, start2, end2, location)) continue;
 
-                                                            if (distance_cad_text < distanceBetweenTB)
+                                                        // If same roatation.
+                                                        if (IsSameRotation(cadModelList[0], text_m.Rotation) && text_m.Layer == layer_name)
+                                                        {
+                                                            //string beamDepth = "400";
+                                                            if (text_m.Text.Contains("±"))
                                                             {
-                                                                if (text_m.Text.Contains("±"))
+                                                                string pattern = @"±(\d+)";
+                                                                Match match = Regex.Match(text_m.Text, pattern);
+                                                                if (match.Success) cadModelList[0].Elevation = 0; // mm
+                                                            }
+                                                            else if (text_m.Text.Contains("+"))
+                                                            {
+                                                                string pattern = @"\+(\d+)";
+                                                                Match match = Regex.Match(text_m.Text, pattern);
+                                                                if (match.Success)
                                                                 {
-                                                                    string pattern = @"±(\d+)";
-                                                                    Match match = Regex.Match(text_m.Text, pattern);
-                                                                    if (match.Success)
-                                                                    {
-                                                                        cadModelList[0].Elevation = 0; // mm
-                                                                        distanceBetweenTB = distance_cad_text;
-                                                                    }
+                                                                    string numbersString = match.Groups[1].Value;
+                                                                    int elevation = int.Parse(numbersString);
+                                                                    cadModelList[0].Elevation = elevation; // mm
                                                                 }
-                                                                else if (text_m.Text.Contains("+"))
-                                                                {
-                                                                    string pattern = @"\+(\d+)";
-                                                                    Match match = Regex.Match(text_m.Text, pattern);
-                                                                    if (match.Success)
-                                                                    {
-                                                                        string numbersString = match.Groups[1].Value;
-                                                                        int elevation = int.Parse(numbersString);
-                                                                        cadModelList[0].Elevation = elevation; // mm
-                                                                        distanceBetweenTB = distance_cad_text;
-                                                                    }
 
-                                                                }
-                                                                else if (text_m.Text.Contains("-"))
+                                                            }
+                                                            else if (text_m.Text.Contains("-"))
+                                                            {
+                                                                string pattern = @"\-(\d+)";
+                                                                Match match = Regex.Match(text_m.Text, pattern);
+                                                                if (match.Success)
                                                                 {
-                                                                    string pattern = @"\-(\d+)";
-                                                                    Match match = Regex.Match(text_m.Text, pattern);
-                                                                    if (match.Success)
-                                                                    {
-                                                                        string numbersString = match.Groups[1].Value;
-                                                                        int elevation = int.Parse(numbersString) * (-1);
-                                                                        cadModelList[0].Elevation = elevation;
-                                                                        distanceBetweenTB = distance_cad_text;
-                                                                    }
-                                                                }
-                                                                else
-                                                                {
-                                                                    cadModelList[0].Elevation = 0;
-                                                                    distanceBetweenTB = distance_cad_text;
+                                                                    string numbersString = match.Groups[1].Value;
+                                                                    int elevation = int.Parse(numbersString) * (-1);
+                                                                    cadModelList[0].Elevation = elevation;
                                                                 }
                                                             }
+                                                            else cadModelList[0].Elevation = 0;
 
-                                                            if (distance_cad_text < distanceBetweenTB_depth)
+                                                            if (text_m.Text.Contains("H"))
                                                             {
-                                                                if (text_m.Text.Contains("H"))
+                                                                try
                                                                 {
+                                                                    // Find the substring between "H(" and the next ")"
                                                                     int startIndex1 = text_m.Text.IndexOf("H(") + 2;
                                                                     int endIndex1 = text_m.Text.IndexOf(")", startIndex1);
-                                                                    beamDepth = text_m.Text.Substring(startIndex1, endIndex1 - startIndex1);
+
+                                                                    // Extract beamDepth from the substring
+                                                                    string beamDepth = text_m.Text.Substring(startIndex1, endIndex1 - startIndex1);
+
+                                                                    // Try to parse and convert beamDepth
                                                                     int intBeamDepth = Int32.Parse(beamDepth) / 10;
-                                                                    beamDepth = intBeamDepth.ToString();
-                                                                    distanceBetweenTB_depth = distance_cad_text;
+                                                                    cadModelList[0].Depth = intBeamDepth.ToString(); //cm
                                                                 }
+                                                                catch (FormatException)
+                                                                {
+                                                                    // If parsing fails, show an error message with the actual text
+                                                                    MessageBox.Show($"\"{text_m.Text}\" is not in the correct format.", "Error");
+                                                                    cadModelList[0].Depth = "400"; //cm
+                                                                    cadModelList[0].Error = $"\"{text_m.Text}\" is not in the correct format.";
+                                                                }
+                                                                catch (ArgumentOutOfRangeException)
+                                                                {
+                                                                    // If substring extraction fails due to invalid indices
+                                                                    MessageBox.Show($"\"{text_m.Text}\" does not contain the expected format (missing parentheses).", "Error");
+                                                                    cadModelList[0].Depth = "400"; //cm
+                                                                    cadModelList[0].Error = $"\"{text_m.Text}\" does not contain the expected format (missing parentheses).";
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                cadModelList[0].Depth = "400"; //cm
+                                                                cadModelList[0].Error = $"\"{text_m.Text}\" does not contain H.";
                                                             }
                                                         }
                                                         break;
@@ -858,12 +780,26 @@ namespace Modeling
                         }
                     }
                 }
-                cadModelList[0].Depth = beamDepth;
-                //break;/////////////////////////////////////////////////////////////
             }
-            //MessageBox.Show(tCount.ToString() + " and " + mCount.ToString());
-
             return CADModelList_List;
+        }
+
+        public static bool IsPointInsideRectangleOnXYPlane(XYZ p1, XYZ p2, XYZ p3, XYZ p4, XYZ pA)
+        {
+            // 將四個頂點與測試點投影到 XY 平面，只取 X、Y
+            // 取得最小、最大 X 與 Y
+            double minX = new double[] { p1.X, p2.X, p3.X, p4.X }.Min();
+            double maxX = new double[] { p1.X, p2.X, p3.X, p4.X }.Max();
+            double minY = new double[] { p1.Y, p2.Y, p3.Y, p4.Y }.Min();
+            double maxY = new double[] { p1.Y, p2.Y, p3.Y, p4.Y }.Max();
+
+            // 取得測試點投影後的 X、Y
+            double testX = pA.X;
+            double testY = pA.Y;
+
+            // 若測試點 X、Y 都在 min ~ max 範圍內，則視為在矩形內
+            return (testX >= minX && testX <= maxX &&
+                    testY >= minY && testY <= maxY);
         }
 
         public Boolean IsSameRotation(CADModel cadmodel, double textRotation)
@@ -909,5 +845,113 @@ namespace Modeling
         {
             return UnitUtils.ConvertToInternalUnits(value, UnitTypeId.Millimeters);
         }
+
+        /// <summary>
+        /// Exports a list of (ElementId, string) pairs to a CSV file named "Checklist_Beam.csv"
+        /// in the "Checklist_Modeling" folder on the user's Desktop. The CSV has two columns:
+        /// - ElementId
+        /// - Error Message
+        /// </summary>
+        /// <param name="data">A collection of pairs containing ElementId and an error message.</param>
+        public static void ExportChecklistToCsv(IEnumerable<(ElementId ElementId, string ErrorMessage)> data)
+        {
+            // Determine folder path on user's desktop
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string folderPath = Path.Combine(desktopPath, "Checklist_Modeling");
+
+            // Ensure folder exists (create if not)
+            Directory.CreateDirectory(folderPath);
+
+            // Create the CSV file path
+            string filePath = Path.Combine(folderPath, "Checklist_Beam.csv");
+
+            // Write to CSV
+            // - Overwrite file if it already exists (set append to 'false')
+            // - Use UTF-8 encoding
+            using (StreamWriter writer = new StreamWriter(filePath, false, Encoding.UTF8))
+            {
+                // Write CSV header
+                writer.WriteLine("ElementId,Error Message");
+
+                // Write each row
+                foreach ((ElementId ElementId, string ErrorMessage) pair in data)
+                {
+                    // ElementId is typically an integer; use pair.ElementId.IntegerValue
+                    writer.WriteLine($"{pair.ElementId.IntegerValue},{pair.ErrorMessage}");
+                }
+            }
+        }
+    }
+    public class CADModel
+    {
+        public CADModel()
+        {
+            CurveArray = null;
+            Shape = "";
+            Length = 0;
+            Width = 0;
+            Depth = "";
+            FamilySymbol = "";
+            Location = new XYZ(0, 0, 0);
+            Rotation = 0;
+            Elevation = 0.0;
+            Error = "";
+        }
+
+        /// <summary>
+        /// Error
+        /// </summary>
+        public string Error { get; set; }
+
+        /// <summary>
+        /// Elevation
+        /// </summary>
+        public double Elevation { get; set; }
+
+        /// <summary>
+        /// CurveArray
+        /// </summary>
+        public CurveArray CurveArray { get; set; }
+
+        /// <summary>
+        /// shape
+        /// </summary>
+        public string Shape { get; set; }
+
+        /// <summary>
+        /// length
+        /// </summary>
+        public double Length { get; set; }
+
+        /// <summary>
+        /// width
+        /// </summary>
+        public double Width { get; set; }
+
+        /// <summary>
+        /// depth
+        /// </summary>
+        public string Depth { get; set; }
+
+        /// <summary>
+        /// familySymbol
+        /// </summary>
+        public string FamilySymbol { get; set; }
+
+        /// <summary>
+        /// location
+        /// </summary>
+        public XYZ Location { get; set; }
+
+        /// <summary>
+        /// rotation
+        /// </summary>
+        public double Rotation { get; set; }
+
+        public static explicit operator CADModel(CurveArray v)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

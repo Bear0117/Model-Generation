@@ -10,15 +10,6 @@ namespace Modeling
     public class Algorithm
     {
         #region XYZ method
-        /// <summary>
-        /// Return the same point with coarser coordinates
-        /// </summary>
-        /// <param name="pt"></param>
-        /// <returns></returns>
-        public static XYZ RoundXYZ(XYZ pt)
-        {
-            return new XYZ(Math.Round(pt.X, 4), Math.Round(pt.Y, 4), Math.Round(pt.Z, 4));
-        }
 
         public static XYZ RoundPoint(XYZ point, double gridSize)
         {
@@ -159,54 +150,7 @@ namespace Modeling
                 return false;
             }
         }
-
-
-        /// <summary>
-        /// Check if two line segments are intersected. May not save that much of computation time.
-        /// </summary>
-        /// <param name="c1"></param>
-        /// <param name="c2"></param>
-        /// <returns></returns>
-        public static bool IsLineLineIntersected(Curve c1, Curve c2)
-        {
-            XYZ p1 = c1.GetEndPoint(0);
-            XYZ q1 = c1.GetEndPoint(1);
-            XYZ p2 = c2.GetEndPoint(0);
-            XYZ q2 = c2.GetEndPoint(1);
-            XYZ v1 = q1 - p1;
-            XYZ v2 = q2 - p2;
-            if (v1.Normalize().IsAlmostEqualTo(v2.Normalize()) || v1.Normalize().IsAlmostEqualTo(-v2.Normalize()))
-            {
-                return false;
-            }
-            else
-            {
-                XYZ w = p2 - p1;
-                XYZ p5 = null;
-
-                double c = (v2.X * w.Y - v2.Y * w.X)
-                  / (v2.X * v1.Y - v2.Y * v1.X);
-
-                if (!double.IsInfinity(c))
-                {
-                    double x = p1.X + c * v1.X;
-                    double y = p1.Y + c * v1.Y;
-
-                    p5 = new XYZ(x, y, 0);
-                }
-
-                if (IsPtOnLine(p5, c1 as Line) && IsPtOnLine(p5, c2 as Line))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-
-
+        
         // Check the parallel lines
         public static bool IsParallel(Curve line1, Curve line2)
         {
@@ -232,31 +176,6 @@ namespace Modeling
 
         }
 
-        // Check the shadowing lines
-        public static bool IsShadowing(Curve line1, Curve line2)
-        {
-            XYZ ptStart1 = line1.GetEndPoint(0);
-            XYZ ptEnd1 = line1.GetEndPoint(1);
-            Line baseline = line2.Clone() as Line;
-            baseline.MakeUnbound();
-            XYZ _ptStart = baseline.Project(ptStart1).XYZPoint;
-            XYZ _ptEnd = baseline.Project(ptEnd1).XYZPoint;
-            Line checkline = Line.CreateBound(_ptStart, _ptEnd);
-            SetComparisonResult result = checkline.Intersect(line2, out _);
-            if (result == SetComparisonResult.Equal) { return true; }
-            // Equal is a cunning way here if they intersected by a line segment
-            else { return false; }
-        }
-
-        //
-        public static bool IsOverlapped(Curve crv1, Curve crv2)
-        {
-            SetComparisonResult result = crv1.Intersect(crv2, out _);
-            if (result == SetComparisonResult.Subset
-                || result == SetComparisonResult.Equal)
-            { return true; }
-            else { return false; }
-        }
 
         /// <summary>
         /// Check if two curves are strictly intersected
@@ -301,89 +220,6 @@ namespace Modeling
         }
 
 
-        // Check a line is overlapping with a group of lines
-        public static bool IsLineIntersectLines(Curve line, List<Curve> list)
-        {
-            int judgement = 0;
-            foreach (Curve element in list)
-            {
-                if (IsIntersected(line, element))
-                {
-                    judgement += 1;
-                }
-            }
-            if (judgement == 0) { return false; }
-            else { return true; }
-        }
-
-
-        // Check a line is overlapping with a group of lines
-        public static bool IsLineOverlapLines(Curve line, List<Curve> list)
-        {
-            int judgement = 0;
-            foreach (Curve element in list)
-            {
-                if (IsParallel(line, element) && IsIntersected(line, element))
-                {
-                    judgement += 1;
-                }
-            }
-            if (judgement == 0) { return false; }
-            else { return true; }
-        }
-
-        // Check a line is parallel with a group of lines
-        public static bool IsLineParallelLines(Curve line, List<Curve> list)
-        {
-            int judgement = 0;
-            foreach (Curve element in list)
-            {
-                if (IsParallel(line, element))
-                {
-                    judgement += 1;
-                }
-            }
-            if (judgement == 0) { return false; }
-            else { return true; }
-        }
-
-        // Check a line is almost joined to a group of lines
-        public static bool IsLineAlmostJoinedLines(Curve line, List<Curve> list)
-        {
-            int judgement = 0;
-            if (list.Count == 0) { return true; }
-            else
-            {
-                foreach (Curve element in list)
-                {
-                    if (IsAlmostJoined(line, element))
-                    {
-                        judgement += 1;
-                    }
-                }
-            }
-            if (judgement == 0) { return false; }
-            else { return true; }
-        }
-
-        // Check a line is almost subset to a group of lines
-        public static bool IsLineAlmostSubsetLines(Curve line, List<Curve> list)
-        {
-            int judgement = 0;
-            if (list.Count == 0) { return true; }
-            else
-            {
-                foreach (Line element in list.Cast<Line>())
-                {
-                    if (IsParallel(line, element) && IsAlmostJoined(line, element))
-                    {
-                        judgement += 1;
-                    }
-                }
-            }
-            if (judgement == 0) { return false; }
-            else { return true; }
-        }
 
 
         /// <summary>
@@ -412,204 +248,6 @@ namespace Modeling
                 if (pt.Y > Ymax) { Ymax = pt.Y; }
             }
             return Line.CreateBound(new XYZ(Xmin, Ymin, Z), new XYZ(Xmax, Ymax, Z));
-        }
-
-
-        /// <summary>
-        /// Cluster and merge the overlapping lines from a bunch of strays (on top of FuseLines)
-        /// </summary>
-        /// <param name="axes"></param>
-        /// <returns></returns>
-        public static List<Curve> MergeAxes(List<Curve> axes)
-        {
-            List<List<Curve>> axisGroups = new List<List<Curve>>
-            {
-                new List<Curve>() { axes[0] }
-            };
-
-            while (axes.Count != 0)
-            {
-                foreach (Line element in axes.Cast<Line>())
-                {
-                    int iterCounter = 0;
-                    foreach (List<Curve> sublist in axisGroups)
-                    {
-                        iterCounter += 1;
-                        if (Algorithm.IsLineOverlapLines(element, sublist))
-                        {
-                            sublist.Add(element);
-                            axes.Remove(element);
-                            goto a;
-                        }
-                        if (iterCounter == axisGroups.Count)
-                        {
-                            axisGroups.Add(new List<Curve>() { element });
-                            axes.Remove(element);
-                            goto a;
-                        }
-                    }
-                }
-            a:;
-            }
-
-            List<Curve> mergedLines = new List<Curve>();
-            foreach (List<Curve> axisGroup in axisGroups)
-            {
-                mergedLines.Add(FuseLines(axisGroup));
-            }
-            return mergedLines;
-        }
-
-
-        /// <summary>
-        /// Offset the curve a little bit to check if it contacts with others.
-        /// </summary>
-        /// <param name="crv"></param>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        public static bool IsVagueIntersected(Curve crv, Curve target)
-        {
-            double tolerance = 0.01;
-            Transform up = Transform.CreateTranslation(tolerance * XYZ.BasisY);
-            Transform down = Transform.CreateTranslation(-tolerance * XYZ.BasisY);
-            Transform left = Transform.CreateTranslation(-tolerance * XYZ.BasisX);
-            Transform right = Transform.CreateTranslation(tolerance * XYZ.BasisX);
-            // Curves are basically not joined. It is better to round the coordinates to get a better intersection recognition
-            //Curve crv0 = Line.CreateBound(RoundXYZ(crv.GetEndPoint(0)), RoundXYZ(crv.GetEndPoint(1))) as Curve;
-            Curve crv0 = crv.Clone();
-            crv0 = ExtendCrv(crv0, 0.01);
-            Curve crv1 = crv0.CreateTransformed(up);
-            Curve crv2 = crv0.CreateTransformed(down);
-            Curve crv3 = crv0.CreateTransformed(left);
-            Curve crv4 = crv0.CreateTransformed(right);
-            if (IsIntersected(crv0, target) ||
-                IsIntersected(crv1, target) ||
-                IsIntersected(crv2, target) ||
-                IsIntersected(crv3, target) ||
-                IsIntersected(crv4, target))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Cluster curves by their intersection. The judgement function can be replaced by vague ones.
-        /// </summary>
-        /// <param name="crvs"></param>
-        /// <returns></returns>
-        public static List<List<Curve>> ClusterByIntersect(List<Curve> crvs)
-        {
-            /*
-            for (int i = 0; i < crvs.Count; i++)
-            {
-                Debug.Print("Line{0} " + crvs[i].GetEndPoint(0) + " " + crvs[i].GetEndPoint(1), i);
-            }
-             */
-
-            List<int> ids = Enumerable.Range(0, crvs.Count).ToList();
-            List<List<Curve>> clusters = new List<List<Curve>>();
-
-            while (ids.Count != 0)
-            {
-                List<Curve> cluster = new List<Curve>();
-                List<int> idCluster = new List<int>() { ids[0] };
-                List<int> idTemp = new List<int>() { ids[0] };
-                ids.Remove(ids[0]);
-                while (idTemp.Count != 0)
-                {
-                    List<int> idNextTemp = new List<int>();
-                    for (int i = 0; i < idTemp.Count; i++)
-                    {
-                        int intersectionCount = 0;
-                        List<int> idDel = new List<int>();
-                        for (int j = 0; j < ids.Count; j++)
-                        {
-                            if (!idTemp.Contains(ids[j]))
-                            {
-                                if (IsVagueIntersected(crvs[idTemp[i]], crvs[ids[j]]))
-                                {
-                                    //Debug.Print("Intersected Line{0} and Line{1}", idTemp[i], ids[j]);
-                                    idCluster.Add(ids[j]);
-                                    idNextTemp.Add(ids[j]);
-                                    idDel.Add(ids[j]);
-                                    intersectionCount += 1;
-                                }
-                            }
-                        }
-                        if (intersectionCount == 0) { continue; }
-                        foreach (int element in idDel)
-                        {
-                            ids.Remove(element);
-                        }
-                    }
-                    idTemp = idNextTemp;
-                }
-                foreach (int id in idCluster)
-                {
-                    cluster.Add(crvs[id]);
-                }
-                clusters.Add(cluster);
-                Debug.Print("Cluster has " + idCluster.Count);
-            }
-            return clusters;
-        }
-
-        /// <summary>
-        /// Cluster line segments if they were all piled upon a single line.
-        /// </summary>
-        /// <param name="crvs"></param>
-        /// <returns></returns>
-        public static List<List<Curve>> ClusterByOverlap(List<Curve> crvs)
-        {
-            List<int> ids = Enumerable.Range(0, crvs.Count).ToList();
-            List<List<Curve>> clusters = new List<List<Curve>>();
-            while (ids.Count != 0)
-            {
-                List<Curve> cluster = new List<Curve>();
-                List<int> idCluster = new List<int>() { ids[0] };
-                List<int> idTemp = new List<int>() { ids[0] };
-                ids.Remove(ids[0]);
-                while (idTemp.Count != 0)
-                {
-                    List<int> idNextTemp = new List<int>();
-                    for (int i = 0; i < idTemp.Count; i++)
-                    {
-                        int intersectionCount = 0;
-                        List<int> idDel = new List<int>();
-                        for (int j = 0; j < ids.Count; j++)
-                        {
-                            if (!idTemp.Contains(ids[j]))
-                            {
-                                // Use this only to line segments
-                                if (IsIntersected(crvs[idTemp[i]], crvs[ids[j]])
-                                    && IsParallel(crvs[idTemp[i]] as Line, crvs[ids[j]] as Line))
-                                {
-                                    idCluster.Add(ids[j]);
-                                    idNextTemp.Add(ids[j]);
-                                    idDel.Add(ids[j]);
-                                    intersectionCount += 1;
-                                }
-                            }
-                        }
-                        if (intersectionCount == 0) { continue; }
-                        foreach (int element in idDel)
-                        {
-                            ids.Remove(element);
-                        }
-                    }
-                    idTemp = idNextTemp;
-                }
-                foreach (int id in idCluster)
-                {
-                    cluster.Add(crvs[id]);
-                }
-                clusters.Add(cluster);
-            }
-            return clusters;
         }
 
         public static bool AreOverlapping(Curve curve1, Curve curve2)
@@ -829,21 +467,6 @@ namespace Modeling
                 return null;
             }
             //Line axis = baseline.CreateOffset(offset, vec.Normalize()) as Line;
-        }
-
-        /// <summary>
-        /// Extend a line segment with certain extension(mm) on both ends.
-        /// </summary>
-        /// <param name="line"></param>
-        /// <param name="extension"></param>
-        /// <returns></returns>
-        public static Curve ExtendLine(Curve line, double extension)
-        {
-            XYZ ptStart = line.GetEndPoint(0);
-            XYZ ptEnd = line.GetEndPoint(1);
-            XYZ vec = (ptEnd - ptStart).Normalize();
-            return Line.CreateBound(ptStart - vec * MmToFoot(extension),
-                ptEnd + vec * MmToFoot(extension));
         }
 
 

@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.UI;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 using System.Windows.Media.Imaging;
@@ -11,7 +10,7 @@ namespace Modeling
     {
         public Result OnStartup(UIControlledApplication application)
         {
-            // 1. 建立一個新面板
+            // 1. Create new tab.
             string tabName = "Modeling";
             try
             {
@@ -19,19 +18,18 @@ namespace Modeling
             }
             catch (Exception)
             {
-                // 若 Tab 已存在，忽略
+
             }
 
-            // 2. 新增一個面板到該 Tab
+            // 2. Add new panel to tab.
             RibbonPanel panel = application.CreateRibbonPanel(tabName, "Modeling Tools");
 
-            //string assemblyPath = Assembly.GetExecutingAssembly().Location;
-            //string assemblyDirectory = Path.GetDirectoryName(assemblyPath);
-            //string imagePath = Path.Combine(assemblyDirectory, "assets", "contrast-adjustment.png");
             string assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
             string assemblyDirectory = Path.GetDirectoryName(assemblyPath);
             string anotherDllPath = Path.Combine(assemblyDirectory,"Debug" ,"CreatBridgeForRevit2018.dll");
-            // 3. 新增按鈕
+
+
+            // 3. Add new buttons.
 
             AddButton(panel, "Tool1", "Columns", "Modeling.AutoCreateColumns", "This function will automatically create columns", Path.Combine(assemblyDirectory, "icons", "column.png"));
             AddButton(panel, "Tool2", " Beams ", "Modeling.AutoCreateBeams", "This function will automatically create beams", Path.Combine(assemblyDirectory, "icons", "beam.png"));
@@ -45,6 +43,7 @@ namespace Modeling
             AddButton(panel_adj, "Tool1", "Model Lines", "Modeling.CreateWallModelline", "This function will create model lines according to the selected layer.", Path.Combine(assemblyDirectory, "icons", "wallLines.png"));
             AddButton(panel_adj, "Tool2", "Customized Walls", "Modeling.TwoLineToWall_A", "Select two lines in sequence to create a wall.", Path.Combine(assemblyDirectory, "icons", "twoLines.png"));
             AddButton(panel_adj, "Tool3", "Adjust Wall Height", "Modeling.AdjustWallHeight", "This function will adjust the height of walls and join the contacted elements.", Path.Combine(assemblyDirectory, "icons", "adjustment.png"));
+            AddButton(panel_adj, "Tool4", "Gap Detection", "Modeling.GapDetection", "This function will list the elements in group.", Path.Combine(assemblyDirectory, "icons", "gap.png"));
 
             //  Test//132594//55d6v2
             return Result.Succeeded;
@@ -52,7 +51,6 @@ namespace Modeling
 
         public Result OnShutdown(UIControlledApplication application)
         {
-            // 在 Revit 關閉時無需執行特定操作
             return Result.Succeeded;
         }
 

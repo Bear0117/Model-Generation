@@ -212,9 +212,8 @@ namespace Modeling
 
         public List<Tuple<Line, int>> AdjustLines(List<Tuple<Line, int>> lines)
         {
-            // bool intersectionsExist = true;
 
-            // while (intersectionsExist)
+            // 先遍歷到的線會退縮，由於組合垂直與水平線段的時候，水平線段是加到垂直線斷之後，所以垂直線會退縮。
             {
                 // intersectionsExist = false;
                 for (int i = 0; i < lines.Count; i++)
@@ -267,14 +266,14 @@ namespace Modeling
                                     if (distanceToStart_2 < distanceToEnd_2)
                                     {
                                         fianl_2 = 2 * intersection - start_2;
-                                        if (fianl.DistanceTo(end) < CentimetersToUnits(0.1)) continue;
+                                        if (fianl_2.DistanceTo(end_2) < CentimetersToUnits(0.1)) continue;
                                         line_fianl = Line.CreateBound(fianl_2, end_2);
                                         lines[j] = new Tuple<Line, int>(line_fianl, lines[j].Item2);
                                     }
                                     else
                                     {
                                         fianl_2 = 2 * intersection - end_2;
-                                        if (fianl.DistanceTo(start) < CentimetersToUnits(0.1)) continue;
+                                        if (fianl_2.DistanceTo(start_2) < CentimetersToUnits(0.1)) continue;
                                         line_fianl = Line.CreateBound(fianl_2, start_2);
                                         lines[j] = new Tuple<Line, int>(line_fianl, lines[j].Item2);
                                     }

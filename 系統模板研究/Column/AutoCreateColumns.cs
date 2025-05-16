@@ -45,7 +45,7 @@ namespace Modeling
             // Initialize Parameters.
             ModelingParam.Initialize();
             double gridline_size = ModelingParam.parameters.General.GridSize * 10; // unit: mm
-            double[] columnWidthRange = ModelingParam.parameters.ColumnParam.columnWidthsRange;
+            double[] columnWidthRange = ModelingParam.parameters.ColumnParam.ColumnWidthsRange;
 
             TransactionGroup transGroup = new TransactionGroup(doc, "Grab the lines in column layer");
             transGroup.Start();

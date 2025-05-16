@@ -14,10 +14,13 @@ using Teigha.Runtime;
 using Line = Autodesk.Revit.DB.Line;
 using Curve = Autodesk.Revit.DB.Curve;
 using Transaction = Autodesk.Revit.DB.Transaction;
+using Exception = System.Exception;
 using System.Windows;
 using static System.Net.Mime.MediaTypeNames;
 using static Autodesk.Revit.DB.SpecTypeId;
 using System.Xml.Linq;
+using System.Threading;
+using System.Text;
 // 2024
 
 namespace Modeling
@@ -37,7 +40,7 @@ namespace Modeling
         //執行檔案
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            //123123
+            //123123 38958yu93
             UIDocument uidoc = commandData.Application.ActiveUIDocument;
             Document doc = uidoc.Document;
 
@@ -67,7 +70,6 @@ namespace Modeling
                 {
                     targetCategory1 = gs1.GraphicsStyleCategory;
                     layername = gs1.GraphicsStyleCategory.Name;
-                    //TaskDialog.Show("Revit", layername);
                 }
             }
 
@@ -84,7 +86,7 @@ namespace Modeling
                 }
             }
 
-            List<CADTextModel> text = GetCADTextInfoparing(path);
+            (List<CADTextModel> text, List<CADText> others) = GetCADTextInfoparing(path);
 
             // Pair two line as open.
             List<List<Curve>> Clusters = Algorithm.ClusterByParallel(curves);
@@ -96,51 +98,66 @@ namespace Modeling
             List<double> widthtype = new List<double>();
 
 
-            // Create 2D BoundingBox to get the middle line of open.
             foreach (List<Curve> clustergroup in Clusters)
             {
-                if (Algorithm.CreateBoundingBox2D(clustergroup) != null)
+                Curve curve1 = clustergroup[0];
+                Curve curve2 = clustergroup[1];
+
+                // step 1: 取得兩條線的起點和終點
+                XYZ start1 = curve1.GetEndPoint(0);
+                XYZ end1 = curve1.GetEndPoint(1);
+                XYZ start2 = curve2.GetEndPoint(0);
+                XYZ end2 = curve2.GetEndPoint(1);
+
+                bool invalid = false;
+                foreach (CADTextModel walltext in text)
                 {
-                    List<Wallmodel> comparewall = new List<Wallmodel>();
-                    List<Line> compareline = new List<Line>();
-                    List<Curve> finalcluster = Algorithm.CreateBoundingBox2D(clustergroup);
-
-                    double firstwidth = 0;
-
-                    for (int i = 0; i < finalcluster.Count; i++)
+                    if (AutoCreateBeams.IsPointInsideRectangleOnXYPlane(start1, start2, end1, end2, walltext.Location * 10))
                     {
-                        for (int j = i + 1; j < finalcluster.Count; j++)
-                        {
-                            if (Algorithm.IsParallel(finalcluster[i], finalcluster[j]))
-                            {
-                                Wallmodel axses = new Wallmodel
-                                {
-                                    Wallaxes = Algorithm.GenerateAxis(finalcluster[i] as Line, finalcluster[j] as Line),
-                                    Width = GetWallWidth(finalcluster[i] as Line, finalcluster[j] as Line)
-                                };
-                                axses.Midpoint = GetMiddlePoint(axses.Wallaxes.GetEndPoint(0), axses.Wallaxes.GetEndPoint(1));
-                                if (axses.Width != firstwidth)
-                                {
-                                    widthtype.Add(axses.Width);
-                                    firstwidth = axses.Width;
-                                }
-                                comparewall.Add(axses);
-                                compareline.Add(axses.Wallaxes as Line);
-                            }
-                        }
+                        invalid = true;
+                        break;
                     }
-
-                    // To find the final open middle line.
-                    int finalnumber = 0;
-                    if (compareline[1].Length > compareline[0].Length)
-                    {
-                        finalnumber = 1;
-                    }
-                    openingwall.Add(comparewall[finalnumber]);
                 }
+                if (invalid) continue;
+
+                // step 2: 計算兩種配對的總距離
+                double distA = start1.DistanceTo(start2) + end1.DistanceTo(end2);
+                double distB = start1.DistanceTo(end2) + end1.DistanceTo(start2);
+
+                // step 3: 根據較小距離決定哪種端點配對
+                XYZ pairedStart1, pairedStart2, pairedEnd1, pairedEnd2;
+                if (distA <= distB)
+                {
+                    // 配對 A：start1↔start2, end1↔end2
+                    pairedStart1 = start1;
+                    pairedStart2 = start2;
+                    pairedEnd1 = end1;
+                    pairedEnd2 = end2;
+                }
+                else
+                {
+                    // 配對 B：start1↔end2, end1↔start2
+                    pairedStart1 = start1;
+                    pairedStart2 = end2;
+                    pairedEnd1 = end1;
+                    pairedEnd2 = start2;
+                }
+
+                // step 4: 計算中心線兩端的中點
+                XYZ centerStart = (pairedStart1 + pairedStart2) / 2;
+                XYZ centerEnd = (pairedEnd1 + pairedEnd2) / 2.0;
+                Line midLine = Line.CreateBound(centerStart, centerEnd);
+
+                Wallmodel axses = new Wallmodel
+                {
+                    Wallaxes = midLine,
+                    Width = GetWallWidth(curve1 as Line, curve2 as Line)
+                };
+                axses.Midpoint = GetMiddlePoint(axses.Wallaxes.GetEndPoint(0), axses.Wallaxes.GetEndPoint(1));
+                openingwall.Add(axses);
             }
 
-            
+
 
             Transform transform = null;
             foreach (GeometryObject gObj in geoElem)
@@ -149,38 +166,128 @@ namespace Modeling
                 transform = geomInstance.Transform;
             }
 
+
+            //MessageBox.Show(openingwall.Count.ToString());
             foreach (Wallmodel wall in openingwall)
             {
-                double comparedistance = 0;
+                double comparedistance;
                 double distanceBetween = double.MaxValue;
+                XYZ mid_new = new XYZ(wall.Midpoint.X, wall.Midpoint.Y, 0) * 0.1;
+                CADTextModel bestWallText = null;
 
                 if (text.Count >= 1)
                 {
                     foreach (CADTextModel walltext in text)
                     {
-                        XYZ mid_new = new XYZ(wall.Midpoint.X, wall.Midpoint.Y, 0) * 0.1;
                         comparedistance = mid_new.DistanceTo(transform.OfPoint(walltext.Location * 10) / 10);
                         if (comparedistance < distanceBetween)
                         {
                             distanceBetween = comparedistance;
-                            // WText is the floor height of window.
-                            wall.HText = walltext.HText;
-                            wall.WText = walltext.WText;
+                            bestWallText = walltext;
+                            //// WText is the floor height of window.
+                            //wall.HText = walltext.HText;
+                            //wall.WText = walltext.WText;
                         }
+                    }
+                    // 離開內層迴圈後，如果成功找到最相近的 CADTextModel
+                    if (bestWallText != null)
+                    {
+                        // 將該 CADTextModel 的內容填到目前 wall
+                        wall.HText = bestWallText.HText;
+                        wall.WText = bestWallText.WText;
+
+                        // 將該配對文字的 num_paired 加 1，紀錄它又被配對了一次
+                        bestWallText.NumPaired++;
                     }
                 }
             }
 
+            List<(ElementId, string)> errorData = new List<(ElementId, string)>();
+            // 處理重複配對
+            foreach (CADTextModel walltext in text)
+            {
+                if (walltext.NumPaired != 1)
+                {
+                    FamilySymbol default_column = new FilteredElementCollector(doc)
+                    .OfClass(typeof(FamilySymbol))
+                    .OfCategory(BuiltInCategory.OST_Columns)
+                    .Cast<FamilySymbol>()
+                    .FirstOrDefault(q => q.Name == "default") as FamilySymbol;
+                    using (Transaction tx = new Transaction(doc))
+                    {
+                        try
+                        {
+                            tx.Start("createColumn");
+                            if (!default_column.IsActive)
+                            {
+                                default_column.Activate();
+                            }
+                            Level level = doc.GetElement(elem2.LevelId) as Level; //elem2是CAD圖
+
+                            FamilyInstance familyInstance = doc.Create.NewFamilyInstance(transform.OfPoint(walltext.Location * 10), default_column, level, StructuralType.Column);
+                            tx.Commit();
+
+                            string error_meesage = $"This label(\"FL{walltext.WText}\" and \"h={walltext.HText}\") has been paired \"{walltext.NumPaired}\" time(s).";
+                            errorData.Add((familyInstance.Id, error_meesage));
+                        }
+                        catch (Exception ex)
+                        {
+                            TaskDialog td = new TaskDialog("error") { Title = "error", AllowCancellation = true, MainInstruction = "error", MainContent = "Error" + ex.Message, CommonButtons = TaskDialogCommonButtons.Close };
+                            td.Show();
+                            Debug.Print(ex.Message);
+                            tx.RollBack();
+                        }
+                    }
+
+                }
+            }
+
+            // 處理文字解析警告
+            foreach (CADText tx in others)
+            {
+                if (tx.Text.Contains("W="))
+                {
+                    ElementId id = null;
+                    string error_meesage = $"Warning: This label (\"{tx.Text})\" does not contain FL and h but contains W.";
+                    errorData.Add((id, error_meesage));
+                }
+                else
+                {
+                    FamilySymbol default_column = new FilteredElementCollector(doc)
+                    .OfClass(typeof(FamilySymbol))
+                    .OfCategory(BuiltInCategory.OST_Columns)
+                    .Cast<FamilySymbol>()
+                    .FirstOrDefault(q => q.Name == "default") as FamilySymbol;
+                    using (Transaction transaction = new Transaction(doc))
+                    {
+                        try
+                        {
+                            transaction.Start("createColumn");
+                            if (!default_column.IsActive) default_column.Activate();
+                            Level level = doc.GetElement(elem2.LevelId) as Level;
+
+                            FamilyInstance familyInstance = doc.Create.NewFamilyInstance(transform.OfPoint(tx.Location * 10), default_column, level, StructuralType.Column);
+                            transaction.Commit();
+
+                            string error_meesage = $"This label(\"{tx.Text}\") is in the wrong format.";
+                            errorData.Add((familyInstance.Id, error_meesage));
+                        }
+                        catch (Exception ex)
+                        {
+                            TaskDialog td = new TaskDialog("error") { Title = "error", AllowCancellation = true, MainInstruction = "error", MainContent = "Error" + ex.Message, CommonButtons = TaskDialogCommonButtons.Close };
+                            td.Show();
+                            Debug.Print(ex.Message);
+                            transaction.RollBack();
+                        }
+                    }
+                }
+            }
+            errorData = errorData.OrderBy(item => item.Item2.StartsWith("W", StringComparison.OrdinalIgnoreCase) ? 1 : 0).ThenBy(item => item.Item2, StringComparer.OrdinalIgnoreCase).ToList();
+            if (errorData != null) ExportChecklistToCsv(errorData);
+
             // Create openings.
             foreach (Wallmodel openwall in openingwall)
             {
-                //MessageBox.Show("Count!");
-                // THIS PROGRAM SHOULD BE CLARIFIED AND UPDATED.
-                //if (Math.Abs(openwall.Width - 209) < 1 || Math.Abs(openwall.Width - 358) < 1)
-                //{
-                //    continue;
-                //}
-
                 double h = Convert.ToDouble(openwall.HText);
                 double fl = Convert.ToDouble(openwall.WText);
                 CreateOpening(doc, openwall.Wallaxes, h, fl, kerbHeight);
@@ -452,11 +559,12 @@ namespace Modeling
         }
 
         // Get the text in CAD.
-        public List<CADTextModel> GetCADTextInfoparing(string dwgFile)
+        public (List<CADTextModel>, List<CADText>) GetCADTextInfoparing(string dwgFile)
         {
             List<CADTextModel> CADModels = new List<CADTextModel>();
             List<CADText> HTEXT = new List<CADText>();
             List<CADText> FLTEXT = new List<CADText>();
+            List<CADText> OTHERS = new List<CADText>();
             //List<ObjectId> allObjectId = new List<ObjectId>();
 
             using (new Services())
@@ -479,83 +587,108 @@ namespace Modeling
                                             Entity entity = (Entity)id.GetObject(OpenMode.ForRead, false, false);
                                             CADText fltext = new CADText();
                                             CADText htext = new CADText();
+                                            CADText others = new CADText();
 
                                             if (entity.Layer == layername)
                                             {
                                                 if (entity.GetRXClass().Name == "AcDbText")
                                                 {
                                                     Teigha.DatabaseServices.DBText text = (Teigha.DatabaseServices.DBText)entity;
-                                                    if (text.TextString.Contains("h"))
+                                                    if (text.TextString.IndexOf("h", StringComparison.OrdinalIgnoreCase) >= 0)
                                                     {
-                                                        htext.Text = ExtractNumber(text.TextString);
-                                                        htext.Location = ConverCADPointToRevitPoint(text.Position);
-                                                        HTEXT.Add(htext);
+                                                        try
+                                                        {
+                                                            htext.Text = ExtractNumber(text.TextString);
+                                                            htext.Location = ConverCADPointToRevitPoint(text.Position);
+                                                            HTEXT.Add(htext);
+                                                            if (!IsExactlyOneHAndDigits(text.TextString))
+                                                            {
+                                                                throw new Exception($"This label(\"{text.TextString}\")  is in the wrong format.");
+                                                            }
+                                                        }
+                                                        catch(Exception)
+                                                        {
+                                                            others.Text = text.TextString;
+                                                            others.Location = ConverCADPointToRevitPoint(text.Position);
+                                                            OTHERS.Add(others);
+                                                        }
                                                     }
-
-                                                    if (text.TextString.Contains("H"))
-                                                    {
-                                                        htext.Text = ExtractNumber(text.TextString);
-                                                        htext.Location = ConverCADPointToRevitPoint(text.Position);
-                                                        HTEXT.Add(htext);
-                                                    }
-
                                                     else if (text.TextString.Contains("FL"))
                                                     {
-                                                        fltext.Text = ExtractNumber(text.TextString);
-                                                        //MessageBox.Show(fltext.Text);
-                                                        fltext.Location = ConverCADPointToRevitPoint(text.Position);
-                                                        //MessageBox.Show(fltext.Location.ToString());
-                                                        FLTEXT.Add(fltext);
-                                                        //Regex regex = new Regex(@"FL(\d+(\.\d+)?)");
-                                                        //Match match = regex.Match(text.TextString);
-                                                        //if (match.Success)
-                                                        //{
-                                                        //    string fl = match.Groups[1].Value;
-                                                        //    fltext.Location = ConverCADPointToRevitPoint(text.Position);
-                                                        //    fltext.Text = fl;
-                                                        //    MessageBox.Show(fl);
-                                                        //    FLTEXT.Add(fltext);
-                                                        //}   
+                                                        try
+                                                        {
+                                                            fltext.Text = ExtractNumber(text.TextString);
+                                                            fltext.Location = ConverCADPointToRevitPoint(text.Position);
+                                                            FLTEXT.Add(fltext);
+                                                            if (!IsExactlyOneFOneLAndDigits(text.TextString))
+                                                            {
+                                                                throw new Exception($"This label(\"{text.TextString}\")  is in the wrong format.");
+                                                            }
+                                                        }
+                                                        catch (Exception)
+                                                        {
+                                                            others.Text = text.TextString;
+                                                            others.Location = ConverCADPointToRevitPoint(text.Position);
+                                                            OTHERS.Add(others);
+                                                        }
                                                     }
-                                                    else continue;
+                                                    else
+                                                    {
+                                                        others.Text = text.TextString;
+                                                        others.Location = ConverCADPointToRevitPoint(text.Position);
+                                                        OTHERS.Add(others);
+                                                    }
+
                                                 }
 
                                                 if (entity.GetRXClass().Name == "AcDbMText")
                                                 {
                                                     MText mText = (MText)entity;
 
-                                                    if (mText.Text.Contains("h"))
+                                                    if (mText.Text.IndexOf("h", StringComparison.OrdinalIgnoreCase) >= 0)
                                                     {
-                                                        htext.Text = ExtractNumber(mText.Text);
-                                                        htext.Location = ConverCADPointToRevitPoint(mText.Location);
-                                                        HTEXT.Add(htext);
+                                                        try
+                                                        {
+                                                            htext.Text = ExtractNumber(mText.Text);
+                                                            htext.Location = ConverCADPointToRevitPoint(mText.Location);
+                                                            HTEXT.Add(htext);
+                                                            if (!IsExactlyOneHAndDigits(mText.Text))
+                                                            {
+                                                                throw new Exception($"This label(\"{mText.Text}\")  is in the wrong format.");
+                                                            }
+                                                        }
+                                                        catch (Exception)
+                                                        {
+                                                            others.Text = mText.Text;
+                                                            others.Location = ConverCADPointToRevitPoint(mText.Location);
+                                                            OTHERS.Add(others);
+                                                        }
                                                     }
-
-                                                    if (mText.Text.Contains("H"))
-                                                    {
-                                                        htext.Text = ExtractNumber(mText.Text);
-                                                        htext.Location = ConverCADPointToRevitPoint(mText.Location);
-                                                        HTEXT.Add(htext);
-                                                    }
-
                                                     else if (mText.Text.Contains("FL"))
                                                     {
-                                                        fltext.Text = ExtractNumber(mText.Text);
-                                                        //MessageBox.Show(fltext.Text);
-                                                        fltext.Location = ConverCADPointToRevitPoint(mText.Location);
-                                                        //MessageBox.Show(fltext.Location.ToString());
-                                                        FLTEXT.Add(fltext);
-                                                        //Regex regex = new Regex(@"FL(\d+(\.\d+)?)");
-                                                        //Match match = regex.Match(mText.Text);
-                                                        //if (match.Success)
-                                                        //{
-                                                        //    string fl = match.Groups[1].Value;
-                                                        //    fltext.Location = ConverCADPointToRevitPoint(mText.Location);
-                                                        //    fltext.Text = fl;
-                                                        //    FLTEXT.Add(fltext);
-                                                        //}
+                                                        try
+                                                        {
+                                                            fltext.Text = ExtractNumber(mText.Text);
+                                                            fltext.Location = ConverCADPointToRevitPoint(mText.Location);
+                                                            FLTEXT.Add(fltext);
+                                                            if (!IsExactlyOneFOneLAndDigits(mText.Text))
+                                                            {
+                                                                throw new Exception($"This label(\"{mText.Text}\")  is in the wrong format.");
+                                                            }
+                                                        }
+                                                        catch (Exception)
+                                                        {
+                                                            others.Text = mText.Text;
+                                                            others.Location = ConverCADPointToRevitPoint(mText.Location);
+                                                            OTHERS.Add(others);
+                                                        }
                                                     }
-                                                    else continue;
+                                                    else
+                                                    {
+                                                        others.Text = mText.Text;
+                                                        others.Location = ConverCADPointToRevitPoint(mText.Location);
+                                                        OTHERS.Add(others);
+                                                    }
                                                 }
                                             }
                                         }
@@ -566,23 +699,6 @@ namespace Modeling
                     }
                 }
             }
-
-            // To check the text 
-            {
-                //    int count1 = 0;
-                //    foreach (CADText height in HTEXT)
-                //    {
-                //        count1++;
-                //        TaskDialog.Show("REVIT", "第" + count1.ToString() + "項為" + height.Text);
-                //    }
-                //    int count = 0;
-                //    foreach (CADText height in FLTEXT)
-                //    {
-                //        count++;
-                //        TaskDialog.Show("REVIT", "第" + count.ToString() + "項為" + height.Text);
-                //    }
-            }
-            //MessageBox.Show(HTEXT.Count().ToString());
 
             // Pair height text with FL text.
             foreach (CADText height in HTEXT)
@@ -600,47 +716,29 @@ namespace Modeling
                         distanceBetween = comparedistance;
                         comparemodel.HText = height.Text;
                         comparemodel.WText = floorheight.Text;
-                        comparemodel.Location = MidPoint(height.Location, floorheight.Location);
+                        //comparemodel.Location = MidPoint(height.Location, floorheight.Location);
+                        comparemodel.Location = floorheight.Location;
                     }
                 }
                 CADModels.Add(comparemodel);
             }
 
-
-            // Check the paired text.
-            {
-                //int count2 = 0;
-                //foreach ( CADTextModel text  in CADModels)
-                //{
-                //    count2++;
-                //    TaskDialog.Show("REVIT", "第" + count1.ToString() + "項為" + text.HText);
-                //    TaskDialog.Show("REVIT", "第" + count1.ToString() + "項為" + text.WText);
-                //}
-            }
-            return CADModels;
-        }
-
-        private void DrawPositionBox(Document doc, XYZ centerPoint)
-        {
-            double halfSideLength = UnitUtils.ConvertToInternalUnits(2.5, UnitTypeId.Centimeters); // 正方形边长的一半
-            XYZ[] points = new XYZ[4];
-            points[0] = new XYZ(centerPoint.X - halfSideLength, centerPoint.Y - halfSideLength, centerPoint.Z);
-            points[1] = new XYZ(centerPoint.X + halfSideLength, centerPoint.Y - halfSideLength, centerPoint.Z);
-            points[2] = new XYZ(centerPoint.X + halfSideLength, centerPoint.Y + halfSideLength, centerPoint.Z);
-            points[3] = new XYZ(centerPoint.X - halfSideLength, centerPoint.Y + halfSideLength, centerPoint.Z);
-            using (Transaction trans = new Transaction(doc, "Create Model Line Square"))
-            {
-                trans.Start();
-                for (int i = 0; i < 4; i++)
-                {
-                    Line line = Line.CreateBound(points[i], points[(i + 1) % 4]);
-                    DetailCurve dl1 = doc.Create.NewDetailCurve(doc.ActiveView, line);
-                }
-                trans.Commit();
-            }
+            return (CADModels, OTHERS);
         }
 
         // Functions of operation.
+        bool IsExactlyOneFOneLAndDigits(string input)
+        {
+            string pattern = @"^FL[0-9.]+$"; ;
+            return Regex.IsMatch(input, pattern);
+        }
+
+        bool IsExactlyOneHAndDigits(string input)
+        {
+            string pattern = @"^[hH]=[0-9.]+$";
+            return Regex.IsMatch(input, pattern);
+        }
+
         private XYZ GetMiddlePoint(XYZ startPoint, XYZ endPoint)
         {
             XYZ MiddlePoint = new XYZ((startPoint.X + endPoint.X) / 2, (startPoint.Y + endPoint.Y) / 2, (startPoint.Z + endPoint.Z) / 2);
@@ -715,45 +813,148 @@ namespace Modeling
             return newLine;
         }
 
-        //public XYZ RoundPoint(XYZ point)
-        //{
-        //    XYZ newPoint = new XYZ(
-        //        CentimetersToUnits(Math.Round(UnitsToCentimeters(point.X) * 2) / 2),
-        //        CentimetersToUnits(Math.Round(UnitsToCentimeters(point.Y) * 2) / 2),
-        //        CentimetersToUnits(Math.Round(UnitsToCentimeters(point.Z) * 2) / 2)
-        //        );
-        //    return newPoint;
-        //}
-
-        public double UnitsToCentimeters(double value)
+        public static void ExportChecklistToCsv(IEnumerable<(ElementId ElementId, string ErrorMessage)> data)
         {
-            return UnitUtils.ConvertFromInternalUnits(value, UnitTypeId.Centimeters);
-        }
+            // Determine folder path on user's desktop
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string folderPath = Path.Combine(desktopPath, "Checklist_Modeling");
 
-        public XYZ PointCentimeterToUnit(XYZ point)
-        {
-            XYZ newPoint = new XYZ(
-                CentimetersToUnits(point.X),
-                CentimetersToUnits(point.Y),
-                CentimetersToUnits(point.Z)
-                );
-            return newPoint;
-        }
+            // Ensure folder exists (create if not)
+            Directory.CreateDirectory(folderPath);
 
-        static List<BuiltInParameter> GetBuiltInParametersByElement(Element element)
-        {
-            List<BuiltInParameter> bips = new List<BuiltInParameter>();
+            // Create the CSV file path
+            string filePath = Path.Combine(folderPath, "Checklist_Window.csv");
 
-            foreach (BuiltInParameter bip in BuiltInParameter.GetValues(typeof(BuiltInParameter)))
+            // Write to CSV
+            // - Overwrite file if it already exists (set append to 'false')
+            // - Use UTF-8 encoding
+            using (StreamWriter writer = new StreamWriter(filePath, false, Encoding.UTF8))
             {
-                Parameter p = element.get_Parameter(bip);
+                // Write CSV header
+                writer.WriteLine("ElementId,Error Message");
 
-                if (p != null)
+                // Write each row
+                foreach ((ElementId ElementId, string ErrorMessage) pair in data)
                 {
-                    bips.Add(bip);
+                    // ElementId is typically an integer; use pair.ElementId.IntegerValue
+                    if(pair.ElementId != null)
+                    {
+                        writer.WriteLine($"{pair.ElementId.IntegerValue},{pair.ErrorMessage}");
+                    }
+                    else writer.WriteLine($"{pair.ElementId},{pair.ErrorMessage}");
                 }
             }
-            return bips;
+        }
+
+
+    }
+    public class Wallmodel
+    {
+
+        private string Htext;
+
+        private string Wtext;
+
+        public double Width { get; set; }
+
+
+        public XYZ Midpoint { get; set; }
+
+        private Autodesk.Revit.DB.Curve wallaxes;
+
+        public Autodesk.Revit.DB.Curve Wallaxes
+        {
+            get
+            {
+                return wallaxes;
+            }
+
+            set
+            {
+                wallaxes = value;
+            }
+        }
+
+        public string HText
+        {
+            get
+            {
+                return Htext;
+            }
+
+            set
+            {
+                Htext = value;
+            }
+        }
+
+        public string WText
+        {
+            get
+            {
+                return Wtext;
+            }
+
+            set
+            {
+                Wtext = value;
+            }
+        }
+
+    }
+
+    public class CADText
+    {
+        private string context;
+
+        private XYZ textlocation;
+
+        public List<string> WTexts { get; set; }
+
+        public string Text
+        {
+            get
+            {
+                return context;
+            }
+
+            set
+            {
+                context = value;
+            }
+        }
+
+        public XYZ Location
+        {
+            get
+            {
+                return textlocation;
+            }
+
+            set
+            {
+                textlocation = value;
+            }
         }
     }
+
+    public class CADTextModel
+    {
+        public CADTextModel()
+        {
+            NumPaired = 0;
+        }
+        public Level Level { get; set; }
+
+        public int NumPaired { get; set; }
+
+        public string HText { get; set; }
+
+        public string WText { get; set; }
+
+        public double Distant { get; set; }
+
+        public XYZ Location { get; set; }
+    }
 }
+

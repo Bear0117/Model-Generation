@@ -677,72 +677,7 @@ namespace Modeling
         }
     }
 
-    public class CADModel
-    {
-        public CADModel()
-        {
-            CurveArray = null;
-            Shape = "";
-            Length = 0;
-            Width = 0;
-            Depth = "";
-            FamilySymbol = "";
-            Location = new XYZ(0, 0, 0);
-            Rotation = 0;
-            Elevation = 0.0;
-        }
-
-        /// <summary>
-        /// Elevation
-        /// </summary>
-        public double Elevation { get; set; }
-
-        /// <summary>
-        /// CurveArray
-        /// </summary>
-        public CurveArray CurveArray { get; set; }
-
-        /// <summary>
-        /// shape
-        /// </summary>
-        public string Shape { get; set; }
-
-        /// <summary>
-        /// length
-        /// </summary>
-        public double Length { get; set; }
-
-        /// <summary>
-        /// width
-        /// </summary>
-        public double Width { get; set; }
-
-        /// <summary>
-        /// depth
-        /// </summary>
-        public string Depth { get; set; }
-
-        /// <summary>
-        /// familySymbol
-        /// </summary>
-        public string FamilySymbol { get; set; }
-
-        /// <summary>
-        /// location
-        /// </summary>
-        public XYZ Location { get; set; }
-
-        /// <summary>
-        /// rotation
-        /// </summary>
-        public double Rotation { get; set; }
-
-        public static explicit operator CADModel(CurveArray v)
-        {
-            throw new NotImplementedException();
-        }
-
-    }
+    
 
     public class SelectCADLinkFilter : ISelectionFilter
     {
