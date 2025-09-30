@@ -538,6 +538,11 @@ namespace Modeling
                                                 {
                                                     case "AcDbText":
                                                         Teigha.DatabaseServices.DBText text = (Teigha.DatabaseServices.DBText)entity2;
+                                                        // ❶ 讀到原文字
+                                                        string raw_t1 = text.TextString ?? "";
+
+                                                        // ❷ 把 AutoCAD 的 ± 符號 (%%P) 轉成真正的 ±
+                                                        string label_t1 = raw_t1.Replace("%%P", "±");      // ← 新增
                                                         if (text.Layer == layer_name)
                                                         {
                                                             List<Autodesk.Revit.DB.Curve> s = slabModel.CurveLoop.ToList();
@@ -550,7 +555,7 @@ namespace Modeling
                                                             if (IsInsideOutline(loaction_label_new, slabModel.CurveLoop))
                                                             {
                                                                 string pattern_th = @"(\d+)\s*[+-±](\d+)";
-                                                                Match match_th = Regex.Match(text.TextString, pattern_th);
+                                                                Match match_th = Regex.Match(label_t1, pattern_th);
                                                                 if (match_th.Success)
                                                                 {
                                                                     string c = match_th.Groups[1].Value;
@@ -562,11 +567,11 @@ namespace Modeling
                                                                     }
                                                                 }
 
-                                                                if (text.TextString.Contains("±")) { continue; }
-                                                                else if (text.TextString.Contains("+"))
+                                                                if (label_t1.Contains("±")) { continue; }
+                                                                else if (label_t1.Contains("+"))
                                                                 {
                                                                     string pattern = @"(\d+)\s*\+(\d+)";
-                                                                    Match match = Regex.Match(text.TextString, pattern);
+                                                                    Match match = Regex.Match(label_t1, pattern);
                                                                     if (match.Success)
                                                                     {
                                                                         string numbersString = match.Groups[2].Value;
@@ -574,11 +579,11 @@ namespace Modeling
                                                                         slabModel.Elevation = elevation; // mm to cm.
                                                                     }
                                                                 }
-                                                                else if (text.TextString.Contains("-"))
+                                                                else if (label_t1.Contains("-"))
                                                                 {
 
                                                                     string pattern = @"(\d+)\s*\-(\d+)";
-                                                                    Match match = Regex.Match(text.TextString, pattern);
+                                                                    Match match = Regex.Match(label_t1, pattern);
                                                                     if (match.Success)
                                                                     {
                                                                         string numbersString = match.Groups[2].Value;
@@ -588,7 +593,7 @@ namespace Modeling
                                                                 }
                                                                 else
                                                                 {
-                                                                    string c = text.TextString.ToString();
+                                                                    string c = label_t1.ToString();
                                                                     double thickness = double.Parse(c) / 10;
                                                                     slabModel.Thickness = thickness;
                                                                     count_l++;
@@ -600,6 +605,11 @@ namespace Modeling
 
                                                     case "AcDbMText":
                                                         Teigha.DatabaseServices.MText text_m = (Teigha.DatabaseServices.MText)entity2;
+                                                        // ❶ 讀到原文字
+                                                        string raw_m1 = text_m.Text ?? "";
+
+                                                        // ❷ 把 AutoCAD 的 ± 符號 (%%P) 轉成真正的 ±
+                                                        string label_m1 = raw_m1.Replace("%%P", "±");      // ← 新增
                                                         if (text_m.Layer == layer_name)
                                                         {
 
@@ -613,7 +623,7 @@ namespace Modeling
                                                             if (IsInsideOutline(loaction_label_new, slabModel.CurveLoop))
                                                             {
                                                                 string pattern_th = @"(\d+)\s*[+-±](\d+)";
-                                                                Match match_th = Regex.Match(text_m.Text, pattern_th);
+                                                                Match match_th = Regex.Match(label_m1, pattern_th);
                                                                 if (match_th.Success)
                                                                 {
                                                                     string c = match_th.Groups[1].Value;
@@ -626,11 +636,11 @@ namespace Modeling
 
                                                                 }
 
-                                                                if (text_m.Text.Contains("±")) { continue; }
-                                                                else if (text_m.Text.Contains("+"))
+                                                                if (label_m1.Contains("±")) { continue; }
+                                                                else if (label_m1.Contains("+"))
                                                                 {
                                                                     string pattern = @"(\d+)\s*\+(\d+)";
-                                                                    Match match = Regex.Match(text_m.Text, pattern);
+                                                                    Match match = Regex.Match(label_m1, pattern);
                                                                     if (match.Success)
                                                                     {
                                                                         //MessageBox.Show("in");
@@ -639,10 +649,10 @@ namespace Modeling
                                                                         slabModel.Elevation = elevation; // mm to cm.
                                                                     }
                                                                 }
-                                                                else if (text_m.Text.Contains("-"))
+                                                                else if (label_m1.Contains("-"))
                                                                 {
                                                                     string pattern = @"(\d+)\s*\-(\d+)";
-                                                                    Match match = Regex.Match(text_m.Text, pattern);
+                                                                    Match match = Regex.Match(label_m1, pattern);
                                                                     if (match.Success)
                                                                     {
                                                                         string numbersString = match.Groups[2].Value;
@@ -652,7 +662,7 @@ namespace Modeling
                                                                 }
                                                                 else
                                                                 {
-                                                                    string c = text_m.Text.ToString();
+                                                                    string c = label_m1.ToString();
                                                                     double thickness = double.Parse(c) / 10;
                                                                     slabModel.Thickness = thickness;
                                                                     count_l++;
@@ -673,6 +683,11 @@ namespace Modeling
                                                     {
                                                         case "AcDbText":
                                                             Teigha.DatabaseServices.DBText text = (Teigha.DatabaseServices.DBText)entity2;
+                                                            // ❶ 讀到原文字
+                                                            string raw_t1 = text.TextString ?? "";
+
+                                                            // ❷ 把 AutoCAD 的 ± 符號 (%%P) 轉成真正的 ±
+                                                            string label_t1 = raw_t1.Replace("%%P", "±");      // ← 新增
                                                             if (text.Layer == layer_name)
                                                             {
                                                                 List<Autodesk.Revit.DB.Curve> s = slabModel.CurveLoop.ToList();
@@ -692,9 +707,9 @@ namespace Modeling
 
                                                                     distanceBetweenTB = distance_cad_text;
                                                                     string pattern_th = @"(\d+)\s*[+-±](\d+)"; ;
-                                                                    Match match_th = Regex.Match(text.TextString, pattern_th);
+                                                                    Match match_th = Regex.Match(label_t1, pattern_th);
 
-                                                                    if (Regex.IsMatch(text.TextString, @"[±+-]"))
+                                                                    if (Regex.IsMatch(label_t1, @"[±+-]"))
                                                                     {
                                                                         string c = match_th.Groups[1].Value;
                                                                         string d = match_th.Groups[2].Value;
@@ -705,16 +720,16 @@ namespace Modeling
                                                                             slabModel.Thickness = thickness;
                                                                         }
                                                                         slabModel.Elevation = elevation;
-                                                                        if (text.TextString.Contains("±")) { continue; }
-                                                                        else if (text.TextString.Contains("+")) { continue; }
-                                                                        else if (text.TextString.Contains("-"))
+                                                                        if (label_t1.Contains("±")) { continue; }
+                                                                        else if (label_t1.Contains("+")) { continue; }
+                                                                        else if (label_t1.Contains("-"))
                                                                         {
                                                                             slabModel.Elevation = slabModel.Elevation * (-1);
                                                                         }
                                                                     }
                                                                     else
                                                                     {
-                                                                        string th = text.TextString;
+                                                                        string th = label_t1;
                                                                         double thickness = double.Parse(th) / 10;
                                                                         if (thickness != 0)
                                                                         {
@@ -727,6 +742,12 @@ namespace Modeling
 
                                                         case "AcDbMText":
                                                             Teigha.DatabaseServices.MText text_m = (Teigha.DatabaseServices.MText)entity2;
+                                                            // ❶ 讀到原文字
+                                                            string raw_m1 = text_m.Text ?? "";
+
+                                                            // ❷ 把 AutoCAD 的 ± 符號 (%%P) 轉成真正的 ±
+                                                            string label_m1 = raw_m1.Replace("%%P", "±");      // ← 新增
+
                                                             if (text_m.Layer == layer_name)
                                                             {
                                                                 List<Autodesk.Revit.DB.Curve> s = slabModel.CurveLoop.ToList();
@@ -743,7 +764,7 @@ namespace Modeling
                                                                 {
                                                                     distanceBetweenTB = distance_cad_text;
                                                                     string pattern_th = @"(\d+)\s*[+-±]\s*(\d+)"; ;
-                                                                    Match match_th = Regex.Match(text_m.Text, pattern_th);
+                                                                    Match match_th = Regex.Match(label_m1, pattern_th);
                                                                     if (Regex.IsMatch(text_m.Text, @"[±+-]"))
                                                                     {
                                                                         string c = match_th.Groups[1].Value;
@@ -755,16 +776,16 @@ namespace Modeling
                                                                             slabModel.Thickness = thickness;
                                                                         }
                                                                         slabModel.Elevation = elevation;
-                                                                        if (text_m.Text.Contains("±")) { continue; }
-                                                                        else if (text_m.Text.Contains("+")) { continue; }
-                                                                        else if (text_m.Text.Contains("-"))
+                                                                        if (label_m1.Contains("±")) { continue; }
+                                                                        else if (label_m1.Contains("+")) { continue; }
+                                                                        else if (label_m1.Contains("-"))
                                                                         {
                                                                             slabModel.Elevation = slabModel.Elevation * (-1);
                                                                         }
                                                                     }
                                                                     else
                                                                     {
-                                                                        string th = text_m.Text;
+                                                                        string th = label_m1;
                                                                         double thickness = double.Parse(th) / 10;
                                                                         if (thickness != 0)
                                                                         {

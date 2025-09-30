@@ -3,6 +3,7 @@ using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 namespace Modeling
 {
@@ -25,12 +26,17 @@ namespace Modeling
                 level = doc.GetElement(w.LevelId) as Level;
 
                 double levelHeight = GetLevelHieght(doc, level);
-                
+
+                //levelHeight = CentimetersToUnits(1180); // for test
+                //MessageBox.Show("The height of level " + level.Name + " is " + UnitsToCentimeters(levelHeight).ToString() + " cm.");
+
                 // Adjust the height of wall with level height.
                 Transaction t1 = new Transaction(doc, "Adjust Wall Height");
                 t1.Start();
                 Parameter wallHeightP = w.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM);
-                wallHeightP.Set(levelHeight);
+                Parameter baseLevel = w.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET);
+                //MessageBox.Show(UnitsToCentimeters(levelHeight).ToString());
+                wallHeightP.Set(levelHeight - baseLevel.AsDouble());
                 WallUtils.DisallowWallJoinAtEnd(w, 0);
                 WallUtils.DisallowWallJoinAtEnd(w, 1);
                 t1.Commit();
@@ -128,7 +134,13 @@ namespace Modeling
                 //    wallHeightP.Set(levelHeight - depthList.Min());
                 //}
 
-                wallHeightP.Set(faceZ.Max() - level.Elevation);
+                //Parameter baseLevel = w.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET);
+                //MessageBox.Show(UnitsToCentimeters(faceZ.Max()).ToString());
+                //MessageBox.Show(UnitsToCentimeters(baseLevel.AsDouble()).ToString());
+                //MessageBox.Show(UnitsToCentimeters(faceZ.Max() - baseLevel.AsDouble() - level.Elevation).ToString());
+
+                wallHeightP.Set(faceZ.Max() - baseLevel.AsDouble() - level.Elevation);
+                //wallHeightP.Set(faceZ.Max() - level.Elevation);
                 t2.Commit();
             }
             return Result.Succeeded;

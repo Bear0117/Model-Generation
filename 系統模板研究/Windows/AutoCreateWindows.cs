@@ -729,7 +729,7 @@ namespace Modeling
         // Functions of operation.
         bool IsExactlyOneFOneLAndDigits(string input)
         {
-            string pattern = @"^FL[0-9.]+$"; ;
+            string pattern = @"^\s*\(?\s*FL\s*[0-9.]+\s*\)?\s*$";
             return Regex.IsMatch(input, pattern);
         }
 
