@@ -417,9 +417,26 @@ namespace Modeling
 
                         FamilySymbol newFamSym = default_FamilySymbol.Duplicate(windowSize) as FamilySymbol;
                         // set the radius to a new value:
+
                         IList<Parameter> pars = newFamSym.GetParameters("高度");
-                        pars[0].Set(CentimetersToUnits(h));
+                        if (pars == null || pars.Count == 0)
+                        {
+                            pars = newFamSym.GetParameters("Height");
+                        }
+                        if (pars != null && pars.Count > 0)
+                        {
+                            pars[0].Set(CentimetersToUnits(h));
+                        }
                         IList<Parameter> pars_2 = newFamSym.GetParameters("寬度");
+                        if (pars_2 == null || pars_2.Count == 0)
+                        {
+                            pars_2 = newFamSym.GetParameters("Width");
+                        }
+                        if (pars_2 != null && pars_2.Count > 0)
+                        {
+                            pars_2[0].Set(startPoint.DistanceTo(endPoint));
+                        }
+
                         pars_2[0].Set(startPoint.DistanceTo(endPoint));
 
                         t_createNewColumnType.Commit();
