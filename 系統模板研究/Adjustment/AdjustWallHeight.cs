@@ -55,12 +55,12 @@ namespace Modeling
                 //Create a filter to get StructuralFraming (which include beam and column) and Slabs.
                 ElementCategoryFilter filterSt = new ElementCategoryFilter(BuiltInCategory.OST_StructuralFraming);
                 ElementCategoryFilter filterSl = new ElementCategoryFilter(BuiltInCategory.OST_Floors);
-                ElementCategoryFilter filterSc = new ElementCategoryFilter(BuiltInCategory.OST_Columns);
+                //ElementCategoryFilter filterSc = new ElementCategoryFilter(BuiltInCategory.OST_Columns);
                 LogicalOrFilter filterStl = new LogicalOrFilter(filterSt, filterSl);
-                LogicalOrFilter filterS = new LogicalOrFilter(filterStl, filterSc);
+                //LogicalOrFilter filterS = new LogicalOrFilter(filterStl, filterSc);
 
                 //Combine two filter.
-                LogicalAndFilter filter = new LogicalAndFilter(filterS, filterW);
+                LogicalAndFilter filter = new LogicalAndFilter(filterStl, filterW);
 
                 //A list to store the intersected elements.
                 IList<Element> inter = new FilteredElementCollector(doc).WherePasses(filter).WhereElementIsNotElementType().ToElements();
@@ -93,15 +93,22 @@ namespace Modeling
                             RunJoinGeometry(doc, w, inter[i]);
                             join.Commit();
                         }
-                        else if(elementName == "柱")
-                        {
-                            Transaction join = new Transaction(doc, "Join");
-                            join.Start();
-                            RunJoinGeometryAndSwitch(doc, w, inter[i]);
-                            join.Commit();
-                        }
+                        //else if (elementName == "柱")
+                        //{
+                        //    Transaction join = new Transaction(doc, "Join");
+                        //    join.Start();
+                        //    RunDisjoinGeometry(doc, w, inter[i]);
+                        //    join.Commit();
+                        //}
                         else continue;
                     }
+                }
+
+                using (var t = new Transaction(doc, "Unjoin Columns"))
+                {
+                    t.Start();
+                    UnjoinColumns(doc, w);
+                    t.Commit();
                 }
 
 
@@ -146,6 +153,29 @@ namespace Modeling
             return Result.Succeeded;
         }
 
+        public void UnjoinColumns(Document doc, Element elem)
+        {
+            if (doc == null || elem == null) return;
+
+            // 取得和 elem 有 Join 的所有 ElementIds
+            var joinedIds = JoinGeometryUtils.GetJoinedElements(doc, elem);
+            if (joinedIds == null || joinedIds.Count == 0) return;
+
+            foreach (var id in joinedIds)
+            {
+                var other = doc.GetElement(id);
+                if (other == null) continue;
+
+                // 只處理柱
+                if (other.Category?.Id.IntegerValue == (int)BuiltInCategory.OST_Columns)
+                {
+                    if (JoinGeometryUtils.AreElementsJoined(doc, elem, other))
+                    {
+                        JoinGeometryUtils.UnjoinGeometry(doc, elem, other);
+                    }
+                }
+            }
+        }
 
         void RunJoinGeometry(Document doc, Element e1, Element e2)
         {
